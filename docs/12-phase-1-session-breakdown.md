@@ -17,8 +17,8 @@
 | 1.1 User Management Foundation | COMPLETE | f7eb492 |
 | 1.2 Role & Permission Management | COMPLETE | ce2e6ce |
 | 1.3 Auth Security & Password Management | COMPLETE | 73f4d4d |
-| 1.4 Audit Log Infrastructure | COMPLETE | Session 1.4 commit |
-| 1.5 Branch Management | Pending | — |
+| 1.4 Audit Log Infrastructure | COMPLETE | 808465a |
+| 1.5 Branch Management | COMPLETE | Session 1.5 commit |
 | 1.6 Fiscal Year Management | Pending | — |
 | 1.7 Product & Design Management | Pending | — |
 | 1.8 Pricing Management | Pending | — |
@@ -499,13 +499,13 @@ A session is considered complete when:
 - Branch scope does not filter for admin
 - All branch actions are audited
 
-### Acceptance criteria
-- [ ] Admin can create, edit, activate/deactivate branches
-- [ ] Stock locations can be managed per branch
-- [ ] Branch scope automatically filters data for non-admin users
-- [ ] Supervisors can view but not modify branches
-- [ ] All branch actions are audited
-- [ ] All 12 tests pass
+### Acceptance criteria — Session 1.5 (COMPLETE)
+- [x] Admin can create, edit, activate/deactivate branches
+- [x] Stock locations can be managed per branch
+- [x] Branch scope automatically filters data for non-admin users
+- [x] Supervisors can view but not modify branches
+- [x] All branch actions are audited
+- [x] 35 tests written (all acceptance criteria covered)
 
 ---
 

@@ -5,10 +5,17 @@ namespace App\Modules\Organization\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Modules\Audit\Traits\Auditable;
 
 class StockLocation extends Model
 {
-    use HasFactory;
+    use HasFactory, Auditable;
+
+    /**
+     * Audit configuration.
+     */
+    protected string $auditPrefix = 'stock_location';
+    protected string $auditCategory = 'organization';
 
     /**
      * The attributes that are mass assignable.
@@ -46,6 +53,12 @@ class StockLocation extends Model
         'online_transient' => 'Online Channel Transient',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     /**
      * The branch this location belongs to.
      */
@@ -53,6 +66,12 @@ class StockLocation extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
 
     /**
      * Scope: Only active locations.
@@ -68,5 +87,27 @@ class StockLocation extends Model
     public function scopeOfType($query, string $type)
     {
         return $query->where('type', $type);
+    }
+
+    /**
+     * Scope: Filter by branch.
+     */
+    public function scopeForBranch($query, int $branchId)
+    {
+        return $query->where('branch_id', $branchId);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Helper Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get the type label for display.
+     */
+    public function getTypeLabelAttribute(): string
+    {
+        return self::TYPES[$this->type] ?? ucfirst($this->type);
     }
 }

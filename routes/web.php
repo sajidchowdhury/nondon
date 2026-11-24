@@ -11,6 +11,9 @@ use App\Modules\Identity\Http\Livewire\Users\UserView;
 use App\Modules\Identity\Http\Livewire\Roles\PermissionMatrix;
 use App\Modules\Identity\Http\Livewire\Password\PasswordChange;
 use App\Modules\Identity\Http\Livewire\Password\ForcePasswordChange;
+use App\Modules\Organization\Http\Livewire\Branches\BranchList;
+use App\Modules\Organization\Http\Livewire\Branches\BranchCreate;
+use App\Modules\Organization\Http\Livewire\Branches\BranchEdit;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +55,14 @@ Route::middleware('auth')->group(function () {
     // Password Management routes (Session 1.3)
     Route::get('/password/change', PasswordChange::class)->name('password.change');
     Route::get('/password/force-change', ForcePasswordChange::class)->name('password.force-change');
+
+    // Branch Management routes (Session 1.5)
+    Route::prefix('branches')->name('branches.')->group(function () {
+        Route::get('/', BranchList::class)->name('index');
+        Route::get('/create', BranchCreate::class)->name('create');
+        Route::get('/{branch}/edit', BranchEdit::class)->name('edit');
+        Route::get('/{branch}', BranchEdit::class)->name('show');
+    });
 });
 
 // Root redirect

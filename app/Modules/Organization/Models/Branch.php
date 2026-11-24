@@ -6,10 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Modules\Identity\Models\User;
+use App\Modules\Audit\Traits\Auditable;
 
 class Branch extends Model
 {
-    use HasFactory;
+    use HasFactory, Auditable;
+
+    /**
+     * Audit configuration.
+     */
+    protected string $auditPrefix = 'branch';
+    protected string $auditCategory = 'organization';
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +45,12 @@ class Branch extends Model
             'is_online_channel' => 'boolean',
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
 
     /**
      * Scope: Only active branches.
@@ -72,6 +85,31 @@ class Branch extends Model
     }
 
     /**
+     * Scope: Search by code or name.
+     */
+    public function scopeSearch($query, string $term)
+    {
+        return $query->where(function ($q) use ($term) {
+            $q->where('code', 'ILIKE', "%{$term}%")
+              ->orWhere('name', 'ILIKE', "%{$term}%");
+        });
+    }
+
+    /**
+     * Scope: Filter by type.
+     */
+    public function scopeOfType($query, string $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
+    /**
      * Users assigned to this branch.
      */
     public function users(): HasMany
@@ -86,6 +124,12 @@ class Branch extends Model
     {
         return $this->hasMany(StockLocation::class);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Helper Methods
+    |--------------------------------------------------------------------------
+    */
 
     /**
      * Check if this is the main branch.
@@ -104,10 +148,39 @@ class Branch extends Model
     }
 
     /**
+     * Count of active users assigned to this branch.
+     */
+    public function getActiveUsersCountAttribute(): int
+    {
+        return $this->users()->where('is_active', true)->count();
+    }
+
+    /**
+     * Count of active stock locations in this branch.
+     */
+    public function getActiveStockLocationsCountAttribute(): int
+    {
+        return $this->stockLocations()->where('is_active', true)->count();
+    }
+
+    /**
      * Get the display label.
      */
     public function getDisplayNameAttribute(): string
     {
         return "{$this->code} — {$this->name}";
+    }
+
+    /**
+     * Get the type label for display.
+     */
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->type) {
+            'main' => 'Main Branch',
+            'physical' => 'Physical Branch',
+            'online' => 'Online Channel',
+            default => ucfirst($this->type),
+        };
     }
 }
