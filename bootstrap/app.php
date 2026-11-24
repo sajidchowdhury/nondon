@@ -19,12 +19,21 @@ return Application::configure(basePath: dirname(__DIR__))
         // Branch scope middleware - applies to all authenticated routes
         $middleware->append(\App\Modules\Identity\Http\Middleware\SetActiveBranchScope::class);
 
+        // Force password change middleware - redirects to password change page
+        // when force_password_change flag is true (after admin reset or first login).
+        // Added to web middleware group so it runs after authentication but before
+        // route handling. Exempt routes: password.force-change, logout, login.
+        $middleware->web(append: [
+            \App\Modules\Identity\Http\Middleware\ForcePasswordChangeMiddleware::class,
+        ]);
+
         // Alias middleware for role-based checks
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'active.branch' => \App\Modules\Identity\Http\Middleware\EnsureActiveBranch::class,
+            'force.password' => \App\Modules\Identity\Http\Middleware\ForcePasswordChangeMiddleware::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule): void {

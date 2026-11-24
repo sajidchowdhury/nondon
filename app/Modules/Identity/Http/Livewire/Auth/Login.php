@@ -61,6 +61,11 @@ class Login extends Component
                 remember: $this->remember,
             );
 
+            // Check if user must change password (after admin reset or first login)
+            if ($user->force_password_change) {
+                return $this->redirect(route('password.force-change'), navigate: true);
+            }
+
             // If user has multiple roles and no active role set, show role selector
             if ($user->roles->count() > 1 && !$user->active_role_id) {
                 return $this->redirect(route('role.select'), navigate: true);

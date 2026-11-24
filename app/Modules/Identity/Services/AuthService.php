@@ -4,8 +4,10 @@ namespace App\Modules\Identity\Services;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Models\LoginAttempt;
+use App\Shared\PasswordRules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
@@ -165,14 +167,48 @@ class AuthService
     }
 
     /**
+     * Validate a password against all security rules.
+     *
+     * Rules:
+     * - Minimum 8 characters
+     * - Must contain at least one letter and one number
+     * - Must not be a commonly-used weak password
+     * - Must not be the same as the user's current password (if user is provided)
+     *
+     * @param string $password
+     * @param User|null $user
+     * @throws ValidationException
+     */
+    public function validatePassword(string $password, ?User $user = null): void
+    {
+        $rules = PasswordRules::rules($user, false);
+
+        $validator = Validator::make(
+            ['password' => $password, 'password_confirmation' => $password],
+            $rules,
+            PasswordRules::messages()
+        );
+
+        $validator->validate();
+    }
+
+    /**
      * Reset a user's password (admin action).
+     *
+     * Validates the new password against security rules.
+     * Sets force_password_change = true so user must change it on next login.
+     * Also clears any lockout state.
      *
      * @param User $user
      * @param string $newPassword
      * @return User
+     * @throws ValidationException if password fails validation
      */
     public function resetPassword(User $user, string $newPassword): User
     {
+        // Validate the new password (skip not-same-as-current for admin reset)
+        $this->validatePassword($newPassword, $user);
+
         $user->update([
             'password_hash' => Hash::make($newPassword),
             'password_changed_at' => now(),
@@ -182,26 +218,40 @@ class AuthService
             'locked_by' => null,
         ]);
 
-        return $user;
+        return $user->fresh();
     }
 
     /**
      * Change the current user's password (self-service).
      *
+     * Requires the current password for verification.
+     * Validates the new password against security rules.
+     * Clears the force_password_change flag.
+     *
      * @param string $currentPassword
      * @param string $newPassword
      * @return User
-     * @throws ValidationException
+     * @throws ValidationException if current password is wrong or new password fails validation
      */
     public function changePassword(string $currentPassword, string $newPassword): User
     {
         $user = Auth::user();
 
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'current_password' => __('Not authenticated.'),
+            ]);
+        }
+
+        // Verify current password
         if (!Hash::check($currentPassword, $user->getAuthPassword())) {
             throw ValidationException::withMessages([
                 'current_password' => __('Current password is incorrect.'),
             ]);
         }
+
+        // Validate new password (includes not-same-as-current check)
+        $this->validatePassword($newPassword, $user);
 
         $user->update([
             'password_hash' => Hash::make($newPassword),
@@ -209,11 +259,63 @@ class AuthService
             'force_password_change' => false,
         ]);
 
-        return $user;
+        return $user->fresh();
+    }
+
+    /**
+     * Change the current user's password without requiring the current password.
+     *
+     * Used for the forced password change flow (after admin reset or first login).
+     * The ForcePasswordChangeMiddleware ensures this is only called when
+     * force_password_change = true.
+     *
+     * @param string $newPassword
+     * @return User
+     * @throws ValidationException if not authenticated or password fails validation
+     */
+    public function changePasswordForced(string $newPassword): User
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'password' => __('Not authenticated.'),
+            ]);
+        }
+
+        // Validate new password (includes not-same-as-current check)
+        $this->validatePassword($newPassword, $user);
+
+        $user->update([
+            'password_hash' => Hash::make($newPassword),
+            'password_changed_at' => now(),
+            'force_password_change' => false,
+        ]);
+
+        return $user->fresh();
+    }
+
+    /**
+     * Force a user to change their password on next login.
+     *
+     * Sets the force_password_change flag without changing the password.
+     * Used when admin wants to require a password change for security reasons
+     * without resetting the password themselves.
+     *
+     * @param User $user
+     * @return User
+     */
+    public function forcePasswordChange(User $user): User
+    {
+        $user->update(['force_password_change' => true]);
+
+        return $user->fresh();
     }
 
     /**
      * Unlock a user account (admin action).
+     *
+     * Clears the lockout state and resets failed login attempts.
      *
      * @param User $user
      * @return User
@@ -221,6 +323,7 @@ class AuthService
     public function unlockAccount(User $user): User
     {
         $user->unlock();
-        return $user;
+
+        return $user->fresh();
     }
 }
