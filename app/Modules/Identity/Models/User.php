@@ -194,4 +194,72 @@ class User extends Authenticatable
     {
         return $this->full_name ?: $this->username;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Scope: Only active (not locked, is_active = true) users.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true)->whereNull('locked_at');
+    }
+
+    /**
+     * Scope: Only inactive users (is_active = false OR locked).
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('is_active', false)->orWhereNotNull('locked_at');
+        });
+    }
+
+    /**
+     * Scope: Only locked users.
+     */
+    public function scopeLocked($query)
+    {
+        return $query->whereNotNull('locked_at');
+    }
+
+    /**
+     * Scope: Users assigned to a specific branch.
+     */
+    public function scopeForBranch($query, int $branchId)
+    {
+        return $query->where('assigned_branch_id', $branchId);
+    }
+
+    /**
+     * Scope: Online channel users.
+     */
+    public function scopeOnlineChannel($query)
+    {
+        return $query->where('is_online_channel', true);
+    }
+
+    /**
+     * Scope: Physical branch users (not online channel).
+     */
+    public function scopePhysicalBranch($query)
+    {
+        return $query->where('is_online_channel', false);
+    }
+
+    /**
+     * Scope: Search by username, full_name, or email.
+     */
+    public function scopeSearch($query, string $term)
+    {
+        return $query->where(function ($q) use ($term) {
+            $q->where('username', 'ILIKE', "%{$term}%")
+              ->orWhere('full_name', 'ILIKE', "%{$term}%")
+              ->orWhere('email', 'ILIKE', "%{$term}%");
+        });
+    }
 }

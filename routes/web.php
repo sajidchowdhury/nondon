@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Identity\Http\Livewire\Auth\Login;
 use App\Modules\Identity\Http\Livewire\Auth\Dashboard;
 use App\Modules\Identity\Http\Livewire\Auth\RoleSwitcher;
+use App\Modules\Identity\Http\Livewire\Users\UserList;
+use App\Modules\Identity\Http\Livewire\Users\UserCreate;
+use App\Modules\Identity\Http\Livewire\Users\UserEdit;
+use App\Modules\Identity\Http\Livewire\Users\UserView;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +34,14 @@ Route::middleware('auth')->group(function () {
 
     // Role switching (for multi-role users)
     Route::get('/role/select', RoleSwitcher::class)->name('role.select');
+
+    // User Management routes (Session 1.1)
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', UserList::class)->name('index');
+        Route::get('/create', UserCreate::class)->name('create');
+        Route::get('/{user}/edit', UserEdit::class)->name('edit');
+        Route::get('/{user}', UserView::class)->name('show');
+    });
 });
 
 // Root redirect
@@ -39,14 +51,3 @@ Route::get('/', function () {
     }
     return redirect()->route('login');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Module Routes (loaded by module service providers)
-|--------------------------------------------------------------------------
-|
-| Business module routes (POS, transfers, inventory, etc.) will be loaded
-| by their respective service providers as modules are implemented
-| in development phases 1-10.
-|
-*/

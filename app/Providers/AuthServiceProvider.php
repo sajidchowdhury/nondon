@@ -13,9 +13,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<string, string>
      */
     protected $policies = [
-        // Phase 1+: Policy registrations will be added here as modules are implemented
-        // \App\Modules\Identity\Models\User::class => \App\Modules\Identity\Policies\UserPolicy::class,
-        // \App\Modules\Catalog\Models\Product::class => \App\Modules\Catalog\Policies\ProductPolicy::class,
+        \App\Modules\Identity\Models\User::class => \App\Modules\Identity\Policies\UserPolicy::class,
     ];
 
     /**

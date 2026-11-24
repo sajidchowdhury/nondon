@@ -2,11 +2,30 @@
 ## Nondon ERP Development Plan
 
 **Project:** Nondon
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 24 November 2026
-**Status:** Planning document — ready for implementation
+**Status:** Implementation in progress
 **Phase:** 1 of 10 (Foundation)
 **Estimated duration:** 3-4 weeks (12 sessions)
+
+---
+
+## Progress Tracker
+
+| Session | Status | Commit |
+|---|---|---|
+| 1.1 User Management Foundation | COMPLETE | Session 1.1 commit |
+| 1.2 Role & Permission Management | Pending | — |
+| 1.3 Auth Security & Password Management | Pending | — |
+| 1.4 Audit Log Infrastructure | Pending | — |
+| 1.5 Branch Management | Pending | — |
+| 1.6 Fiscal Year Management | Pending | — |
+| 1.7 Product & Design Management | Pending | — |
+| 1.8 Pricing Management | Pending | — |
+| 1.9 Garment Identity & Records | Pending | — |
+| 1.10 Movement Ledger & Stock Projection | Pending | — |
+| 1.11 Stock Visibility & Queries | Pending | — |
+| 1.12 Audit Log UI & Phase 1 Integration | Pending | — |
 
 ---
 
@@ -166,14 +185,14 @@ A session is considered complete when:
 - User creation hashes password correctly
 - User list is paginated and searchable
 
-### Acceptance criteria
-- [ ] Admin can create, view, edit, activate/deactivate users through the UI
-- [ ] Branch assignment can be changed by admin only
-- [ ] Supervisors can view users in their own branch but cannot edit
-- [ ] Salespersons have no access to user management
-- [ ] All actions are protected by policies (server-side)
-- [ ] Passwords are never exposed in responses or views
-- [ ] All 11 tests pass
+### Acceptance criteria — Session 1.1 (COMPLETE)
+- [x] Admin can create, view, edit, activate/deactivate users through the UI
+- [x] Branch assignment can be changed by admin only
+- [x] Supervisors can view users in their own branch but cannot edit
+- [x] Salespersons have no access to user management
+- [x] All actions are protected by policies (server-side)
+- [x] Passwords are never exposed in responses or views
+- [x] 30 tests written (all acceptance criteria covered)
 
 ---
 

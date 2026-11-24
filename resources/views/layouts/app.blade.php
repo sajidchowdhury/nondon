@@ -24,7 +24,11 @@
                             <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
-                            {{-- Phase 1+ navigation links will be added here as modules are implemented --}}
+                            @can('viewAny', \App\Modules\Identity\Models\User::class)
+                            <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                                {{ __('Users') }}
+                            </x-nav-link>
+                            @endcan
                         </div>
                     </div>
 
