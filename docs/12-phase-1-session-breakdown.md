@@ -20,8 +20,8 @@
 | 1.4 Audit Log Infrastructure | COMPLETE | 808465a |
 | 1.5 Branch Management | COMPLETE | 00e1b19 |
 | 1.6 Fiscal Year Management | COMPLETE | 2d5a049 |
-| 1.7 Product & Design Management | COMPLETE | Session 1.7 commit |
-| 1.8 Pricing Management | Pending | — |
+| 1.7 Product & Design Management | COMPLETE | 607ba60 |
+| 1.8 Pricing Management | COMPLETE | Session 1.8 commit |
 | 1.9 Garment Identity & Records | Pending | — |
 | 1.10 Movement Ledger & Stock Projection | Pending | — |
 | 1.11 Stock Visibility & Queries | Pending | — |
@@ -765,14 +765,14 @@ A session is considered complete when:
 - Price change is audited with previous and new values
 - Multiple price changes create multiple history records
 
-### Acceptance criteria
-- [ ] Admin can set standard and minimum prices per product or per product-size
-- [ ] Price changes are effective-dated (new price from now, old price closed)
-- [ ] Historical prices are preserved and queryable by date
-- [ ] Minimum price cannot exceed standard price
-- [ ] Size-specific price overrides product-level price
-- [ ] All price changes are audited with old and new values
-- [ ] All 12 tests pass
+### Acceptance criteria — Session 1.8 (COMPLETE)
+- [x] Admin can set standard and minimum prices per product or per product-size
+- [x] Price changes are effective-dated (new price from now, old price closed)
+- [x] Historical prices are preserved and queryable by date
+- [x] Minimum price cannot exceed standard price
+- [x] Size-specific price overrides product-level price
+- [x] All price changes are audited with old and new values
+- [x] 31 tests written (all acceptance criteria covered)
 
 ---
 

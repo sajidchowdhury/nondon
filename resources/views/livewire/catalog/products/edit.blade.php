@@ -70,4 +70,10 @@
         </div>
     </div>
     @endcan
+
+    {{-- Price Management (Session 1.8) --}}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
+        <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">{{ __('Pricing') }}</h3>
+        <livewire:catalog.prices.price-manager :product="$product" :key="'prices-' . $product->id" />
+    </div>
 </div>

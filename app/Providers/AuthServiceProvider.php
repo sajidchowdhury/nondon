@@ -19,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Modules\Organization\Models\FiscalYear::class => \App\Modules\Organization\Policies\FiscalYearPolicy::class,
         \App\Modules\Catalog\Models\Product::class => \App\Modules\Catalog\Policies\ProductPolicy::class,
         \App\Modules\Catalog\Models\ProductSize::class => \App\Modules\Catalog\Policies\ProductSizePolicy::class,
+        \App\Modules\Catalog\Models\ProductPrice::class => \App\Modules\Catalog\Policies\PricePolicy::class,
     ];
 
     /**
