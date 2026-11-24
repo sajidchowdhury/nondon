@@ -110,6 +110,47 @@ See [11-development-roadmap.md](11-development-roadmap.md) for full details.
 ```
 nondon/
 ├── README.md                          (this file)
+├── composer.json                      (PHP dependencies)
+├── package.json                       (Frontend dependencies)
+├── artisan                            (Laravel CLI)
+├── phpunit.xml                        (Test configuration)
+├── pint.json                          (Code style configuration)
+├── vite.config.js                     (Frontend build config)
+├── tailwind.config.js                 (Tailwind CSS config)
+├── .env.example                       (Environment template)
+│
+├── app/
+│   ├── Modules/                       (Modular monolith modules)
+│   │   ├── Identity/                  (Users, roles, auth, login security)
+│   │   │   ├── Models/                (User, LoginAttempt)
+│   │   │   ├── Services/              (AuthService)
+│   │   │   ├── Http/
+│   │   │   │   ├── Livewire/Auth/     (Login, Dashboard, RoleSwitcher)
+│   │   │   │   ├── Middleware/        (SetActiveBranchScope, EnsureActiveBranch)
+│   │   │   │   └── Controllers/Api/   (AuthController)
+│   │   │   └── Database/Migrations/   (users, login_attempts, sessions)
+│   │   └── Organization/              (Branches, fiscal years, stock locations)
+│   │       ├── Models/                (Branch, FiscalYear, StockLocation)
+│   │       └── Database/Migrations/   (branches, fiscal_years, stock_locations)
+│   └── Providers/                     (App, Auth service providers)
+│
+├── bootstrap/app.php                  (Laravel 11 bootstrap config)
+├── config/                            (app, auth, database, session, etc.)
+├── database/
+│   ├── migrations/                    (cache, jobs tables)
+│   ├── seeders/                       (Roles, Branches, FiscalYear, AdminUser)
+│   └── factories/                     (User, Branch, FiscalYear factories)
+├── routes/                            (web.php, api.php, console.php)
+├── resources/
+│   ├── views/
+│   │   ├── layouts/                   (app.blade.php, auth.blade.php)
+│   │   ├── livewire/auth/             (login, dashboard, role-switcher)
+│   │   └── components/                (nav-link)
+│   ├── css/app.css                    (Tailwind CSS entry)
+│   └── js/app.js                      (Alpine.js + Livewire)
+├── tests/                             (Pest PHP tests)
+└── .github/workflows/                 (CI pipeline)
+│
 ├── 01-business-requirements.md        (BRD v1.6)
 ├── 02-architecture.md                 (Architecture design)
 ├── 03-database-design.md              (PostgreSQL schema)
@@ -123,7 +164,147 @@ nondon/
 └── 11-development-roadmap.md          (Phased roadmap)
 ```
 
-The Laravel application code will be added to this repository once documentation is approved and development begins.
+---
+
+## Development Setup
+
+### Prerequisites
+
+- PHP 8.3+
+- Composer 2.x
+- PostgreSQL 15+
+- Node.js 20+ and npm
+- Git
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/sajidchowdhury/nondon.git
+   cd nondon
+   ```
+
+2. **Install PHP dependencies:**
+   ```bash
+   composer install
+   ```
+
+3. **Install frontend dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Edit `.env` and set your PostgreSQL credentials:
+   ```ini
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=nondon
+   DB_USERNAME=your_db_user
+   DB_PASSWORD=your_db_password
+   ```
+
+5. **Create the database:**
+   ```sql
+   CREATE DATABASE nondon WITH ENCODING 'UTF8';
+   CREATE USER nondon_app WITH ENCRYPTED PASSWORD 'your_password';
+   GRANT ALL PRIVILEGES ON DATABASE nondon TO nondon_app;
+   ```
+
+6. **Publish Spatie permission migrations:**
+   ```bash
+   php artisan vendor:publish --tag="permission-migrations"
+   ```
+
+7. **Run migrations and seeders:**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+8. **Build frontend assets:**
+   ```bash
+   npm run build    # production
+   # OR
+   npm run dev      # development with hot reload
+   ```
+
+9. **Start the development server:**
+   ```bash
+   php artisan serve
+   ```
+   The application will be available at `http://localhost:8000`
+
+### Default Admin Credentials
+
+After seeding, an admin user is created:
+- **Username:** `admin`
+- **Password:** `Nondon@2025`
+
+**Change the password immediately after first login.** The admin account is configured with `force_password_change = true`.
+
+### Running Tests
+
+```bash
+# Run all tests
+php artisan test
+
+# Run with coverage
+php artisan test --coverage
+
+# Run specific test file
+php artisan test tests/Feature/Auth/LoginTest.php
+
+# Run tests in parallel
+php artisan test --parallel
+```
+
+### Code Style
+
+```bash
+# Check code style
+./vendor/bin/pint --test
+
+# Fix code style
+./vendor/bin/pint
+```
+
+---
+
+## Phase 0 Implementation Status
+
+Phase 0 (Project Setup) is **complete**. The following has been implemented:
+
+- [x] Laravel 11 project with modular monolith structure
+- [x] Module registration system (Identity, Organization)
+- [x] PostgreSQL database configuration
+- [x] Spatie Laravel Permission for RBAC
+- [x] Livewire 3 + Tailwind CSS + Alpine.js frontend
+- [x] User model with login security (lockout, attempt tracking)
+- [x] Branch, FiscalYear, StockLocation models
+- [x] Fiscal year serial generation (`YY-NNNNN` format)
+- [x] Authentication system (login, logout, role switching)
+- [x] Login attempt logging
+- [x] Base layout, navigation, dashboard
+- [x] 5 roles with full permission matrix (main_branch_admin, branch_supervisor, salesperson, online_team, online_supervisor)
+- [x] Database seeders (roles, branches, fiscal year, admin user)
+- [x] Model factories for testing
+- [x] Pest PHP test suite with auth tests
+- [x] GitHub Actions CI pipeline
+- [x] API authentication controller (Sanctum)
+
+### Next: Phase 1 — Foundation (3-4 weeks)
+
+Phase 1 will build:
+- Full Identity module (user management, password reset, account unlock)
+- Full Organization module (branch management, fiscal year management)
+- Catalog module (products, sizes, prices)
+- Inventory module (garments, movements, current stock projection)
+- Audit module (audit log infrastructure)
 
 ---
 

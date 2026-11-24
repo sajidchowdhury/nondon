@@ -1,0 +1,64 @@
+# Nondon ERP - .gitignore
+
+# Environment
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+
+# Dependencies
+/vendor
+/node_modules
+/public/build
+/public/hot
+
+# Storage (runtime data)
+/storage/*
+!/storage/app/.gitkeep
+!/storage/framework/.gitkeep
+!/storage/framework/cache/.gitkeep
+!/storage/framework/cache/data/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/views/.gitkeep
+!/storage/logs/.gitkeep
+
+# Database
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# IDE
+/.idea
+/.vscode
+/.fleet
+/.zed
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Homestead
+Homestead.json
+Homestead.yaml
+
+# Sail
+/sail
+/.sail
+
+# Logs
+*.log
+npm-debug.log
+yarn-error.log
+
+# Backup files
+*.sql.gz
+*.sql
+
+# Temporary files
+/tmp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# Documentation builds
+/docs/_build/
