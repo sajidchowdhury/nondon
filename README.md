@@ -22,17 +22,18 @@ This repository contains the complete project documentation. All documents shoul
 
 | Document | Description | Status |
 |---|---|---|
-| [01-business-requirements.md](01-business-requirements.md) | Consolidated Business Requirements Document (BRD v1.6) covering all confirmed business decisions from discovery rounds 1-5 | Draft — pending client approval |
-| [02-architecture.md](02-architecture.md) | Laravel modular monolith architecture, module decomposition, offline POS architecture, event-driven communication | Design document |
-| [03-database-design.md](03-database-design.md) | PostgreSQL schema, ER relationships, constraints, indexes, partitioning strategy, concurrency control | Design document |
-| [04-inventory-workflow.md](04-inventory-workflow.md) | 27 detailed operational workflows covering POS, transfers, online orders, returns, cash, stock counts, damaged stock | Design document |
-| [05-security-design.md](05-security-design.md) | RBAC, 5-role permission matrix, audit logging, authentication, data protection, security checklist | Design document |
-| [06-performance-strategy.md](06-performance-strategy.md) | Indexing, current-stock projection, summary tables, caching, offline cache, monitoring, capacity planning | Design document |
-| [07-api-documentation.md](07-api-documentation.md) | REST API endpoints for all modules, sync API, authentication, response formats | Design document |
-| [08-testing-strategy.md](08-testing-strategy.md) | Test pyramid, unit/integration/concurrency tests, 50 acceptance criteria, test data management | Design document |
-| [09-deployment-guide.md](09-deployment-guide.md) | Nginx + PHP-FPM + PostgreSQL setup, SSL, backup, queue workers, security hardening | Design document |
-| [10-architecture-decisions.md](10-architecture-decisions.md) | 18 Architecture Decision Records (ADRs) documenting key design choices and rationale | Design document |
-| [11-development-roadmap.md](11-development-roadmap.md) | 10-phase development plan with milestones, dependencies, and team requirements | Design document |
+| [docs/01-business-requirements.md](docs/01-business-requirements.md) | Consolidated Business Requirements Document (BRD v1.6) covering all confirmed business decisions from discovery rounds 1-5 | Draft — pending client approval |
+| [docs/02-architecture.md](docs/02-architecture.md) | Laravel modular monolith architecture, module decomposition, offline POS architecture, event-driven communication | Design document |
+| [docs/03-database-design.md](docs/03-database-design.md) | PostgreSQL schema, ER relationships, constraints, indexes, partitioning strategy, concurrency control | Design document |
+| [docs/04-inventory-workflow.md](docs/04-inventory-workflow.md) | 27 detailed operational workflows covering POS, transfers, online orders, returns, cash, stock counts, damaged stock | Design document |
+| [docs/05-security-design.md](docs/05-security-design.md) | RBAC, 5-role permission matrix, audit logging, authentication, data protection, security checklist | Design document |
+| [docs/06-performance-strategy.md](docs/06-performance-strategy.md) | Indexing, current-stock projection, summary tables, caching, offline cache, monitoring, capacity planning | Design document |
+| [docs/07-api-documentation.md](docs/07-api-documentation.md) | REST API endpoints for all modules, sync API, authentication, response formats | Design document |
+| [docs/08-testing-strategy.md](docs/08-testing-strategy.md) | Test pyramid, unit/integration/concurrency tests, 50 acceptance criteria, test data management | Design document |
+| [docs/09-deployment-guide.md](docs/09-deployment-guide.md) | Nginx + PHP-FPM + PostgreSQL setup, SSL, backup, queue workers, security hardening | Design document |
+| [docs/10-architecture-decisions.md](docs/10-architecture-decisions.md) | 18 Architecture Decision Records (ADRs) documenting key design choices and rationale | Design document |
+| [docs/11-development-roadmap.md](docs/11-development-roadmap.md) | 10-phase development plan with milestones, dependencies, and team requirements | Design document |
+| [docs/12-phase-1-session-breakdown.md](docs/12-phase-1-session-breakdown.md) | Phase 1 Foundation split into 12 focused development sessions with detailed deliverables and acceptance criteria | Planning document |
 
 ---
 
@@ -149,19 +150,21 @@ nondon/
 │   ├── css/app.css                    (Tailwind CSS entry)
 │   └── js/app.js                      (Alpine.js + Livewire)
 ├── tests/                             (Pest PHP tests)
-└── .github/workflows/                 (CI pipeline)
+├── .github/workflows/                 (CI pipeline — requires workflow-scope token to push)
 │
-├── 01-business-requirements.md        (BRD v1.6)
-├── 02-architecture.md                 (Architecture design)
-├── 03-database-design.md              (PostgreSQL schema)
-├── 04-inventory-workflow.md           (27 operational workflows)
-├── 05-security-design.md              (Security & RBAC)
-├── 06-performance-strategy.md         (Performance & caching)
-├── 07-api-documentation.md            (REST API docs)
-├── 08-testing-strategy.md             (Testing & acceptance criteria)
-├── 09-deployment-guide.md             (Deployment & ops)
-├── 10-architecture-decisions.md       (18 ADRs)
-└── 11-development-roadmap.md          (Phased roadmap)
+├── docs/                              (Project documentation)
+│   ├── 01-business-requirements.md    (BRD v1.6)
+│   ├── 02-architecture.md             (Architecture design)
+│   ├── 03-database-design.md          (PostgreSQL schema)
+│   ├── 04-inventory-workflow.md       (27 operational workflows)
+│   ├── 05-security-design.md          (Security & RBAC)
+│   ├── 06-performance-strategy.md     (Performance & caching)
+│   ├── 07-api-documentation.md        (REST API docs)
+│   ├── 08-testing-strategy.md         (Testing & acceptance criteria)
+│   ├── 09-deployment-guide.md         (Deployment & ops)
+│   ├── 10-architecture-decisions.md   (18 ADRs)
+│   ├── 11-development-roadmap.md      (Phased roadmap)
+│   └── 12-phase-1-session-breakdown.md (Phase 1 session plan)
 ```
 
 ---
