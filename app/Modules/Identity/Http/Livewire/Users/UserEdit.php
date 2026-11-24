@@ -25,7 +25,8 @@ class UserEdit extends Component
     public string $email = '';
     public ?int $assigned_branch_id = null;
     public bool $is_online_channel = false;
-    public array $selectedRoles = [];
+    // Note: Role management is now handled by the RoleAssignment Livewire component
+    // embedded in the edit view. Permission overrides are handled by PermissionOverride.
 
     /**
      * Password reset fields (optional, admin-initiated).
@@ -45,7 +46,6 @@ class UserEdit extends Component
         $this->email = $user->email ?? '';
         $this->assigned_branch_id = $user->assigned_branch_id;
         $this->is_online_channel = $user->is_online_channel;
-        $this->selectedRoles = $user->roles->pluck('name')->toArray();
     }
 
     /**
@@ -59,7 +59,6 @@ class UserEdit extends Component
             'email' => ['nullable', 'email', 'max:255'],
             'assigned_branch_id' => ['required_unless:is_online_channel,true'],
             'is_online_channel' => ['boolean'],
-            'selectedRoles' => ['array'],
             'new_password' => ['nullable', 'string', 'min:8', 'required_with:new_password_confirmation'],
             'new_password_confirmation' => ['nullable', 'same:new_password'],
         ];
@@ -106,7 +105,6 @@ class UserEdit extends Component
                 'username' => $validated['username'],
                 'full_name' => $validated['full_name'],
                 'email' => $validated['email'] ?: null,
-                'roles' => $validated['selectedRoles'],
             ]);
 
             // Handle branch assignment if changed
@@ -199,12 +197,10 @@ class UserEdit extends Component
     {
         $branches = Branch::active()->physical()->orderBy('code')->get();
         $onlineBranch = Branch::onlineChannel()->first();
-        $roles = Role::orderBy('name')->get();
 
         return view('livewire.identity.users.edit', [
             'branches' => $branches,
             'onlineBranch' => $onlineBranch,
-            'roles' => $roles,
         ])
         ->layout('layouts.app');
     }

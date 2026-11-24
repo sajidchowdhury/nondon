@@ -8,6 +8,7 @@ use App\Modules\Identity\Http\Livewire\Users\UserList;
 use App\Modules\Identity\Http\Livewire\Users\UserCreate;
 use App\Modules\Identity\Http\Livewire\Users\UserEdit;
 use App\Modules\Identity\Http\Livewire\Users\UserView;
+use App\Modules\Identity\Http\Livewire\Roles\PermissionMatrix;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{user}/edit', UserEdit::class)->name('edit');
         Route::get('/{user}', UserView::class)->name('show');
     });
+
+    // Role & Permission Management routes (Session 1.2)
+    Route::get('/roles/matrix', PermissionMatrix::class)->name('roles.matrix');
 });
 
 // Root redirect

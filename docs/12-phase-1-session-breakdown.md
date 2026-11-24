@@ -14,8 +14,8 @@
 
 | Session | Status | Commit |
 |---|---|---|
-| 1.1 User Management Foundation | COMPLETE | Session 1.1 commit |
-| 1.2 Role & Permission Management | Pending | — |
+| 1.1 User Management Foundation | COMPLETE | f7eb492 |
+| 1.2 Role & Permission Management | COMPLETE | Session 1.2 commit |
 | 1.3 Auth Security & Password Management | Pending | — |
 | 1.4 Audit Log Infrastructure | Pending | — |
 | 1.5 Branch Management | Pending | — |
@@ -256,14 +256,15 @@ A session is considered complete when:
 - Non-admin cannot access role/permission management
 
 ### Acceptance criteria
-- [ ] Admin can assign multiple roles to a user
-- [ ] Multi-role users can switch between roles via the UI
-- [ ] Active role determines what the user can see and do
-- [ ] Admin can grant custom permissions to a user (overrides)
-- [ ] Admin can revoke permissions from a user
-- [ ] Branch scope always applies regardless of role
-- [ ] Sensitive data (purchase cost) is hidden from non-admin regardless of role combination
-- [ ] All 11 tests pass
+### Acceptance criteria — Session 1.2 (COMPLETE)
+- [x] Admin can assign multiple roles to a user
+- [x] Multi-role users can switch between roles via the UI
+- [x] Active role determines what the user can see and do
+- [x] Admin can grant custom permissions to a user (overrides)
+- [x] Admin can revoke permissions from a user
+- [x] Branch scope always applies regardless of role
+- [x] Sensitive data (purchase cost) is hidden from non-admin regardless of role combination
+- [x] 31 tests written (all acceptance criteria covered)
 
 ---
 

@@ -90,24 +90,6 @@
         </div>
         @endunless
 
-        {{-- Roles --}}
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Roles') }}</label>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ __('All roles can sell. Supervision/admin is an additional permission layer.') }}</p>
-            <div class="space-y-2">
-                @foreach($roles as $role)
-                <label class="flex items-start space-x-3">
-                    <input type="checkbox" wire:model="selectedRoles" value="{{ $role->name }}"
-                           class="mt-1 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
-                    <div>
-                        <span class="block text-sm font-medium text-gray-900 dark:text-white">{{ $role->display_name ?? $role->name }}</span>
-                        <span class="block text-sm text-gray-500 dark:text-gray-400">{{ $role->description ?? '' }}</span>
-                    </div>
-                </label>
-                @endforeach
-            </div>
-        </div>
-
         {{-- Submit --}}
         <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <a href="{{ route('users.show', $user) }}" wire:navigate
@@ -161,4 +143,20 @@
         </form>
         @endif
     </div>
+
+    {{-- Role Assignment (Session 1.2) --}}
+    @can('assignRoles', $user)
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
+        <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">{{ __('Role Assignment') }}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ __('All roles can sell. Supervision/admin is an additional permission layer. Assign or remove roles, and set the active role for this user\'s session.') }}</p>
+        <livewire:identity.roles.role-assignment :user="$user" :key="'roles-' . $user->id" />
+    </div>
+
+    {{-- Permission Overrides (Session 1.2) --}}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
+        <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">{{ __('Permission Overrides') }}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ __('Grant or revoke specific permissions for this user, in addition to or overriding their role permissions. Admin-only permissions cannot be granted to non-admin users.') }}</p>
+        <livewire:identity.roles.permission-override :user="$user" :key="'perms-' . $user->id" />
+    </div>
+    @endcan
 </div>

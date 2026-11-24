@@ -3,8 +3,10 @@
 namespace App\Modules\Identity\Http\Livewire\Auth;
 
 use Livewire\Component;
-use App\Modules\Identity\Services\AuthService;
+use App\Modules\Identity\Services\RoleAssignmentService;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Illuminate\Validation\ValidationException;
 
 class RoleSwitcher extends Component
 {
@@ -29,22 +31,59 @@ class RoleSwitcher extends Component
             return;
         }
 
-        $this->roles = $user->roles;
+        // Load roles with display names
+        $this->roles = $user->roles->load('permissions');
+
+        // Pre-select the current active role, or the first available
         $this->selectedRoleId = $user->active_role_id ?? ($this->roles->first()?->id);
     }
 
     /**
      * Switch to the selected role.
+     *
+     * Uses RoleAssignmentService for proper role switching with validation.
+     * Stores the active role in session for middleware access.
+     * Redirects to dashboard with confirmation toast.
+     *
+     * @param RoleAssignmentService $roleAssignmentService
      */
-    public function switchRole(AuthService $authService)
+    public function switchRole(RoleAssignmentService $roleAssignmentService)
     {
         $this->validate([
             'selectedRoleId' => ['required', 'integer', 'exists:roles,id'],
         ]);
 
-        $user = $authService->switchRole($this->selectedRoleId);
+        $user = Auth::user();
+        $role = Role::find($this->selectedRoleId);
 
-        return $this->redirect(route('dashboard'), navigate: true);
+        try {
+            $roleAssignmentService->setActiveRole($user, $role);
+
+            // Store in session for middleware access
+            session()->put('active_role_id', $role->id);
+            session()->put('active_role_name', $role->name);
+
+            // Flash confirmation message
+            session()->flash('success', __('Switched to :role role.', [
+                'role' => $role->display_name ?? $role->name,
+            ]));
+
+            // TODO: Session 1.4 — Audit log the role switch event
+            // Event::dispatch(new RoleSwitched($user, $role));
+
+            return $this->redirect(route('dashboard'), navigate: true);
+
+        } catch (ValidationException $e) {
+            $this->addError('selectedRoleId', $e->getMessage());
+        }
+    }
+
+    /**
+     * Get the display name for a role.
+     */
+    public function getRoleDisplayName($role): string
+    {
+        return $role->display_name ?? ucfirst(str_replace('_', ' ', $role->name));
     }
 
     /**

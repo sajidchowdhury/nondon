@@ -29,6 +29,11 @@
                                 {{ __('Users') }}
                             </x-nav-link>
                             @endcan
+                            @can('assignRoles', \App\Modules\Identity\Models\User::class)
+                            <x-nav-link href="{{ route('roles.matrix') }}" :active="request()->routeIs('roles.*')">
+                                {{ __('Permissions') }}
+                            </x-nav-link>
+                            @endcan
                         </div>
                     </div>
 
