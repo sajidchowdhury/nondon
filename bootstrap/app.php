@@ -34,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'active.branch' => \App\Modules\Identity\Http\Middleware\EnsureActiveBranch::class,
             'force.password' => \App\Modules\Identity\Http\Middleware\ForcePasswordChangeMiddleware::class,
+            'log.data-access' => \App\Modules\Audit\Http\Middleware\LogDataAccess::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule): void {

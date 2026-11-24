@@ -7,13 +7,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Modules\Organization\Models\Branch;
+use App\Modules\Audit\Traits\Auditable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, Auditable;
+
+    /**
+     * Audit configuration for the User model.
+     */
+    protected string $auditPrefix = 'user';
+    protected string $auditCategory = 'identity';
+    protected array $auditHidden = ['password_hash', 'remember_token'];
 
     /**
      * The attributes that are mass assignable.
