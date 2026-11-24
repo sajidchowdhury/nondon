@@ -34,6 +34,11 @@
                                 {{ __('Branches') }}
                             </x-nav-link>
                             @endcan
+                            @can('viewAny', \App\Modules\Organization\Models\FiscalYear::class)
+                            <x-nav-link href="{{ route('fiscal-years.index') }}" :active="request()->routeIs('fiscal-years.*')">
+                                {{ __('Fiscal Years') }}
+                            </x-nav-link>
+                            @endcan
                             @can('assignRoles', \App\Modules\Identity\Models\User::class)
                             <x-nav-link href="{{ route('roles.matrix') }}" :active="request()->routeIs('roles.*')">
                                 {{ __('Permissions') }}

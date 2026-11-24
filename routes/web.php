@@ -14,6 +14,9 @@ use App\Modules\Identity\Http\Livewire\Password\ForcePasswordChange;
 use App\Modules\Organization\Http\Livewire\Branches\BranchList;
 use App\Modules\Organization\Http\Livewire\Branches\BranchCreate;
 use App\Modules\Organization\Http\Livewire\Branches\BranchEdit;
+use App\Modules\Organization\Http\Livewire\FiscalYears\FiscalYearList;
+use App\Modules\Organization\Http\Livewire\FiscalYears\FiscalYearCreate;
+use App\Modules\Organization\Http\Livewire\FiscalYears\FiscalYearView;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +65,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', BranchCreate::class)->name('create');
         Route::get('/{branch}/edit', BranchEdit::class)->name('edit');
         Route::get('/{branch}', BranchEdit::class)->name('show');
+    });
+
+    // Fiscal Year Management routes (Session 1.6)
+    Route::prefix('fiscal-years')->name('fiscal-years.')->group(function () {
+        Route::get('/', FiscalYearList::class)->name('index');
+        Route::get('/create', FiscalYearCreate::class)->name('create');
+        Route::get('/{fiscalYear}', FiscalYearView::class)->name('show');
     });
 });
 

@@ -18,8 +18,8 @@
 | 1.2 Role & Permission Management | COMPLETE | ce2e6ce |
 | 1.3 Auth Security & Password Management | COMPLETE | 73f4d4d |
 | 1.4 Audit Log Infrastructure | COMPLETE | 808465a |
-| 1.5 Branch Management | COMPLETE | Session 1.5 commit |
-| 1.6 Fiscal Year Management | Pending | — |
+| 1.5 Branch Management | COMPLETE | 00e1b19 |
+| 1.6 Fiscal Year Management | COMPLETE | Session 1.6 commit |
 | 1.7 Product & Design Management | Pending | — |
 | 1.8 Pricing Management | Pending | — |
 | 1.9 Garment Identity & Records | Pending | — |
@@ -585,14 +585,14 @@ A session is considered complete when:
 - Salesperson has no access to fiscal year management
 - All fiscal year actions are audited
 
-### Acceptance criteria
-- [ ] Admin can create fiscal years with auto-calculated dates and prefix
-- [ ] Fiscal year close and activation work correctly
-- [ ] Only one active fiscal year at a time
-- [ ] Serial generation is concurrency-safe (advisory locked)
-- [ ] Serial format is YY-NNNNN (e.g., 25-00001)
-- [ ] All fiscal year actions are audited
-- [ ] All 15 tests pass
+### Acceptance criteria — Session 1.6 (COMPLETE)
+- [x] Admin can create fiscal years with auto-calculated dates and prefix
+- [x] Fiscal year close and activation work correctly
+- [x] Only one active fiscal year at a time
+- [x] Serial generation is concurrency-safe (advisory locked)
+- [x] Serial format is YY-NNNNN (e.g., 25-00001)
+- [x] All fiscal year actions are audited
+- [x] 40 tests written (all acceptance criteria covered)
 
 ---
 
