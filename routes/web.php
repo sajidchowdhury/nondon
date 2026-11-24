@@ -17,6 +17,10 @@ use App\Modules\Organization\Http\Livewire\Branches\BranchEdit;
 use App\Modules\Organization\Http\Livewire\FiscalYears\FiscalYearList;
 use App\Modules\Organization\Http\Livewire\FiscalYears\FiscalYearCreate;
 use App\Modules\Organization\Http\Livewire\FiscalYears\FiscalYearView;
+use App\Modules\Catalog\Http\Livewire\Products\ProductList;
+use App\Modules\Catalog\Http\Livewire\Products\ProductCreate;
+use App\Modules\Catalog\Http\Livewire\Products\ProductEdit;
+use App\Modules\Catalog\Http\Livewire\Products\ProductView;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +76,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/', FiscalYearList::class)->name('index');
         Route::get('/create', FiscalYearCreate::class)->name('create');
         Route::get('/{fiscalYear}', FiscalYearView::class)->name('show');
+    });
+
+    // Product Management routes (Session 1.7)
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', ProductList::class)->name('index');
+        Route::get('/create', ProductCreate::class)->name('create');
+        Route::get('/{product}/edit', ProductEdit::class)->name('edit');
+        Route::get('/{product}', ProductView::class)->name('show');
     });
 });
 

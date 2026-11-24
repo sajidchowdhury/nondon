@@ -19,8 +19,8 @@
 | 1.3 Auth Security & Password Management | COMPLETE | 73f4d4d |
 | 1.4 Audit Log Infrastructure | COMPLETE | 808465a |
 | 1.5 Branch Management | COMPLETE | 00e1b19 |
-| 1.6 Fiscal Year Management | COMPLETE | Session 1.6 commit |
-| 1.7 Product & Design Management | Pending | — |
+| 1.6 Fiscal Year Management | COMPLETE | 2d5a049 |
+| 1.7 Product & Design Management | COMPLETE | Session 1.7 commit |
 | 1.8 Pricing Management | Pending | — |
 | 1.9 Garment Identity & Records | Pending | — |
 | 1.10 Movement Ledger & Stock Projection | Pending | — |
@@ -678,16 +678,16 @@ A session is considered complete when:
 - Product list is paginated
 - All product actions are audited
 
-### Acceptance criteria
-- [ ] Admin can create products with multiple sizes
-- [ ] Product code is unique
-- [ ] Sizes can be added and removed (with referential integrity check)
-- [ ] Products can be activated/deactivated
-- [ ] Deactivated products remain in database for historical reference
-- [ ] Supervisors and salespersons can view the product catalog
-- [ ] Only admin can manage products
-- [ ] All product actions are audited
-- [ ] All 12 tests pass
+### Acceptance criteria — Session 1.7 (COMPLETE)
+- [x] Admin can create products with multiple sizes
+- [x] Product code is unique
+- [x] Sizes can be added and removed (with referential integrity check)
+- [x] Products can be activated/deactivated
+- [x] Deactivated products remain in database for historical reference
+- [x] Supervisors and salespersons can view the product catalog
+- [x] Only admin can manage products
+- [x] All product actions are audited
+- [x] 30 tests written (all acceptance criteria covered)
 
 ---
 

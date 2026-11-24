@@ -40,9 +40,9 @@ class AppServiceProvider extends ServiceProvider
             \App\Modules\Identity\IdentityServiceProvider::class,
             \App\Modules\Organization\OrganizationServiceProvider::class,
             \App\Modules\Audit\AuditServiceProvider::class,
+            \App\Modules\Catalog\CatalogServiceProvider::class,
 
             // Business modules (to be added in later phases)
-            // \App\Modules\Catalog\CatalogServiceProvider::class,
             // \App\Modules\Purchasing\PurchasingServiceProvider::class,
             // \App\Modules\Inventory\InventoryServiceProvider::class,
             // \App\Modules\Transfers\TransfersServiceProvider::class,
