@@ -21,8 +21,8 @@
 | 1.5 Branch Management | COMPLETE | 00e1b19 |
 | 1.6 Fiscal Year Management | COMPLETE | 2d5a049 |
 | 1.7 Product & Design Management | COMPLETE | 607ba60 |
-| 1.8 Pricing Management | COMPLETE | Session 1.8 commit |
-| 1.9 Garment Identity & Records | Pending | — |
+| 1.8 Pricing Management | COMPLETE | ca28d10 |
+| 1.9 Garment Identity & Records | COMPLETE | Session 1.9 commit |
 | 1.10 Movement Ledger & Stock Projection | Pending | — |
 | 1.11 Stock Visibility & Queries | Pending | — |
 | 1.12 Audit Log UI & Phase 1 Integration | Pending | — |
@@ -886,16 +886,15 @@ A session is considered complete when:
 - Non-admin cannot create garments directly (creation is via purchasing module in Phase 2)
 - All authenticated users can view garments (without purchase cost)
 
-### Acceptance criteria
-- [ ] Garment model has all required fields and relationships
-- [ ] Internal ID (UUID) is immutable and globally unique
-- [ ] Barcode is globally unique and never reused
-- [ ] Fiscal-year serial is in YY-NNNNN format and unique per fiscal year
-- [ ] Current stock projection is created alongside garment
-- [ ] Purchase cost is hidden from non-admin users at model level
-- [ ] Garment lookup works by barcode, serial, and internal ID
-- [ ] Status changes are audited
-- [ ] All 19 tests pass
+### Acceptance criteria — Session 1.9 (COMPLETE)
+- [x] Internal ID (UUID) is immutable and globally unique
+- [x] Barcode is globally unique and never reused
+- [x] Fiscal-year serial is in YY-NNNNN format and unique per fiscal year
+- [x] Current stock projection is created alongside garment
+- [x] Purchase cost is hidden from non-admin users at model level
+- [x] Garment lookup works by barcode, serial, and internal ID
+- [x] Status changes are audited
+- [x] 35 tests written (all acceptance criteria covered)
 
 ---
 

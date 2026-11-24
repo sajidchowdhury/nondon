@@ -21,6 +21,9 @@ use App\Modules\Catalog\Http\Livewire\Products\ProductList;
 use App\Modules\Catalog\Http\Livewire\Products\ProductCreate;
 use App\Modules\Catalog\Http\Livewire\Products\ProductEdit;
 use App\Modules\Catalog\Http\Livewire\Products\ProductView;
+use App\Modules\Inventory\Http\Livewire\Garments\GarmentList;
+use App\Modules\Inventory\Http\Livewire\Garments\GarmentView;
+use App\Modules\Inventory\Http\Livewire\Garments\GarmentLookup;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +87,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', ProductCreate::class)->name('create');
         Route::get('/{product}/edit', ProductEdit::class)->name('edit');
         Route::get('/{product}', ProductView::class)->name('show');
+    });
+
+    // Garment routes (Session 1.9)
+    Route::prefix('garments')->name('garments.')->group(function () {
+        Route::get('/', GarmentList::class)->name('index');
+        Route::get('/lookup', GarmentLookup::class)->name('lookup');
+        Route::get('/{garment}', GarmentView::class)->name('show');
     });
 });
 

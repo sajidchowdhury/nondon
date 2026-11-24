@@ -44,6 +44,11 @@
                                 {{ __('Products') }}
                             </x-nav-link>
                             @endcan
+                            @can('viewAny', \App\Modules\Inventory\Models\Garment::class)
+                            <x-nav-link href="{{ route('garments.index') }}" :active="request()->routeIs('garments.*')">
+                                {{ __('Garments') }}
+                            </x-nav-link>
+                            @endcan
                             @can('assignRoles', \App\Modules\Identity\Models\User::class)
                             <x-nav-link href="{{ route('roles.matrix') }}" :active="request()->routeIs('roles.*')">
                                 {{ __('Permissions') }}
