@@ -1,6 +1,6 @@
 @tailwind base;
 @tailwind components;
-@tailwind layers;
+@tailwind utilities;
 
 /* Custom scrollbar styling for long lists */
 @layer utilities {

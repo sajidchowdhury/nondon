@@ -70,16 +70,9 @@ echo "[5/8] Running database migrations..."
 php artisan migrate --force
 echo "      Done."
 
-# Step 5b: Ensure Spatie permission tables have extra columns
-# This is a safety net in case the migration with 9999 timestamp doesn't run
-# (e.g., if migrations were already marked as run before this migration was added)
-echo "[5b/8] Ensuring Spatie table columns..."
-php artisan db:statement "ALTER TABLE permissions ADD COLUMN IF NOT EXISTS display_name VARCHAR(255) NULL" 2>/dev/null || true
-php artisan db:statement "ALTER TABLE permissions ADD COLUMN IF NOT EXISTS module VARCHAR(50) NULL" 2>/dev/null || true
-php artisan db:statement "ALTER TABLE permissions ADD COLUMN IF NOT EXISTS description TEXT NULL" 2>/dev/null || true
-php artisan db:statement "ALTER TABLE roles ADD COLUMN IF NOT EXISTS display_name VARCHAR(255) NULL" 2>/dev/null || true
-php artisan db:statement "ALTER TABLE roles ADD COLUMN IF NOT EXISTS description TEXT NULL" 2>/dev/null || true
-echo "      Done."
+# Note: The 9999_12_31_235959 migration adds display_name, module, description
+# columns to the Spatie tables. It runs automatically as part of migrate.
+# No manual ALTER TABLE needed.
 
 # Step 6: Run database seeders (idempotent — uses firstOrCreate)
 echo "[6/8] Running database seeders..."
