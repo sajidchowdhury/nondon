@@ -222,37 +222,35 @@ This is the recommended setup for Windows. Docker provides PHP 8.3, PostgreSQL, 
 
 **Manual Docker commands (if setup.ps1 fails):**
 ```powershell
-# Build and start containers
-docker compose up -d --build
+# Build and start containers (app, web, db only - not node)
+docker compose up -d --build app web db
 
-# Wait for PostgreSQL to be ready (about 10 seconds)
+# Wait for PostgreSQL to be ready
 Start-Sleep -Seconds 10
 
-# Install PHP dependencies
-docker compose exec app composer install --no-interaction --prefer-dist
+# Run the init script (composer install, key:generate, migrations, seeders)
+docker compose exec -T app bash /var/www/html/docker/init.sh
 
-# Create .env and set up application
-docker compose exec app cp .env.example .env
-docker compose exec app sed -i 's/DB_HOST=127.0.0.1/DB_HOST=db/' .env
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan vendor:publish --tag="permission-migrations" --force
-docker compose exec app php artisan migrate --seed --force
+# Build frontend assets (uses default command from docker-compose.yml)
+docker compose run --rm --no-deps node
 
-# Build frontend assets
-docker compose run --rm node sh -c "npm install && npm run build"
+# Optimize
+docker compose exec -T app php artisan config:cache
+docker compose exec -T app php artisan route:cache
+docker compose exec -T app php artisan view:cache
 
 # Run tests
-docker compose exec app php artisan test
+docker compose exec -T app php artisan test
 ```
 
 **Docker container management:**
 ```powershell
-docker compose up -d          # Start containers
-docker compose down           # Stop containers
-docker compose down -v        # Stop and delete database data
-docker compose logs -f app    # View PHP logs
-docker compose logs -f web    # View Nginx logs
-docker compose ps             # Show container status
+docker compose up -d app web db  # Start containers (without node)
+docker compose down              # Stop containers
+docker compose down -v           # Stop and delete database data
+docker compose logs -f app       # View PHP logs
+docker compose logs -f web       # View Nginx logs
+docker compose ps                # Show container status
 ```
 
 **Default admin credentials:**

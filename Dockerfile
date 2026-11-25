@@ -16,13 +16,13 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libsqlite3-dev \
     nano \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_pgsql \
     pgsql \
-    pdo_mysql \
     mbstring \
     xml \
     bcmath \
@@ -42,11 +42,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Configure PHP
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/nondon.ini
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html
+# Fix line endings in shell scripts (Windows CRLF to LF)
+# Creates an entrypoint script that converts CRLF to LF in init.sh before running
+RUN printf '#!/bin/bash\nif [ -f /var/www/html/docker/init.sh ]; then\n  dos2unix /var/www/html/docker/init.sh 2>/dev/null || sed -i "s/\\r$//" /var/www/html/docker/init.sh\nfi\nexec "$@"\n' > /usr/local/bin/fix-line-endings.sh \
+    && chmod +x /usr/local/bin/fix-line-endings.sh
 
-# Switch to www-data user
-USER www-data
-
-# Default command
+# Development: run as root to avoid volume permission issues on Windows
+# In production, use a non-root user with proper volume ownership
+ENTRYPOINT ["/usr/local/bin/fix-line-endings.sh"]
 CMD ["php-fpm"]

@@ -1,0 +1,8 @@
+# Line ending enforcement for cross-platform development
+# Shell scripts must have LF endings (for Linux containers)
+# PowerShell scripts must have CRLF endings (for Windows)
+* text=auto
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
