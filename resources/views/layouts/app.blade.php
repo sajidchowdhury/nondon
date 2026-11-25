@@ -57,6 +57,11 @@
                                 {{ __('Permissions') }}
                             </x-nav-link>
                             @endcan
+                            @if(auth()->user()?->hasRole(['main_branch_admin', 'branch_supervisor', 'online_supervisor']))
+                            <x-nav-link href="{{ route('audit.index') }}" :active="request()->routeIs('audit.*')">
+                                {{ __('Audit Log') }}
+                            </x-nav-link>
+                            @endif
                         </div>
                     </div>
 

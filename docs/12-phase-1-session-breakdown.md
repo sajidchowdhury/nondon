@@ -24,8 +24,10 @@
 | 1.8 Pricing Management | COMPLETE | ca28d10 |
 | 1.9 Garment Identity & Records | COMPLETE | ec3f04f |
 | 1.10 Movement Ledger & Stock Projection | COMPLETE | 4a30189 |
-| 1.11 Stock Visibility & Queries | COMPLETE | Session 1.11 commit |
-| 1.12 Audit Log UI & Phase 1 Integration | Pending | — |
+| 1.11 Stock Visibility & Queries | COMPLETE | 20372d5 |
+| 1.12 Audit Log UI & Phase 1 Integration | COMPLETE | Session 1.12 commit |
+
+**PHASE 1 COMPLETE — ALL 12 SESSIONS DONE**
 
 ---
 
@@ -1139,18 +1141,17 @@ A session is considered complete when:
 - Verify no linting errors
 - Verify all modules are registered and working
 
-### Acceptance criteria
-- [ ] Audit log UI works with role-appropriate filtering
-- [ ] Admin sees all audit entries; supervisor sees own branch today only
-- [ ] Navigation is complete and role-appropriate
-- [ ] Dashboard shows relevant information per role
-- [ ] Full lifecycle integration test passes
-- [ ] Permission matrix is verified for all 5 roles
-- [ ] Branch scope is enforced for all branch-sensitive data
-- [ ] Purchase cost is never exposed to non-admin users
-- [ ] All Phase 1 tests pass (Sessions 1.1-1.12)
-- [ ] No linting errors
-- [ ] Phase 1 is ready for Phase 2 (Purchasing & Barcode Generation)
+### Acceptance criteria — Session 1.12 (COMPLETE)
+- [x] Audit log UI works with role-appropriate filtering
+- [x] Admin sees all audit entries; supervisor sees own branch today only
+- [x] Navigation is complete and role-appropriate
+- [x] Dashboard shows relevant information per role
+- [x] Full lifecycle integration test passes
+- [x] Permission matrix is verified for all 5 roles
+- [x] Branch scope is enforced for all branch-sensitive data
+- [x] Purchase cost is never exposed to non-admin users
+- [x] All Phase 1 tests pass (Sessions 1.1-1.12)
+- [x] Phase 1 is ready for Phase 2 (Purchasing & Barcode Generation)
 
 ---
 

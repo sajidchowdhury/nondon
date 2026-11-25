@@ -28,6 +28,8 @@ use App\Modules\Inventory\Http\Livewire\Stock\StockOverview;
 use App\Modules\Inventory\Http\Livewire\Stock\StockAvailability;
 use App\Modules\Inventory\Http\Livewire\Stock\GarmentHistory;
 use App\Modules\Inventory\Http\Livewire\Stock\ReservationBoard;
+use App\Modules\Audit\Http\Livewire\AuditLogList;
+use App\Modules\Audit\Http\Livewire\AuditLogView;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +108,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/', StockAvailability::class)->name('availability');
         Route::get('/overview', StockOverview::class)->name('overview');
         Route::get('/reservations', ReservationBoard::class)->name('reservations');
+    });
+
+    // Audit Log routes (Session 1.12)
+    Route::prefix('audit')->name('audit.')->group(function () {
+        Route::get('/', AuditLogList::class)->name('index');
+        Route::get('/{log}', AuditLogView::class)->name('show');
     });
 });
 
