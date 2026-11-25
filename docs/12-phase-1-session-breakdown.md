@@ -22,8 +22,8 @@
 | 1.6 Fiscal Year Management | COMPLETE | 2d5a049 |
 | 1.7 Product & Design Management | COMPLETE | 607ba60 |
 | 1.8 Pricing Management | COMPLETE | ca28d10 |
-| 1.9 Garment Identity & Records | COMPLETE | Session 1.9 commit |
-| 1.10 Movement Ledger & Stock Projection | Pending | — |
+| 1.9 Garment Identity & Records | COMPLETE | ec3f04f |
+| 1.10 Movement Ledger & Stock Projection | COMPLETE | Session 1.10 commit |
 | 1.11 Stock Visibility & Queries | Pending | — |
 | 1.12 Audit Log UI & Phase 1 Integration | Pending | — |
 
@@ -973,16 +973,16 @@ A session is considered complete when:
 - Movement recording is atomic (transaction rolls back on failure)
 - All movements are audited via event listener
 
-### Acceptance criteria
-- [ ] InventoryMovement model is append-only (no update/delete)
-- [ ] Every status change creates a movement record
-- [ ] Movement captures from/to status and from/to branch
-- [ ] GarmentCurrentStock projection is updated transactionally
-- [ ] Reconciliation job detects projection drift
-- [ ] Reconciliation is scheduled hourly
-- [ ] Movement history is queryable per garment
-- [ ] All movements are audited
-- [ ] All 16 tests pass
+### Acceptance criteria — Session 1.10 (COMPLETE)
+- [x] InventoryMovement model is append-only (no update/delete)
+- [x] Every status change creates a movement record
+- [x] Movement captures from/to status and from/to branch
+- [x] GarmentCurrentStock projection is updated transactionally
+- [x] Reconciliation job detects projection drift
+- [x] Reconciliation is scheduled hourly
+- [x] Movement history is queryable per garment
+- [x] All movements are audited
+- [x] 25 tests written (all acceptance criteria covered)
 
 ---
 
