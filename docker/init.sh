@@ -23,7 +23,7 @@ echo "      Done."
 
 # Step 1: Create .env if it does not exist
 if [ ! -f ".env" ]; then
-    echo "[1/7] Creating .env from .env.example..."
+    echo "[1/8] Creating .env from .env.example..."
     cp .env.example .env
     # Only DB_HOST needs changing for Docker (container name, not localhost)
     sed -i 's/DB_HOST=127.0.0.1/DB_HOST=db/' .env
@@ -40,12 +40,12 @@ else
 fi
 
 # Step 2: Install PHP dependencies
-echo "[2/7] Installing PHP dependencies (composer install)..."
+echo "[2/8] Installing PHP dependencies (composer install)..."
 composer install --no-interaction --prefer-dist --optimize-autoloader
 echo "      Done."
 
 # Step 3: Generate application key (only if not set)
-echo "[3/7] Generating application key..."
+echo "[3/8] Generating application key..."
 if grep -q "APP_KEY=" .env | grep -v "^APP_KEY=$"; then
     php artisan key:generate --force
     echo "      Done."
@@ -61,22 +61,33 @@ else
 fi
 
 # Step 4: Publish Spatie permission migrations (if not already published)
-echo "[4/7] Publishing Spatie permission migrations..."
+echo "[4/8] Publishing Spatie permission migrations..."
 php artisan vendor:publish --tag="permission-migrations" --force 2>/dev/null || true
 echo "      Done."
 
 # Step 5: Run database migrations
-echo "[5/7] Running database migrations..."
+echo "[5/8] Running database migrations..."
 php artisan migrate --force
 echo "      Done."
 
+# Step 5b: Ensure Spatie permission tables have extra columns
+# This is a safety net in case the migration with 9999 timestamp doesn't run
+# (e.g., if migrations were already marked as run before this migration was added)
+echo "[5b/8] Ensuring Spatie table columns..."
+php artisan db:statement "ALTER TABLE permissions ADD COLUMN IF NOT EXISTS display_name VARCHAR(255) NULL" 2>/dev/null || true
+php artisan db:statement "ALTER TABLE permissions ADD COLUMN IF NOT EXISTS module VARCHAR(50) NULL" 2>/dev/null || true
+php artisan db:statement "ALTER TABLE permissions ADD COLUMN IF NOT EXISTS description TEXT NULL" 2>/dev/null || true
+php artisan db:statement "ALTER TABLE roles ADD COLUMN IF NOT EXISTS display_name VARCHAR(255) NULL" 2>/dev/null || true
+php artisan db:statement "ALTER TABLE roles ADD COLUMN IF NOT EXISTS description TEXT NULL" 2>/dev/null || true
+echo "      Done."
+
 # Step 6: Run database seeders (idempotent — uses firstOrCreate)
-echo "[6/7] Running database seeders..."
+echo "[6/8] Running database seeders..."
 php artisan db:seed --force
 echo "      Done."
 
 # Step 7: Clear stale caches (safe to rerun)
-echo "[7/7] Clearing caches..."
+echo "[7/8] Clearing caches..."
 php artisan config:clear 2>/dev/null || true
 php artisan route:clear 2>/dev/null || true
 php artisan cache:clear 2>/dev/null || true
