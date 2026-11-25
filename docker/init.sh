@@ -10,6 +10,17 @@ echo "  Nondon ERP - Docker Application Setup"
 echo "=========================================="
 echo ""
 
+# Step 0: Ensure required directories exist and are writable
+echo "[0/8] Ensuring directories exist..."
+mkdir -p bootstrap/cache
+mkdir -p storage/app
+mkdir -p storage/framework/cache/data
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+chmod -R 777 bootstrap/cache storage
+echo "      Done."
+
 # Step 1: Create .env if it does not exist
 if [ ! -f ".env" ]; then
     echo "[1/7] Creating .env from .env.example..."
