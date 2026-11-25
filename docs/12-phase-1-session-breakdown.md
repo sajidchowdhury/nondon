@@ -23,8 +23,8 @@
 | 1.7 Product & Design Management | COMPLETE | 607ba60 |
 | 1.8 Pricing Management | COMPLETE | ca28d10 |
 | 1.9 Garment Identity & Records | COMPLETE | ec3f04f |
-| 1.10 Movement Ledger & Stock Projection | COMPLETE | Session 1.10 commit |
-| 1.11 Stock Visibility & Queries | Pending | — |
+| 1.10 Movement Ledger & Stock Projection | COMPLETE | 4a30189 |
+| 1.11 Stock Visibility & Queries | COMPLETE | Session 1.11 commit |
 | 1.12 Audit Log UI & Phase 1 Integration | Pending | — |
 
 ---
@@ -1067,14 +1067,14 @@ A session is considered complete when:
 - Purchase cost is never included in stock query results
 - Stock queries use projection table (not ledger scan)
 
-### Acceptance criteria
-- [ ] Cross-branch stock visibility works for all roles (without supplier/cost info)
-- [ ] Garment movement history shows full lifecycle
-- [ ] Reservation count display works per branch
-- [ ] Stock queries use the projection table (fast, no ledger scan)
-- [ ] Purchase cost is never exposed in stock queries
-- [ ] Search vs. report boundary is respected
-- [ ] All 15 tests pass
+### Acceptance criteria — Session 1.11 (COMPLETE)
+- [x] Cross-branch stock visibility works for all roles (without supplier/cost info)
+- [x] Garment movement history shows full lifecycle
+- [x] Reservation count display works per branch
+- [x] Stock queries use the projection table (fast, no ledger scan)
+- [x] Purchase cost is never exposed in stock queries
+- [x] Search vs. report boundary is respected
+- [x] 25 tests written (all acceptance criteria covered)
 
 ---
 

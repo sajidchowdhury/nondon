@@ -24,6 +24,10 @@ use App\Modules\Catalog\Http\Livewire\Products\ProductView;
 use App\Modules\Inventory\Http\Livewire\Garments\GarmentList;
 use App\Modules\Inventory\Http\Livewire\Garments\GarmentView;
 use App\Modules\Inventory\Http\Livewire\Garments\GarmentLookup;
+use App\Modules\Inventory\Http\Livewire\Stock\StockOverview;
+use App\Modules\Inventory\Http\Livewire\Stock\StockAvailability;
+use App\Modules\Inventory\Http\Livewire\Stock\GarmentHistory;
+use App\Modules\Inventory\Http\Livewire\Stock\ReservationBoard;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,7 +97,15 @@ Route::middleware('auth')->group(function () {
     Route::prefix('garments')->name('garments.')->group(function () {
         Route::get('/', GarmentList::class)->name('index');
         Route::get('/lookup', GarmentLookup::class)->name('lookup');
+        Route::get('/{garment}/history', GarmentHistory::class)->name('history');
         Route::get('/{garment}', GarmentView::class)->name('show');
+    });
+
+    // Stock visibility routes (Session 1.11)
+    Route::prefix('stock')->name('stock.')->group(function () {
+        Route::get('/', StockAvailability::class)->name('availability');
+        Route::get('/overview', StockOverview::class)->name('overview');
+        Route::get('/reservations', ReservationBoard::class)->name('reservations');
     });
 });
 
