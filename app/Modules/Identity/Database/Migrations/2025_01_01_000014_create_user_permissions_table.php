@@ -31,9 +31,16 @@ return new class extends Migration
 
             $table->unique(['user_id', 'permission_id']); // one entry per user-permission pair
 
+            // FK to users (same module, created in this migration batch)
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->foreign('permission_id')->references('id')->on('permissions')->cascadeOnDelete();
             $table->foreign('granted_by')->references('id')->on('users')->nullOnDelete();
+
+            // NOTE: No FK on permission_id — the permissions table is created by
+            // Spatie's published migration which runs at runtime with a current-date
+            // timestamp. Our migration runs before Spatie's, so the permissions table
+            // does not exist yet. The permission_id column is an unsignedBigInteger
+            // without a FK constraint. Referential integrity is enforced at the
+            // application level (PermissionOverrideService).
 
             $table->index(['user_id', 'granted']);
         });

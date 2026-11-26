@@ -10,8 +10,8 @@ return new class extends Migration
      * Run the migrations.
      *
      * Note: This migration references the 'branches' table which must exist.
-     * The branches migration (Organization module) runs before this one
-     * due to timestamp ordering (000xxx < 100xxx).
+     * The branches migration (Organization module, timestamp 000001) runs before
+     * this one (Identity module, timestamp 000010).
      */
     public function up(): void
     {
