@@ -16,6 +16,11 @@ class Garment extends Model
 {
     use HasFactory, Auditable;
 
+    protected static function newFactory()
+    {
+        return \Database\Factories\GarmentFactory::new();
+    }
+
     /**
      * Audit configuration.
      */

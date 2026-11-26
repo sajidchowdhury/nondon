@@ -13,6 +13,11 @@ class ProductPrice extends Model
 {
     use HasFactory, Auditable;
 
+    protected static function newFactory()
+    {
+        return \Database\Factories\ProductPriceFactory::new();
+    }
+
     /**
      * Audit configuration.
      */

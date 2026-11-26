@@ -10,6 +10,11 @@ class FiscalYear extends Model
 {
     use HasFactory, Auditable;
 
+    protected static function newFactory()
+    {
+        return \Database\Factories\FiscalYearFactory::new();
+    }
+
     /**
      * Audit configuration.
      */

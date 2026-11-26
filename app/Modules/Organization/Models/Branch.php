@@ -12,6 +12,11 @@ class Branch extends Model
 {
     use HasFactory, Auditable;
 
+    protected static function newFactory()
+    {
+        return \Database\Factories\BranchFactory::new();
+    }
+
     /**
      * Audit configuration.
      */

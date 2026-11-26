@@ -11,6 +11,11 @@ class ProductSize extends Model
 {
     use HasFactory, Auditable;
 
+    protected static function newFactory()
+    {
+        return \Database\Factories\ProductSizeFactory::new();
+    }
+
     /**
      * Audit configuration.
      */

@@ -17,6 +17,17 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles, Auditable;
 
     /**
+     * Resolve factory for modular model location.
+     * Laravel's default factory resolution looks for
+     * Database\Factories\Modules\Identity\Models\UserFactory
+     * but our factory is at Database\Factories\UserFactory.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\UserFactory::new();
+    }
+
+    /**
      * Audit configuration for the User model.
      */
     protected string $auditPrefix = 'user';
