@@ -109,10 +109,12 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can assign roles to a user.
+     * Determine whether the user can assign roles.
      * Only Main Branch Admin can assign roles.
+     * Accepts optional target user — when called via @can with a class
+     * name (no model instance), only the first argument is passed.
      */
-    public function assignRoles(User $user, User $target): bool
+    public function assignRoles(User $user, ?User $target = null): bool
     {
         return $user->hasRole('main_branch_admin');
     }

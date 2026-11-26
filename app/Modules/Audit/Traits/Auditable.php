@@ -164,14 +164,16 @@ trait Auditable
         ?array $newValues = null,
         ?string $reason = null,
     ): void {
-        AuditableEvent::dispatch($action, [
+        // Use event() helper directly for synchronous dispatch
+        // This avoids potential issues with Dispatchable trait's static dispatch
+        event(new AuditableEvent($action, [
             'category' => $this->getAuditCategory(),
             'reference_type' => $this->getAuditReferenceType(),
             'reference_id' => $this->getKey(),
             'previous_values' => $previousValues,
             'new_values' => $newValues,
             'reason' => $reason,
-        ]);
+        ]));
     }
 
     /**

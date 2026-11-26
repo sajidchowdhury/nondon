@@ -177,12 +177,16 @@ class AuditService
 
     /**
      * Get the current branch ID from the session/container.
+     * Returns null if no branch is set (e.g., in tests without auth).
      */
     protected function getCurrentBranchId(): ?int
     {
-        $branch = app('active.branch');
-
-        return $branch?->id;
+        try {
+            $branch = app('active.branch');
+            return $branch?->id;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**

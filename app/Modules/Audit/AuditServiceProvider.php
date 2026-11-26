@@ -31,6 +31,9 @@ class AuditServiceProvider extends ServiceProvider
 
         // Register the audit event listener
         // All AuditableEvent instances are picked up by AuditListener
-        Event::listen(AuditableEvent::class, AuditListener::class);
+        // Using closure-based listener for synchronous, immediate execution
+        Event::listen(AuditableEvent::class, function (AuditableEvent $event) {
+            app(AuditListener::class)->handle($event);
+        });
     }
 }
