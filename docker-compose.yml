@@ -15,12 +15,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=nondon
-      - DB_USERNAME=nondon_app
-      - DB_PASSWORD=secret
 
   # Nginx Web Server
   web:
@@ -50,6 +44,7 @@ services:
       - "5433:5432"
     volumes:
       - nondon-db-data:/var/lib/postgresql/data
+      - ./docker/db/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
     networks:
       - nondon-network
     healthcheck:

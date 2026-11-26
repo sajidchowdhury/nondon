@@ -6,7 +6,8 @@
 |--------------------------------------------------------------------------
 |
 | Pest PHP configuration for the Nondon ERP project.
-| Tests use SQLite in-memory database for speed and isolation.
+| Tests use PostgreSQL with a dedicated nondon_test database.
+| RefreshDatabase trait handles migration and cleanup.
 |
 */
 

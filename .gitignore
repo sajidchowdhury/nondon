@@ -52,6 +52,8 @@ yarn-error.log
 # Backup files
 *.sql.gz
 *.sql
+# Allow Docker init SQL scripts
+!docker/db/*.sql
 
 # Temporary files
 /tmp/

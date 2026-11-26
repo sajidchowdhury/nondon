@@ -21,6 +21,21 @@ mkdir -p storage/logs
 chmod -R 777 bootstrap/cache storage
 echo "      Done."
 
+# Step 0b: Ensure test database exists (separate from development database)
+echo "[0b/8] Ensuring test database (nondon_test) exists..."
+php -r "
+\$pdo = new PDO('pgsql:host=db;port=5432;dbname=nondon', 'nondon_app', 'secret');
+\$result = \$pdo->query(\"SELECT 1 FROM pg_database WHERE datname = 'nondon_test'\");
+if (\$result->fetchColumn() === false) {
+    \$pdo->exec('CREATE DATABASE nondon_test');
+    \$pdo->exec('GRANT ALL PRIVILEGES ON DATABASE nondon_test TO nondon_app');
+    echo 'Created nondon_test database.';
+} else {
+    echo 'nondon_test database already exists.';
+}
+" 2>/dev/null || echo "Could not create test database (will be created by Docker init script on fresh volume)."
+echo "      Done."
+
 # Step 1: Create .env if it does not exist
 if [ ! -f ".env" ]; then
     echo "[1/8] Creating .env from .env.example..."
