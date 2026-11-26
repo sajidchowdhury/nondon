@@ -2,6 +2,8 @@
 
 namespace App\Modules\Audit\Events;
 
+use Illuminate\Foundation\Events\Dispatchable;
+
 /**
  * Base event class for all audit-worthy events.
  *
@@ -10,12 +12,15 @@ namespace App\Modules\Audit\Events;
  * writes to the audit log via AuditService.
  *
  * Usage:
- *   event(new AuditableEvent('user.create', [
+ *   AuditableEvent::dispatch('user.create', [
  *       'category' => 'identity',
  *       'reference_type' => 'user',
  *       'reference_id' => $user->id,
  *       'new_values' => ['username' => $user->username, 'full_name' => $user->full_name],
- *   ]));
+ *   ]);
+ *
+ * Or via explicit event() helper:
+ *   event(new AuditableEvent('user.create', [...]));
  *
  * Or for module-specific events, extend this class:
  *   class UserCreated extends AuditableEvent
@@ -25,6 +30,8 @@ namespace App\Modules\Audit\Events;
  */
 class AuditableEvent
 {
+    use Dispatchable;
+
     /**
      * The action identifier (e.g., 'user.create', 'sale.complete').
      */
