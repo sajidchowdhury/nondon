@@ -16,8 +16,16 @@ class AuditLog extends Model
     protected $table = 'audit_logs';
 
     /**
+     * The column name for the "created at" timestamp.
+     * Overrides the default 'created_at' to use 'performed_at'
+     * so that latest() and other timestamp-based methods work correctly.
+     */
+    const CREATED_AT = 'performed_at';
+
+    /**
      * Indicates if the model should be timestamped.
      * We use performed_at instead of created_at/updated_at.
+     * performed_at is set explicitly in AuditService::log().
      */
     public $timestamps = false;
 

@@ -79,16 +79,16 @@ describe('fiscal year create', function () {
 
     it('auto-calculates start date as July 1', function () {
         $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
-        $fy = $service->create(['start_year' => 2026]);
+        $fy = $service->create(['start_year' => 2028]);
 
         expect($fy->start_date->format('m-d'))->toBe('07-01');
     });
 
     it('auto-calculates end date as June 30 of next year', function () {
         $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
-        $fy = $service->create(['start_year' => 2026]);
+        $fy = $service->create(['start_year' => 2028]);
 
-        expect($fy->end_date->format('Y-m-d'))->toBe('2027-06-30');
+        expect($fy->end_date->format('Y-m-d'))->toBe('2029-06-30');
     });
 
     it('auto-derives serial prefix from start year', function () {

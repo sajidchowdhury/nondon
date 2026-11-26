@@ -80,11 +80,11 @@ trait Auditable
 
     /**
      * Get the reference type for this model.
-     * Uses the short class name by default.
+     * Uses the snake_case short class name by default.
      */
     protected function getAuditReferenceType(): string
     {
-        return strtolower(class_basename($this));
+        return \Illuminate\Support\Str::snake(class_basename($this));
     }
 
     /**
