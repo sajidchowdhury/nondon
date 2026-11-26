@@ -10,7 +10,33 @@
 |
 */
 
-// Helpers for common test setup
+/*
+|--------------------------------------------------------------------------
+| Test Case
+|--------------------------------------------------------------------------
+|
+| The closure below tells Pest to use the Tests\TestCase class as the
+| base test case for all tests in the Feature and Unit directories.
+| This gives every test access to Laravel testing helpers:
+|   - $this->seed()
+|   - $this->actingAs()
+|   - $this->get(), $this->post()
+|   - $this->assertDatabaseHas()
+|   - RefreshDatabase trait (via Tests\TestCase)
+|
+*/
+uses(Tests\TestCase::class)->in('Feature', 'Unit');
+
+/*
+|--------------------------------------------------------------------------
+| Test Helpers
+|--------------------------------------------------------------------------
+|
+| Helper functions available to all Pest tests for creating users
+| with specific roles and branches.
+|
+*/
+
 function adminUser(): \App\Modules\Identity\Models\User
 {
     $user = \App\Modules\Identity\Models\User::factory()->create();
