@@ -143,7 +143,10 @@ class PriceService
      * Get the full price history for a product/size.
      *
      * Returns all price records ordered by effective_from descending
-     * (most recent first).
+     * (most recent first). When multiple prices share the same
+     * effective_from timestamp (common when prices are set in rapid
+     * succession during tests), the secondary sort on id DESC ensures
+     * a deterministic "newest created first" ordering.
      *
      * @param Product $product
      * @param ProductSize|null $size If null, returns all prices for the product (all sizes)
@@ -153,7 +156,8 @@ class PriceService
     {
         $query = ProductPrice::forProduct($product->id)
             ->with('productSize', 'setByUser')
-            ->latest('effective_from');
+            ->latest('effective_from')
+            ->latest('id');
 
         if ($size) {
             $query->forSize($size->id);

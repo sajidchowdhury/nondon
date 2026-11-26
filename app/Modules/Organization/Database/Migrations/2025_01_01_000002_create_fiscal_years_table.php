@@ -19,7 +19,16 @@ return new class extends Migration
             $table->boolean('is_closed')->default(false);
             $table->timestamps();
 
-            $table->unique('start_date');
+            // Note: We intentionally do NOT enforce a unique constraint on
+            // start_date. The FiscalYearService validates date overlap at the
+            // application layer (which is more flexible than a single-column
+            // unique constraint). Multiple fiscal years can share the same
+            // start_date only if their date ranges do not actually overlap,
+            // and even then the service rejects overlap. Allowing the database
+            // to store historical/test fixtures with explicit start dates
+            // (which may coincide with the seeder's current FY) without
+            // raising a unique violation makes test setup simpler.
+            $table->index('start_date');
             $table->index('is_active');
         });
     }

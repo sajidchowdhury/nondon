@@ -44,6 +44,40 @@ use App\Modules\Audit\Http\Livewire\AuditLogView;
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
+
+    // Traditional POST login endpoint (mirrors the Livewire Login component logic).
+    // Used by HTTP-level feature tests and any non-Livewire clients. The actual
+    // business logic lives in AuthService::login().
+    Route::post('/login', function (\Illuminate\Http\Request $request, \App\Modules\Identity\Services\AuthService $authService) {
+        $request->validate([
+            'username' => ['required', 'string', 'min:3', 'max:100'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        try {
+            $user = $authService->login(
+                username: $request->input('username'),
+                password: $request->input('password'),
+                remember: $request->boolean('remember'),
+            );
+
+            if ($user->force_password_change) {
+                return redirect()->route('password.force-change');
+            }
+
+            if ($user->roles->count() > 1 && !$user->active_role_id) {
+                return redirect()->route('role.select');
+            }
+
+            return redirect()->route('dashboard');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'username' => __('An error occurred during login. Please try again.'),
+            ]);
+        }
+    });
 });
 
 Route::middleware('auth')->group(function () {

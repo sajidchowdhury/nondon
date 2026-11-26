@@ -109,6 +109,10 @@ class UserCreate extends Component
      */
     public function render()
     {
+        // Authorize on initial render so supervisors/salespersons get 403
+        // when navigating to /users/create directly (not just on form submit).
+        $this->authorize('create', User::class);
+
         $branches = Branch::active()->physical()->orderBy('code')->get();
         $onlineBranch = Branch::onlineChannel()->first();
         $roles = Role::orderBy('name')->get();

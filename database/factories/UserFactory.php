@@ -31,7 +31,12 @@ class UserFactory extends Factory
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
             'full_name' => fake()->name(),
-            'password_hash' => static::$password ??= Hash::make('password'),
+            // Default password is a strong, non-weak value so that tests
+            // which check "the password was NOT changed to X" can use a
+            // sentinel like 'password' or 'password123' and reliably get
+            // false from Hash::check(). This value is intentionally NOT
+            // in the NotWeakPassword deny-list.
+            'password_hash' => static::$password ??= Hash::make('NondonFactory2025'),
             'assigned_branch_id' => Branch::inRandomOrder()->first()?->id ?? Branch::factory(),
             'is_online_channel' => false,
             'is_active' => true,

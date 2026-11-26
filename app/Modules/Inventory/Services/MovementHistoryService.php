@@ -3,7 +3,7 @@
 namespace App\Modules\Inventory\Services;
 
 use App\Modules\Inventory\Models\Garment;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 /**
  * MovementHistoryService — provides formatted garment lifecycle traces.
@@ -35,7 +35,7 @@ class MovementHistoryService
      * - notes
      *
      * @param Garment $garment
-     * @return Collection
+     * @return Collection<int, array<string, mixed>>
      */
     public function getGarmentHistory(Garment $garment): Collection
     {

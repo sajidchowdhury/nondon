@@ -3,6 +3,7 @@
 namespace App\Modules\Catalog;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class CatalogServiceProvider extends ServiceProvider
 {
@@ -21,5 +22,9 @@ class CatalogServiceProvider extends ServiceProvider
     {
         // Load module migrations
         $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
+
+        // Register Livewire component aliases so they can be referenced
+        // by dot-notation in Blade views (e.g., <livewire:catalog.prices.price-manager />).
+        Livewire::component('catalog.prices.price-manager', \App\Modules\Catalog\Http\Livewire\Prices\PriceManager::class);
     }
 }

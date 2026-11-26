@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Modules\Inventory\Services\StockQueryService;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductSize;
 
 class StockAvailability extends Component
 {

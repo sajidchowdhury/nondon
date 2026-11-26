@@ -9,6 +9,7 @@ use App\Modules\Organization\Models\Branch;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -138,9 +139,9 @@ class StockProjectionService
      *
      * @param Product $product
      * @param ProductSize|null $size
-     * @return Collection Grouped by branch
+     * @return SupportCollection<int, Collection<int, Garment>> Grouped by branch
      */
-    public function getAvailableStockForProduct(Product $product, ?ProductSize $size = null): Collection
+    public function getAvailableStockForProduct(Product $product, ?ProductSize $size = null): SupportCollection
     {
         $query = Garment::with(['currentBranch', 'productSize'])
             ->available()

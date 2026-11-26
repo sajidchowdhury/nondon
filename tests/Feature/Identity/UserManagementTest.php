@@ -250,6 +250,7 @@ describe('activate / deactivate', function () {
 
     it('prevents user from deactivating themselves', function () {
         $admin = adminUser();
+        $this->actingAs($admin);
 
         $userService = app(\App\Modules\Identity\Services\UserService::class);
 

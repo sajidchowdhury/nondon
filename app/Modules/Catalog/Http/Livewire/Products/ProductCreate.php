@@ -96,6 +96,10 @@ class ProductCreate extends Component
 
     public function render()
     {
+        // Authorize on initial render so non-admin users get 403
+        // when navigating to /products/create directly.
+        $this->authorize('create', Product::class);
+
         return view('livewire.catalog.products.create')
             ->layout('layouts.app');
     }

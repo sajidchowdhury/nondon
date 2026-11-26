@@ -62,6 +62,10 @@ class BranchCreate extends Component
 
     public function render()
     {
+        // Authorize on initial render so non-admin users get 403
+        // when navigating to /branches/create directly.
+        $this->authorize('create', Branch::class);
+
         return view('livewire.organization.branches.create')
             ->layout('layouts.app');
     }

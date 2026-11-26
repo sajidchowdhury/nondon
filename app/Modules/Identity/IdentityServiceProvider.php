@@ -4,6 +4,7 @@ namespace App\Modules\Identity;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\File;
+use Livewire\Livewire;
 
 class IdentityServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,11 @@ class IdentityServiceProvider extends ServiceProvider
 
         // Load module routes (if any, besides main routes/web.php)
         // $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+
+        // Register Livewire component aliases so they can be referenced
+        // by dot-notation in Blade views (e.g., <livewire:identity.roles.role-assignment />).
+        Livewire::component('identity.roles.role-assignment', \App\Modules\Identity\Http\Livewire\Roles\RoleAssignment::class);
+        Livewire::component('identity.roles.permission-override', \App\Modules\Identity\Http\Livewire\Roles\PermissionOverride::class);
 
         // Register module-specific configurations
         $this->registerModuleConfig();

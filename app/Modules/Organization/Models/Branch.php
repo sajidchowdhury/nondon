@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Modules\Identity\Models\User;
 use App\Modules\Audit\Traits\Auditable;
+use App\Modules\Inventory\Models\Garment;
 
 class Branch extends Model
 {
@@ -128,6 +129,17 @@ class Branch extends Model
     public function stockLocations(): HasMany
     {
         return $this->hasMany(StockLocation::class);
+    }
+
+    /**
+     * Garments currently located at this branch.
+     *
+     * Based on the garment's current_branch_id foreign key.
+     * Used for stock overview counts and reservation counts.
+     */
+    public function garments(): HasMany
+    {
+        return $this->hasMany(Garment::class, 'current_branch_id');
     }
 
     /*

@@ -8,6 +8,7 @@ use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection as SupportCollection;
 
 /**
  * StockQueryService — unified read-side query interface for stock visibility.
@@ -68,9 +69,9 @@ class StockQueryService
      *
      * @param Product $product
      * @param ProductSize|null $size
-     * @return Collection Grouped by branch_id
+     * @return SupportCollection<int, Collection<int, Garment>> Grouped by branch_id
      */
-    public function getStockForProduct(Product $product, ?ProductSize $size = null): Collection
+    public function getStockForProduct(Product $product, ?ProductSize $size = null): SupportCollection
     {
         $query = Garment::with(['currentBranch:id,code,name', 'productSize:id,size_label'])
             ->available()

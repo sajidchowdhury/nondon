@@ -220,9 +220,14 @@ class AuditLog extends Model
 
     /**
      * Scope: Order by most recent first.
+     *
+     * Primary sort is performed_at DESC. When multiple entries share the
+     * same performed_at timestamp (common when several actions are logged
+     * in rapid succession), the secondary sort on id DESC ensures a
+     * deterministic "newest inserted first" ordering.
      */
     public function scopeLatest(Builder $query): Builder
     {
-        return $query->orderBy('performed_at', 'desc');
+        return $query->orderBy('performed_at', 'desc')->orderBy('id', 'desc');
     }
 }

@@ -6,6 +6,7 @@ use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -217,8 +218,10 @@ class ProductService
 
     /**
      * Get all unique categories.
+     *
+     * @return SupportCollection<string>
      */
-    public function getCategories(): Collection
+    public function getCategories(): SupportCollection
     {
         return Product::whereNotNull('category')
             ->where('category', '!=', '')

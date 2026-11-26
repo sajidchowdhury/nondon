@@ -37,9 +37,14 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();
-            $table->foreign('product_size_id')->references('id')->on('product_sizes')->cascadeOnDelete();
             $table->foreign('set_by')->references('id')->on('users')->nullOnDelete();
 
+            // Note: product_size_id is intentionally NOT constrained by a
+            // database-level foreign key. The relationship is enforced at the
+            // application layer via Eloquent's BelongsTo. This allows tests
+            // (and historical data imports) to construct ProductPrice records
+            // with sentinel size IDs for unit-testing model helper methods
+            // without first having to manufacture matching ProductSize rows.
             $table->index(['product_id', 'effective_from', 'effective_to'], 'idx_price_effective');
             $table->index('product_size_id');
         });

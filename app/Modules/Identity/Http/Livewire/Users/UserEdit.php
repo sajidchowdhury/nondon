@@ -40,6 +40,9 @@ class UserEdit extends Component
      */
     public function mount(User $user): void
     {
+        // Authorize on initial load — only Main Branch Admin can edit users.
+        $this->authorize('update', $user);
+
         $this->user = $user;
         $this->username = $user->username;
         $this->full_name = $user->full_name;

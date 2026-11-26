@@ -89,6 +89,10 @@ class FiscalYearCreate extends Component
 
     public function render()
     {
+        // Authorize on initial render so non-admin users get 403
+        // when navigating to /fiscal-years/create directly.
+        $this->authorize('create', FiscalYear::class);
+
         return view('livewire.organization.fiscal-years.create')
             ->layout('layouts.app');
     }

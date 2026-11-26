@@ -194,6 +194,13 @@ describe('AuditService — query and filter', function () {
         $this->admin = adminUser();
         $this->branch = Branch::where('code', 'B1')->first();
         $this->service = app(AuditService::class);
+
+        // Clear any audit entries produced by the global beforeEach seeders
+        // (RolePermissionSeeder, BranchSeeder, FiscalYearSeeder) and by the
+        // adminUser() factory call above (the Auditable trait fires a
+        // 'user.create' event whenever a User is persisted). Starting from
+        // a clean slate keeps the count-based assertions below deterministic.
+        AuditLog::query()->delete();
     });
 
     it('filters by user', function () {

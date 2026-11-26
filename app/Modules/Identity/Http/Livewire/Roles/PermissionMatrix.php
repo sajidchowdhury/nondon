@@ -28,7 +28,10 @@ class PermissionMatrix extends Component
      */
     public function mount(): void
     {
-        $this->authorize('viewAny', \App\Modules\Identity\Models\User::class);
+        // Only Main Branch Admin can view/manipulate the global permission matrix.
+        // Using the assignRoles policy (admin-only) rather than viewAny (which
+        // also allows supervisors) ensures non-admin users get a 403 here.
+        $this->authorize('assignRoles', \App\Modules\Identity\Models\User::class);
 
         $this->roles = Role::with('permissions')->orderBy('name')->get();
 
