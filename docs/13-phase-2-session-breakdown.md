@@ -17,7 +17,7 @@
 |---|---|---|
 | 2.1 Supplier Management | COMPLETE | de42522 |
 | 2.2 Purchase Order Foundation | COMPLETE | 532cfdd |
-| 2.3 Purchase Management UI & Confirmation | PENDING | — |
+| 2.3 Purchase Management UI & Confirmation | COMPLETE | e57ab69 |
 | 2.4 Goods Receiving — Core Transaction | PENDING | — |
 | 2.5 Goods Receiving UI & Edge Cases | PENDING | — |
 | 2.6 Barcode Label Generation | PENDING | — |
@@ -433,14 +433,14 @@ Indexes: `INDEX(purchase_id)`, `INDEX(product_id)`.
 - Salesperson cannot access purchase management routes (403)
 - Purchase list shows correct status badges
 
-### Acceptance criteria — Session 2.3
-- [ ] Admin can create a purchase with dynamic line items through the UI
-- [ ] Admin can confirm and cancel purchases through the UI
-- [ ] Only draft purchases are editable
-- [ ] Purchase cost fields are not rendered for non-admin roles
-- [ ] Purchase list is filterable and paginated
-- [ ] All UI actions are protected by policies
-- [ ] 15+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.3 (COMPLETE)
+- [x] Admin can create a purchase with dynamic line items through the UI
+- [x] Admin can confirm and cancel purchases through the UI
+- [x] Only draft purchases are editable
+- [x] Purchase cost fields are not rendered for non-admin roles
+- [x] Purchase list is filterable and paginated
+- [x] All UI actions are protected by policies
+- [x] 20 tests written (all acceptance criteria covered)
 
 ---
 
