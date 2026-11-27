@@ -30,6 +30,10 @@ use App\Modules\Inventory\Http\Livewire\Stock\GarmentHistory;
 use App\Modules\Inventory\Http\Livewire\Stock\ReservationBoard;
 use App\Modules\Audit\Http\Livewire\AuditLogList;
 use App\Modules\Audit\Http\Livewire\AuditLogView;
+use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierList;
+use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierCreate;
+use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierEdit;
+use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierView;
 
 /*
 |--------------------------------------------------------------------------
@@ -148,6 +152,14 @@ Route::middleware('auth')->group(function () {
     Route::prefix('audit')->name('audit.')->group(function () {
         Route::get('/', AuditLogList::class)->name('index');
         Route::get('/{log}', AuditLogView::class)->name('show');
+    });
+
+    // Supplier Management routes (Session 2.1)
+    Route::prefix('suppliers')->name('suppliers.')->group(function () {
+        Route::get('/', SupplierList::class)->name('index');
+        Route::get('/create', SupplierCreate::class)->name('create');
+        Route::get('/{supplier}/edit', SupplierEdit::class)->name('edit');
+        Route::get('/{supplier}', SupplierView::class)->name('show');
     });
 });
 
