@@ -18,7 +18,7 @@
 | 2.1 Supplier Management | COMPLETE | de42522 |
 | 2.2 Purchase Order Foundation | COMPLETE | 532cfdd |
 | 2.3 Purchase Management UI & Confirmation | COMPLETE | e57ab69 |
-| 2.4 Goods Receiving — Core Transaction | PENDING | — |
+| 2.4 Goods Receiving — Core Transaction | COMPLETE | 5ed1cf3 |
 | 2.5 Goods Receiving UI & Edge Cases | PENDING | — |
 | 2.6 Barcode Label Generation | PENDING | — |
 | 2.7 Label Printing UI & Printer Configuration | PENDING | — |
@@ -549,19 +549,19 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Salesperson cannot receive goods (403)
 - Receiving only happens at Main Branch (received_by must be Main Branch user)
 
-### Acceptance criteria — Session 2.4
-- [ ] Full WF-1 goods receiving transaction is implemented and atomic
-- [ ] Garment identities (UUID, barcode, serial) are generated correctly during receiving
-- [ ] Advisory locking prevents duplicate serials under concurrency (100-serial test passes)
-- [ ] Each received garment has garment + projection + movement records created in one transaction
-- [ ] Purchase status transitions correctly (confirmed → received or partially_received)
-- [ ] Partial receipts are supported (multiple receipts per purchase)
-- [ ] Excess quantity is flagged, not auto-accepted
-- [ ] Transaction rollback on failure leaves no partial data
-- [ ] Receiving is audited per garment and per receipt
-- [ ] PurchaseReceived event is dispatched
-- [ ] Only admin + supervisor (with purchase.receive) can receive; salesperson cannot
-- [ ] 25+ tests written (all acceptance criteria + concurrency)
+### Acceptance criteria — Session 2.4 (COMPLETE)
+- [x] Full WF-1 goods receiving transaction is implemented and atomic
+- [x] Garment identities (UUID, barcode, serial) are generated correctly during receiving
+- [x] Advisory locking prevents duplicate serials under concurrency (100-serial test passes)
+- [x] Each received garment has garment + projection + movement records created in one transaction
+- [x] Purchase status transitions correctly (confirmed → received or partially_received)
+- [x] Partial receipts are supported (multiple receipts per purchase)
+- [x] Excess quantity is flagged, not auto-accepted
+- [x] Transaction rollback on failure leaves no partial data
+- [x] Receiving is audited per garment and per receipt
+- [x] PurchaseReceived event is dispatched
+- [x] Only admin + supervisor (with purchase.receive) can receive; salesperson cannot
+- [x] 32 tests written (all acceptance criteria + concurrency)
 
 ---
 
