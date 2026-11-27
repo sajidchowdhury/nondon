@@ -161,6 +161,15 @@ class Purchase extends Model
         return $this->belongsTo(User::class, 'confirmed_by');
     }
 
+    /**
+     * Goods receipts for this purchase.
+     * One purchase can have multiple receipts (for partial receipts).
+     */
+    public function goodsReceipts(): HasMany
+    {
+        return $this->hasMany(GoodsReceipt::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Query Scopes
