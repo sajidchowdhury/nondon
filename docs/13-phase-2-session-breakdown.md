@@ -16,7 +16,7 @@
 | Session | Status | Commit |
 |---|---|---|
 | 2.1 Supplier Management | COMPLETE | de42522 |
-| 2.2 Purchase Order Foundation | PENDING | — |
+| 2.2 Purchase Order Foundation | COMPLETE | 532cfdd |
 | 2.3 Purchase Management UI & Confirmation | PENDING | — |
 | 2.4 Goods Receiving — Core Transaction | PENDING | — |
 | 2.5 Goods Receiving UI & Edge Cases | PENDING | — |
@@ -364,14 +364,14 @@ Indexes: `INDEX(purchase_id)`, `INDEX(product_id)`.
 - Purchase confirmation is audited
 - Purchase cancellation is audited
 
-### Acceptance criteria — Session 2.2
-- [ ] Purchase and PurchaseItem models exist with correct schema and relationships
-- [ ] PurchasingService supports create/update/confirm/cancel with proper status transitions
-- [ ] Purchase status state machine: draft → confirmed → received/partially_received; draft/confirmed → cancelled
-- [ ] Purchase cost data (total_cost, unit_cost) is never in non-admin serialization
-- [ ] Only admin can create/confirm/cancel purchases; admin + supervisor can receive
-- [ ] All purchase actions are audited
-- [ ] 20+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.2 (COMPLETE)
+- [x] Purchase and PurchaseItem models exist with correct schema and relationships
+- [x] PurchasingService supports create/update/confirm/cancel with proper status transitions
+- [x] Purchase status state machine: draft → confirmed → received/partially_received; draft/confirmed → cancelled
+- [x] Purchase cost data (total_cost, unit_cost) is never in non-admin serialization
+- [x] Only admin can create/confirm/cancel purchases; admin + supervisor can receive
+- [x] All purchase actions are audited
+- [x] 38 tests written (all acceptance criteria covered)
 
 ---
 
