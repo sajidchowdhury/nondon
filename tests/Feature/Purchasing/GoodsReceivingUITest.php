@@ -115,6 +115,11 @@ describe('receiving form — UI access', function () {
 
     it('guest redirected from receiving form', function () {
         $purchase = createConfirmedPurchaseForUi();
+        // The helper authenticates as admin to build the purchase; log out
+        // so this test actually exercises the guest path.
+        auth()->logout();
+        $this->assertGuest();
+
         $response = $this->get(route('purchases.receive', $purchase));
         $response->assertRedirect(route('login'));
     });
