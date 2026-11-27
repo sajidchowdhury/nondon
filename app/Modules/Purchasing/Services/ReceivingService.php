@@ -195,7 +195,11 @@ class ReceivingService
             ]);
 
             // Update purchase status
-            $purchase->fresh('items');
+            // Reload the items relationship on the existing instance so
+            // isFullyReceived() sees the incremented received_quantity values.
+            // (fresh() returns a new instance but doesn't update $purchase;
+            // load() refreshes the relationship in-place.)
+            $purchase->load('items');
             if ($purchase->isFullyReceived()) {
                 $purchase->update(['status' => Purchase::STATUS_RECEIVED]);
             } else {
