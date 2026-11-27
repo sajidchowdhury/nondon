@@ -34,6 +34,10 @@ use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierList;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierCreate;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierEdit;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierView;
+use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseList;
+use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseCreate;
+use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseEdit;
+use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseView;
 
 /*
 |--------------------------------------------------------------------------
@@ -160,6 +164,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', SupplierCreate::class)->name('create');
         Route::get('/{supplier}/edit', SupplierEdit::class)->name('edit');
         Route::get('/{supplier}', SupplierView::class)->name('show');
+    });
+
+    // Purchase Management routes (Session 2.3)
+    Route::prefix('purchases')->name('purchases.')->group(function () {
+        Route::get('/', PurchaseList::class)->name('index');
+        Route::get('/create', PurchaseCreate::class)->name('create');
+        Route::get('/{purchase}/edit', PurchaseEdit::class)->name('edit');
+        Route::get('/{purchase}', PurchaseView::class)->name('show');
     });
 });
 
