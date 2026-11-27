@@ -22,6 +22,7 @@ class PurchaseView extends Component
             'items.productSize',
             'creator',
             'confirmer',
+            'goodsReceipts.receiver',
         ]);
 
         // Make cost fields visible — this is safe because mount() is gated

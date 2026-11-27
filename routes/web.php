@@ -38,6 +38,9 @@ use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseList;
 use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseCreate;
 use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseEdit;
 use App\Modules\Purchasing\Http\Livewire\Purchases\PurchaseView;
+use App\Modules\Purchasing\Http\Livewire\Receiving\ReceiveGoods;
+use App\Modules\Purchasing\Http\Livewire\Receiving\GoodsReceiptList;
+use App\Modules\Purchasing\Http\Livewire\Receiving\GoodsReceiptView;
 
 /*
 |--------------------------------------------------------------------------
@@ -171,7 +174,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/', PurchaseList::class)->name('index');
         Route::get('/create', PurchaseCreate::class)->name('create');
         Route::get('/{purchase}/edit', PurchaseEdit::class)->name('edit');
+        Route::get('/{purchase}/receive', ReceiveGoods::class)->name('receive');
         Route::get('/{purchase}', PurchaseView::class)->name('show');
+    });
+
+    // Goods Receipt routes (Session 2.5)
+    Route::prefix('goods-receipts')->name('goods-receipts.')->group(function () {
+        Route::get('/', GoodsReceiptList::class)->name('index');
+        Route::get('/{receipt}', GoodsReceiptView::class)->name('show');
     });
 });
 
