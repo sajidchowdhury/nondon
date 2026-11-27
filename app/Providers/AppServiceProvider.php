@@ -44,8 +44,7 @@ class AppServiceProvider extends ServiceProvider
             \App\Modules\Inventory\InventoryServiceProvider::class,
 
             // Business modules (to be added in later phases)
-            // \App\Modules\Purchasing\PurchasingServiceProvider::class,
-            // \App\Modules\Inventory\InventoryServiceProvider::class,
+            \App\Modules\Purchasing\PurchasingServiceProvider::class,
             // \App\Modules\Transfers\TransfersServiceProvider::class,
             // \App\Modules\Sales\SalesServiceProvider::class,
             // \App\Modules\OnlineOrders\OnlineOrdersServiceProvider::class,
