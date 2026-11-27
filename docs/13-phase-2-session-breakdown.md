@@ -19,7 +19,7 @@
 | 2.2 Purchase Order Foundation | COMPLETE | 532cfdd |
 | 2.3 Purchase Management UI & Confirmation | COMPLETE | e57ab69 |
 | 2.4 Goods Receiving — Core Transaction | COMPLETE | 5ed1cf3 |
-| 2.5 Goods Receiving UI & Edge Cases | PENDING | — |
+| 2.5 Goods Receiving UI & Edge Cases | COMPLETE | 92a9170 |
 | 2.6 Barcode Label Generation | PENDING | — |
 | 2.7 Label Printing UI & Printer Configuration | PENDING | — |
 | 2.8 Phase 2 Integration & Sensitive Data Hardening | PENDING | — |
