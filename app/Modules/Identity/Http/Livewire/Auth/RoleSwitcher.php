@@ -11,12 +11,10 @@ use Illuminate\Validation\ValidationException;
 class RoleSwitcher extends Component
 {
     /**
-     * The available roles for the user.
-     */
-    public $roles = [];
-
-    /**
      * The selected role ID.
+     *
+     * This is a simple scalar and is safe to expose as a public Livewire
+     * property (it is wired to the radio inputs via wire:model).
      */
     public ?int $selectedRoleId = null;
 
@@ -31,11 +29,12 @@ class RoleSwitcher extends Component
             return;
         }
 
-        // Load roles with display names
-        $this->roles = $user->roles->load('permissions');
-
-        // Pre-select the current active role, or the first available
-        $this->selectedRoleId = $user->active_role_id ?? ($this->roles->first()?->id);
+        // Pre-select the current active role, or the first available.
+        // Roles themselves are loaded in render() — see the note there about
+        // why they must NOT be a public Livewire property (Eloquent Collection
+        // dehydration throws "getMorphClass does not exist").
+        $roles = $user->roles->load('permissions');
+        $this->selectedRoleId = $user->active_role_id ?? ($roles->first()?->id);
     }
 
     /**
@@ -91,7 +90,13 @@ class RoleSwitcher extends Component
      */
     public function render()
     {
-        return view('livewire.auth.role-switcher')
-            ->layout('layouts.auth');
+        // Load roles here (not as a public property) to avoid Livewire's
+        // EloquentCollectionSynth dehydration error.
+        $user = Auth::user();
+        $roles = $user ? $user->roles->load('permissions') : collect();
+
+        return view('livewire.auth.role-switcher', [
+            'roles' => $roles,
+        ])->layout('layouts.auth');
     }
 }

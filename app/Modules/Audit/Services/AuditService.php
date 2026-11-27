@@ -69,7 +69,17 @@ class AuditService
      */
     public function query(array $filters = []): Builder
     {
-        $query = AuditLog::latest();
+        // NOTE: Do not use AuditLog::latest() here.
+        // The Builder's built-in latest() method takes precedence over the
+        // model's scopeLatest() (scopes only fire via __call when the Builder
+        // lacks the method). The built-in latest() orders only by performed_at
+        // DESC without the deterministic secondary sort on id DESC, which makes
+        // ordering non-deterministic when several entries share the same
+        // performed_at timestamp (common in rapid-fire test logging).
+        // Use the explicit orderBy to match scopeLatest()'s behaviour.
+        $query = AuditLog::query()
+            ->orderBy('performed_at', 'desc')
+            ->orderBy('id', 'desc');
 
         if (!empty($filters['user_id'])) {
             $query->forUser((int) $filters['user_id']);

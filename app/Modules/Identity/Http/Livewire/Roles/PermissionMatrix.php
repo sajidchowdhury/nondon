@@ -9,19 +9,17 @@ use Spatie\Permission\Models\Permission;
 class PermissionMatrix extends Component
 {
     /**
-     * All roles in the system.
+     * NOTE: Roles and permissions are NOT declared as public properties.
+     *
+     * Livewire's EloquentCollectionSynth attempts to call getMorphClass() on
+     * Illuminate\Database\Eloquent\Collection during dehydration, which throws
+     * "Method Illuminate\Database\Eloquent\Collection::getMorphClass does not
+     * exist". This happens because Eloquent Collections (unlike Eloquent Models)
+     * are not morphable.
+     *
+     * To avoid this, the data is loaded fresh in render() and passed directly
+     * to the view as render-time data (which Livewire does not dehydrate).
      */
-    public $roles;
-
-    /**
-     * All permissions grouped by module.
-     */
-    public $permissionsByModule;
-
-    /**
-     * Permission override service for checking admin-only permissions.
-     */
-    protected $permissionOverrideService;
 
     /**
      * Initialize the component.
@@ -32,13 +30,6 @@ class PermissionMatrix extends Component
         // Using the assignRoles policy (admin-only) rather than viewAny (which
         // also allows supervisors) ensures non-admin users get a 403 here.
         $this->authorize('assignRoles', \App\Modules\Identity\Models\User::class);
-
-        $this->roles = Role::with('permissions')->orderBy('name')->get();
-
-        $permissions = Permission::orderBy('module')->orderBy('name')->get();
-
-        // Group permissions by module
-        $this->permissionsByModule = $permissions->groupBy('module');
     }
 
     /**
@@ -88,8 +79,7 @@ class PermissionMatrix extends Component
             ]));
         }
 
-        // Refresh roles with permissions
-        $this->roles = Role::with('permissions')->orderBy('name')->get();
+        // No need to refresh a public property — render() reloads data fresh.
     }
 
     /**
@@ -106,7 +96,13 @@ class PermissionMatrix extends Component
      */
     public function render()
     {
-        return view('livewire.identity.roles.permission-matrix')
-            ->layout('layouts.app');
+        $roles = Role::with('permissions')->orderBy('name')->get();
+        $permissions = Permission::orderBy('module')->orderBy('name')->get();
+        $permissionsByModule = $permissions->groupBy('module');
+
+        return view('livewire.identity.roles.permission-matrix', [
+            'roles' => $roles,
+            'permissionsByModule' => $permissionsByModule,
+        ])->layout('layouts.app');
     }
 }

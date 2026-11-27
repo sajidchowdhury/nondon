@@ -73,16 +73,21 @@ class StockQueryService
      */
     public function getStockForProduct(Product $product, ?ProductSize $size = null): SupportCollection
     {
+        // NOTE: makeHidden() is a Model/Collection method, NOT a Builder method.
+        // Calling it on the Builder (as the previous code did) throws
+        // "Call to undefined method Builder::makeHidden()". It must be called
+        // AFTER ->get() resolves the Builder into a Collection.
         $query = Garment::with(['currentBranch:id,code,name', 'productSize:id,size_label'])
             ->available()
-            ->forProduct($product->id)
-            ->makeHidden('purchase_cost');
+            ->forProduct($product->id);
 
         if ($size) {
             $query->forSize($size->id);
         }
 
-        return $query->get()->groupBy('current_branch_id');
+        return $query->get()
+            ->makeHidden('purchase_cost')
+            ->groupBy('current_branch_id');
     }
 
     /**

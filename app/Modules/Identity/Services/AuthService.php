@@ -99,8 +99,14 @@ class AuthService
     {
         Auth::login($user, $remember);
 
-        // Regenerate session to prevent session fixation
-        request()->session()->regenerate(true);
+        // Regenerate session to prevent session fixation.
+        // Guard with hasSession() so the AuthService can be used outside of a
+        // full HTTP request lifecycle (e.g., direct service calls in tests or
+        // console commands) without throwing "Session store not set on request."
+        $request = request();
+        if ($request->hasSession()) {
+            $request->session()->regenerate(true);
+        }
     }
 
     /**
@@ -162,8 +168,13 @@ class AuthService
         }
 
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+
+        // Guard session calls for non-HTTP contexts (tests, console).
+        $request = request();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
     }
 
     /**

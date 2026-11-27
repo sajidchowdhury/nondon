@@ -171,7 +171,16 @@ class StockProjectionService
     /**
      * Get the count of reserved garments per branch.
      *
-     * @return Collection Collection of [{branch_id, branch_name, reserved_count}]
+     * Only branches with at least one reserved garment are included.
+     *
+     * NOTE: PostgreSQL does not allow referencing a SELECT-list alias (such as
+     * "reserved_count" produced by withCount) in a HAVING clause. The previous
+     * implementation used ->having('reserved_count', '>', 0) which raised
+     * "column reserved_count does not exist". The branch list is now filtered
+     * in PHP after the query runs, which keeps the reserved_count attribute on
+     * each returned Branch model intact.
+     *
+     * @return Collection Collection of Branch models with a reserved_count attribute
      */
     public function getReservationCounts(): Collection
     {
@@ -179,9 +188,10 @@ class StockProjectionService
             ->withCount(['garments as reserved_count' => function ($query) {
                 $query->where('current_status', Garment::STATUS_RESERVED);
             }])
-            ->having('reserved_count', '>', 0)
             ->orderBy('code')
-            ->get();
+            ->get()
+            ->filter(fn ($branch) => $branch->reserved_count > 0)
+            ->values();
     }
 
     /**
