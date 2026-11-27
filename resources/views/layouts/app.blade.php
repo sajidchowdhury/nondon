@@ -49,6 +49,11 @@
                                 {{ __('Suppliers') }}
                             </x-nav-link>
                             @endcan
+                            @can('viewAny', \App\Modules\Purchasing\Models\Purchase::class)
+                            <x-nav-link href="{{ route('purchases.index') }}" :active="request()->routeIs('purchases.*')">
+                                {{ __('Purchases') }}
+                            </x-nav-link>
+                            @endcan
                             @can('viewAny', \App\Modules\Inventory\Models\Garment::class)
                             <x-nav-link href="{{ route('garments.index') }}" :active="request()->routeIs('garments.*')">
                                 {{ __('Garments') }}
