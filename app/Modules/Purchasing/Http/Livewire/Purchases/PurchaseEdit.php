@@ -23,7 +23,18 @@ class PurchaseEdit extends Component
 
     public function mount(Purchase $purchase): void
     {
-        $this->authorize('update', $purchase);
+        // Use 'view' policy (not 'update') for initial page access so admin
+        // can view the edit form for ANY purchase — including confirmed and
+        // received purchases where the form renders read-only items plus
+        // action buttons (Cancel for confirmed, etc.).
+        //
+        // The actual update() method separately enforces 'update' policy,
+        // which requires draft status — preventing actual edits to
+        // non-draft purchases. This matches the blade design where:
+        //   - Draft: editable form + Save + Confirm + Cancel buttons
+        //   - Confirmed: read-only items + Cancel button
+        //   - Received/Cancelled: read-only items only
+        $this->authorize('view', $purchase);
 
         $this->purchase = $purchase->load('items');
         $this->fillFromPurchase($purchase);
