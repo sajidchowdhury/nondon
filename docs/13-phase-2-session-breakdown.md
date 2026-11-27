@@ -20,7 +20,7 @@
 | 2.3 Purchase Management UI & Confirmation | COMPLETE | e57ab69 |
 | 2.4 Goods Receiving — Core Transaction | COMPLETE | 5ed1cf3 |
 | 2.5 Goods Receiving UI & Edge Cases | COMPLETE | 92a9170 |
-| 2.6 Barcode Label Generation | PENDING | — |
+| 2.6 Barcode Label Generation | COMPLETE | 2a0370e |
 | 2.7 Label Printing UI & Printer Configuration | PENDING | — |
 | 2.8 Phase 2 Integration & Sensitive Data Hardening | PENDING | — |
 
@@ -733,14 +733,14 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Label data for a garment with a size includes the correct size_label
 - Barcode image for a 14-character barcode (NND-25-00001) renders without error
 
-### Acceptance criteria — Session 2.6
-- [ ] Code 128 barcode library installed and working
-- [ ] LabelPrintingService generates barcode images (base64 PNG/SVG)
-- [ ] Label data includes barcode, serial, product name, size, optional price
-- [ ] All four label formats are defined with correct dimensions
-- [ ] Barcode rendering works for the NND-{serial} format
-- [ ] ADR-019 documents the library choice
-- [ ] 15+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.6 (COMPLETE)
+- [x] Code 128 barcode library installed and working
+- [x] LabelPrintingService generates barcode images (base64 PNG/SVG)
+- [x] Label data includes barcode, serial, product name, size, optional price
+- [x] All four label formats are defined with correct dimensions
+- [x] Barcode rendering works for the NND-{serial} format
+- [x] ADR-019 documents the library choice
+- [x] 29 tests written (all acceptance criteria covered)
 
 ---
 
