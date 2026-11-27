@@ -15,7 +15,7 @@
 
 | Session | Status | Commit |
 |---|---|---|
-| 2.1 Supplier Management | PENDING | — |
+| 2.1 Supplier Management | COMPLETE | de42522 |
 | 2.2 Purchase Order Foundation | PENDING | — |
 | 2.3 Purchase Management UI & Confirmation | PENDING | — |
 | 2.4 Goods Receiving — Core Transaction | PENDING | — |
@@ -228,14 +228,14 @@ Indexes: `UNIQUE(code)`. No soft deletes — suppliers are deactivated via `is_a
 - Supplier update is audited
 - Supplier deactivate is audited
 
-### Acceptance criteria — Session 2.1
-- [ ] Admin can create, view, edit, activate/deactivate suppliers through the UI
-- [ ] Supplier code is unique
-- [ ] Suppliers with outstanding balance cannot be deactivated
-- [ ] All non-admin roles get 403 on all supplier routes
-- [ ] Supplier contact information (phone, email, address) is never visible to non-admin roles in any response or view
-- [ ] All supplier actions are audited
-- [ ] 15+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.1 (COMPLETE)
+- [x] Admin can create, view, edit, activate/deactivate suppliers through the UI
+- [x] Supplier code is unique
+- [x] Suppliers with outstanding balance cannot be deactivated
+- [x] All non-admin roles get 403 on all supplier routes
+- [x] Supplier contact information (phone, email, address) is never visible to non-admin roles in any response or view
+- [x] All supplier actions are audited
+- [x] 30 tests written (all acceptance criteria covered)
 
 ---
 
