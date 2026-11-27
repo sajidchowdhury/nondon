@@ -1,12 +1,14 @@
 <?php
 
+use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Catalog\Models\Product;
-use App\Modules\Catalog\Models\ProductSize;
 use App\Modules\Catalog\Models\ProductPrice;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Catalog\Models\ProductSize;
+use App\Modules\Catalog\Services\PriceService;
+use App\Modules\Organization\Models\Branch;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
-use Carbon\Carbon;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -21,7 +23,7 @@ describe('setPrice', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         $price = $service->setPrice($product, null, 1500.00, 1000.00);
 
@@ -40,7 +42,7 @@ describe('setPrice', function () {
 
         $product = Product::factory()->create();
         $size = ProductSize::factory()->forProduct($product)->create(['size_label' => '34']);
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         $price = $service->setPrice($product, $size, 1600.00, 1100.00);
 
@@ -53,9 +55,9 @@ describe('setPrice', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
-        expect(fn() => $service->setPrice($product, null, 1000.00, 1500.00))
+        expect(fn () => $service->setPrice($product, null, 1000.00, 1500.00))
             ->toThrow(ValidationException::class);
     });
 
@@ -64,9 +66,9 @@ describe('setPrice', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
-        expect(fn() => $service->setPrice($product, null, -100.00, -50.00))
+        expect(fn () => $service->setPrice($product, null, -100.00, -50.00))
             ->toThrow(ValidationException::class);
     });
 
@@ -75,7 +77,7 @@ describe('setPrice', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         // Set first price
         $firstPrice = $service->setPrice($product, null, 1000.00, 800.00);
@@ -96,7 +98,7 @@ describe('setPrice', function () {
 
         $product = Product::factory()->create();
         $size = ProductSize::factory()->forProduct($product)->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         // Set product-level price
         $productPrice = $service->setPrice($product, null, 1000.00, 800.00);
@@ -117,7 +119,7 @@ describe('getCurrentPrice', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
         $service->setPrice($product, null, 1500.00, 1000.00);
 
         $current = $service->getCurrentPrice($product);
@@ -131,7 +133,7 @@ describe('getCurrentPrice', function () {
 
         $product = Product::factory()->create();
         $size = ProductSize::factory()->forProduct($product)->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         // Set product-level price
         $service->setPrice($product, null, 1000.00, 800.00);
@@ -148,7 +150,7 @@ describe('getCurrentPrice', function () {
 
         $product = Product::factory()->create();
         $size = ProductSize::factory()->forProduct($product)->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         // Set only product-level price
         $service->setPrice($product, null, 1000.00, 800.00);
@@ -159,7 +161,7 @@ describe('getCurrentPrice', function () {
 
     it('returns null if no price set', function () {
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         $current = $service->getCurrentPrice($product);
         expect($current)->toBeNull();
@@ -172,7 +174,7 @@ describe('getPriceAt — historical price lookup', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         // Create an old price (expired)
         ProductPrice::factory()->forProduct($product)->effectiveAt(
@@ -197,7 +199,7 @@ describe('getPriceAt — historical price lookup', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
         $service->setPrice($product, null, 1500.00, 1000.00);
 
         $todayPrice = $service->getPriceAt($product, null, now());
@@ -206,7 +208,7 @@ describe('getPriceAt — historical price lookup', function () {
 
     it('returns null if no price was effective at the date', function () {
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         $pastPrice = $service->getPriceAt($product, null, now()->subDays(10));
         expect($pastPrice)->toBeNull();
@@ -219,7 +221,7 @@ describe('getPriceHistory', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         // Set multiple prices
         $service->setPrice($product, null, 500.00, 400.00);
@@ -241,7 +243,7 @@ describe('getPriceHistory', function () {
 
         $product = Product::factory()->create();
         $size = ProductSize::factory()->forProduct($product)->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
 
         $service->setPrice($product, null, 1000.00, 800.00);
         $service->setPrice($product, $size, 1200.00, 900.00);
@@ -260,9 +262,12 @@ describe('getAllCurrentPrices', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        $size1 = ProductSize::factory()->forProduct($product)->create();
-        $size2 = ProductSize::factory()->forProduct($product)->create();
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        // Explicit distinct labels — the factory's random label can collide
+        // (product_sizes unique on product_id + size_label), making this
+        // test flaky when both random picks land on the same size.
+        $size1 = ProductSize::factory()->forProduct($product)->create(['size_label' => '36']);
+        $size2 = ProductSize::factory()->forProduct($product)->create(['size_label' => '38']);
+        $service = app(PriceService::class);
 
         $service->setPrice($product, null, 1000.00, 800.00);
         $service->setPrice($product, $size1, 1100.00, 850.00);
@@ -324,12 +329,12 @@ describe('auditing', function () {
         $this->actingAs($admin);
 
         $product = Product::factory()->create();
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
-        $service = app(\App\Modules\Catalog\Services\PriceService::class);
+        $service = app(PriceService::class);
         $price = $service->setPrice($product, null, 1500.00, 1000.00);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'price.create')
+        $auditLog = AuditLog::where('action', 'price.create')
             ->where('reference_id', $price->id)
             ->first();
 
@@ -340,7 +345,7 @@ describe('auditing', function () {
 
 describe('authorization', function () {
     it('denies supervisor from setting prices', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $product = Product::factory()->create();
 
@@ -350,7 +355,7 @@ describe('authorization', function () {
     });
 
     it('denies salesperson from setting prices', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         $product = Product::factory()->create();
 
