@@ -644,9 +644,9 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 ### Deliverables
 
 **1. Barcode library selection and installation:**
-- Evaluate `picqer/php-barcode` (recommended for Code 128 1D barcodes) vs `bacon/bacon-qr-code`.
+- Evaluate `picqer/php-barcode-generator` (recommended for Code 128 1D barcodes) vs `bacon/bacon-qr-code`.
 - Install the chosen library via Composer.
-- Document the decision in an ADR (`docs/10-architecture-decisions.md` — add ADR-018: Barcode Generation Library).
+- Document the decision in an ADR (`docs/10-architecture-decisions.md` — ADR-019: Barcode Generation Library. Number re-assigned during Session 2.6 because ADR-018 was already taken by the Search vs. Report Boundary decision).
 
 **2. LabelPrintingService (`app/Modules/Purchasing/Services/LabelPrintingService.php`):**
 - `generateBarcodeImage(string $barcode, int $height = 60): string`
@@ -714,7 +714,7 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Store in `config/system_settings` table or a dedicated settings table (follow the existing System Settings pattern from Phase 1, if any; otherwise use Laravel's `config()` + database override).
 
 **6. ADR documentation:**
-- Add ADR-018 to `docs/10-architecture-decisions.md`: "Barcode Generation Library — picqer/php-barcode for Code 128." Document context, decision, rationale, consequences.
+- Add ADR-019 to `docs/10-architecture-decisions.md`: "Barcode Generation Library — picqer/php-barcode-generator for Code 128." Document context, decision, rationale, consequences.
 
 **7. Tests (`tests/Feature/Purchasing/BarcodeLabelGenerationTest.php`):**
 - generateBarcodeImage returns a valid base64 PNG/SVG string
@@ -739,7 +739,7 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - [ ] Label data includes barcode, serial, product name, size, optional price
 - [ ] All four label formats are defined with correct dimensions
 - [ ] Barcode rendering works for the NND-{serial} format
-- [ ] ADR-018 documents the library choice
+- [ ] ADR-019 documents the library choice
 - [ ] 15+ tests written (all acceptance criteria covered)
 
 ---
@@ -988,7 +988,7 @@ These decisions are unresolved in the current design docs and must be finalized 
 | # | Decision | Session | Recommendation |
 |---|---|---|---|
 | 1 | Final barcode format string | 2.4 (verify existing) | Keep Phase 1's `NND-{serial}` (e.g., `NND-25-00001`) — simple, unique, embeds serial. |
-| 2 | Barcode generation PHP library | 2.6 | `picqer/php-barcode` (Code 128 support). Document as ADR-018. |
+| 2 | Barcode generation PHP library | 2.6 | `picqer/php-barcode-generator` (Code 128 support). Document as ADR-019. |
 | 3 | Print transport | 2.7 | Browser CSS print media first (works for all formats via `@page`). ESC/POS/TSCL JS bridge as future enhancement. |
 | 4 | Does PurchasingService create garments directly or via GarmentIdentityService? | 2.4 | Via GarmentIdentityService (extended signature) — respects architecture §3.2 service-interface rule. Single transaction wraps all calls. |
 | 5 | Advisory lock key derivation | 2.4 (verify existing) | Already implemented in Phase 1 FiscalYearService — verify the key derivation and document it. |

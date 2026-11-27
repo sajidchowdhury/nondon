@@ -533,6 +533,30 @@ Implement a clear **search vs. report boundary**:
 - UI clearly separates search (always available) from reports (restricted).
 - Audit logs track all searches (for visibility into who looked up what).
 
+## ADR-019: Barcode Generation Library — picqer/php-barcode-generator
+
+**Status:** Accepted
+**Date:** November 2026
+
+### Context
+Phase 2 requires rendering Code 128 barcode images for garment labels (WF-2). The system generates barcodes during goods receiving (`NND-{serial}`, e.g. `NND-25-00001`) and must print them as physical labels on thermal printers (Xprinter XP-420B, G-Printer GP-3120TUC, Rongta RP400H) via the browser print dialog. A PHP library is needed to render the barcode symbol itself; the print transport (browser CSS `@page` directives) is a separate decision implemented in Session 2.7.
+
+### Decision
+Use `picqer/php-barcode-generator` (Composer package `picqer/php-barcode-generator`, MIT/LGPL-3.0) for Code 128 barcode rendering. Labels render as **base64-encoded SVG** — not PNG — and are embedded inline via `data:image/svg+xml;base64,` URIs. Quiet zones of 10 modules (Code 128 minimum: 10x the narrowest bar) are injected on both sides of every symbol.
+
+*Note: the Phase 2 session plan referred to this library as "picqer/php-barcode"; the correct Composer package name is `picqer/php-barcode-generator`. Decision recorded as ADR-019 because ADR-018 (Search vs. Report Boundary) was already assigned.*
+
+### Rationale
+- Lightweight, no bloated dependencies; purpose-built for 1D barcodes including Code 128 with automatic code-set switching.
+- SVG output is vector: labels scale crisply to any thermal-printer DPI through the browser print dialog without pixelation, and rendering requires no GD image extension on the server.
+- Deterministic output (no timestamps/ids in the SVG) makes rendering testable.
+- The library's `Barcode`/`BarcodeBar` value objects let us inject quiet-zone bars cleanly, satisfying scanner boundary requirements.
+
+### Consequences
+- `LabelPrintingService` wraps the library; symbology is configurable via `barcode.barcode_symbology` (default CODE128) but only Code 128 is implemented in Phase 2.
+- Barcode images live only in generated HTML/print output — nothing is stored on disk, keeping the system stateless for labels.
+- If a future printer requires raster output (ESC/POS direct transport), a PNG renderer from the same library can be added behind the same service interface.
+
 ---
 
 ## Summary of ADRs
@@ -557,6 +581,7 @@ Implement a clear **search vs. report boundary**:
 | ADR-016 | Database Queue Driver Initially | Accepted |
 | ADR-017 | Spatie Laravel Permission for RBAC | Accepted |
 | ADR-018 | Search vs. Report Boundary for Date Restrictions | Accepted |
+| ADR-019 | Barcode Generation Library — picqer/php-barcode-generator | Accepted |
 
 ---
 

@@ -1,6 +1,6 @@
 {
     "preset": "laravel",
     "rules": {
-        "simplified_null_return_type": true
+        "simplified_null_return": true
     }
 }
