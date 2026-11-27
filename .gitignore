@@ -64,3 +64,12 @@ yarn-error.log
 
 # Documentation builds
 /docs/_build/
+
+# Runtime caches (regenerated automatically by composer/artisan)
+/bootstrap/cache/*.php
+
+# Spatie permission migrations are published per-machine by docker/init.sh
+# (php artisan vendor:publish --tag=permission-migrations). Each machine
+# generates its own timestamped copy — never commit it, otherwise migrations
+# collide with the local copy ("table already exists" on migrate).
+/database/migrations/*create_permission_tables.php
