@@ -40,6 +40,8 @@ class GarmentIdentityService
      * @param FiscalYear $fiscalYear
      * @param Branch $branch
      * @param float|null $purchaseCost Restricted to admin — hidden from non-admin users
+     * @param int|null $purchaseId Optional purchase context (set during goods receiving)
+     * @param int|null $purchaseItemId Optional purchase item context (set during goods receiving)
      * @return Garment
      * @throws ValidationException if fiscal year is closed
      */
@@ -49,6 +51,8 @@ class GarmentIdentityService
         FiscalYear $fiscalYear,
         Branch $branch,
         ?float $purchaseCost = null,
+        ?int $purchaseId = null,
+        ?int $purchaseItemId = null,
     ): Garment {
         if ($fiscalYear->is_closed) {
             throw ValidationException::withMessages([
@@ -56,7 +60,7 @@ class GarmentIdentityService
             ]);
         }
 
-        return DB::transaction(function () use ($product, $size, $fiscalYear, $branch, $purchaseCost) {
+        return DB::transaction(function () use ($product, $size, $fiscalYear, $branch, $purchaseCost, $purchaseId, $purchaseItemId) {
             // Generate fiscal-year serial with advisory locking (concurrency-safe)
             $serial = $this->fiscalYearService->generateNextSerial($fiscalYear);
 
@@ -74,6 +78,8 @@ class GarmentIdentityService
                 'fiscal_year_serial' => $serial,
                 'product_id' => $product->id,
                 'product_size_id' => $size?->id,
+                'purchase_id' => $purchaseId,
+                'purchase_item_id' => $purchaseItemId,
                 'purchase_cost' => $purchaseCost,
                 'current_status' => Garment::STATUS_AVAILABLE,
                 'current_branch_id' => $branch->id,
