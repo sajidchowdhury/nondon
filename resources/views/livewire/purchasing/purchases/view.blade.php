@@ -12,7 +12,8 @@
             </a>
             @endcan
             @can('receive', $purchase)
-            <a href="{{ route('purchases.index') }}" wire:navigate class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm opacity-50 cursor-not-allowed" title="{{ __('Available in Session 2.4') }}">
+            <a href="{{ route('purchases.receive', $purchase) }}" wire:navigate
+               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm">
                 {{ __('Receive Goods') }}
             </a>
             @endcan
@@ -127,9 +128,46 @@
         </div>
     </div>
 
-    {{-- Goods receipts placeholder (populated in Session 2.4) --}}
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
-        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ __('Goods Receipts') }}</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Goods receipts will appear here once the receiving module is built (Session 2.4).') }}</p>
+    {{-- Goods receipts --}}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mt-6">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Goods Receipts') }}</h3>
+            @if($purchase->goodsReceipts->isNotEmpty())
+            <a href="{{ route('goods-receipts.index') }}" wire:navigate class="text-sm text-emerald-600 hover:text-emerald-900">{{ __('View All') }}</a>
+            @endif
+        </div>
+        @if($purchase->goodsReceipts->isNotEmpty())
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Receipt Number') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Date') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Received By') }}</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Qty') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach($purchase->goodsReceipts as $receipt)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4 text-sm font-medium text-emerald-600">
+                            <a href="{{ route('goods-receipts.show', $receipt) }}" wire:navigate>{{ $receipt->receipt_number }}</a>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $receipt->received_date->format('M d, Y') }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $receipt->receiver?->display_name ?? __('N/A') }}</td>
+                        <td class="px-6 py-4 text-sm text-right text-gray-900 dark:text-white">{{ $receipt->total_received_quantity }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @else
+        <div class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            {{ __('No goods receipts yet.') }}
+            @can('receive', $purchase)
+            <br><a href="{{ route('purchases.receive', $purchase) }}" wire:navigate class="text-emerald-600 hover:text-emerald-900">{{ __('Receive goods now') }}</a>
+            @endcan
+        </div>
+        @endif
     </div>
 </div>
