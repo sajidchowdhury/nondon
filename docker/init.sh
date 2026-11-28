@@ -61,18 +61,15 @@ echo "      Done."
 
 # Step 3: Generate application key (only if not set)
 echo "[3/8] Generating application key..."
-if grep -q "APP_KEY=" .env | grep -v "^APP_KEY=$"; then
+# Check the APP_KEY value directly — a bare `grep -q | grep -v` pipeline is
+# always false (grep -q produces no output), which made the skip/generate
+# decision unreliable. Value-based check handles both "APP_KEY=" and missing key.
+APP_KEY_VALUE=$(grep "^APP_KEY=" .env | cut -d'=' -f2)
+if [ -z "$APP_KEY_VALUE" ]; then
     php artisan key:generate --force
     echo "      Done."
 else
-    # Check if key is empty
-    APP_KEY_VALUE=$(grep "^APP_KEY=" .env | cut -d'=' -f2)
-    if [ -z "$APP_KEY_VALUE" ]; then
-        php artisan key:generate --force
-        echo "      Done."
-    else
-        echo "      Skipped: APP_KEY already set."
-    fi
+    echo "      Skipped: APP_KEY already set."
 fi
 
 # Step 4: Publish Spatie permission migrations (if not already published)
