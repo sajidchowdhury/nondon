@@ -620,15 +620,15 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Goods receipt detail shows garment identities (barcode, serial)
 - Purchase cost is not visible in goods receipt detail for non-admin (supervisor sees garments but not cost)
 
-### Acceptance criteria — Session 2.5
-- [ ] Receiving form is accessible for confirmed/partially_received purchases
-- [ ] Staff can enter received quantities per line item and generate garment identities
-- [ ] Excess quantity is flagged and blocked
-- [ ] Partial receipts work and allow subsequent receipts
-- [ ] Goods receipt list and detail views work
-- [ ] Only admin + supervisor can access receiving; salesperson is denied
-- [ ] Purchase cost is hidden from supervisor in receipt views
-- [ ] 13+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.5 (COMPLETE)
+- [x] Receiving form is accessible for confirmed/partially_received purchases
+- [x] Staff can enter received quantities per line item and generate garment identities
+- [x] Excess quantity is flagged and blocked
+- [x] Partial receipts work and allow subsequent receipts
+- [x] Goods receipt list and detail views work
+- [x] Only admin + supervisor can access receiving; salesperson is denied
+- [x] Purchase cost is hidden from supervisor in receipt views
+- [x] 13+ tests written (all acceptance criteria covered)
 
 ---
 

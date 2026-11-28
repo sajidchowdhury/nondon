@@ -1,16 +1,20 @@
 <?php
 
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Models\GoodsReceipt;
-use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Purchasing\Services\ReceivingService;
-use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Inventory\Models\Garment;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Catalog\Models\Product;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Purchasing\Http\Livewire\Receiving\ReceiveGoods;
+use App\Modules\Purchasing\Models\GoodsReceipt;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Services\PurchasingService;
+use App\Modules\Purchasing\Services\ReceivingService;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Auth\Access\AuthorizationException;
+use Livewire\Livewire;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -41,6 +45,7 @@ function createConfirmedPurchaseForUi(int $quantity = 10, float $unitCost = 250.
     ]);
 
     $service->confirmPurchase($purchase);
+
     return $purchase->fresh('items');
 }
 
@@ -56,6 +61,7 @@ function createReceivedPurchaseForUi(int $quantity = 5): GoodsReceipt
     $itemId = $purchase->items->first()->id;
 
     $receivingService = app(ReceivingService::class);
+
     return $receivingService->receiveGoods($purchase, [$itemId => $quantity], $admin);
 }
 
@@ -172,6 +178,114 @@ describe('receiving form — edge cases', function () {
         $response = $this->actingAs($admin)->get(route('purchases.show', $purchase->fresh()));
         $response->assertStatus(200);
         $response->assertSee('Partially Received');
+    });
+});
+
+describe('receiving form — Livewire submit interactions', function () {
+    it('admin can enter received quantities and submit — identities are generated with redirect to receipt detail', function () {
+        $admin = adminUser();
+        $purchase = createConfirmedPurchaseForUi(10);
+        $itemId = $purchase->items->first()->id;
+
+        $component = Livewire::test(ReceiveGoods::class, ['purchase' => $purchase])
+            ->set("receivedQuantities.{$itemId}", '10')
+            ->call('receive')
+            ->assertHasNoErrors();
+
+        $receipt = GoodsReceipt::first();
+        expect($receipt)->not->toBeNull();
+        expect(Garment::count())->toBe(10);
+        expect($purchase->fresh()->status)->toBe(Purchase::STATUS_RECEIVED);
+        $component->assertRedirect(route('goods-receipts.show', $receipt));
+    });
+
+    it('submitting with no quantities shows a validation error and receives nothing', function () {
+        $admin = adminUser();
+        $purchase = createConfirmedPurchaseForUi(10);
+        $itemId = $purchase->items->first()->id;
+
+        Livewire::test(ReceiveGoods::class, ['purchase' => $purchase])
+            ->set("receivedQuantities.{$itemId}", '')
+            ->call('receive')
+            ->assertHasErrors('quantities');
+
+        expect(GoodsReceipt::count())->toBe(0);
+        expect(Garment::count())->toBe(0);
+        expect($purchase->fresh()->status)->toBe(Purchase::STATUS_CONFIRMED);
+    });
+
+    it('submitting an excess quantity is blocked with a validation error and no identities are generated', function () {
+        $admin = adminUser();
+        $purchase = createConfirmedPurchaseForUi(10);
+        $itemId = $purchase->items->first()->id;
+
+        Livewire::test(ReceiveGoods::class, ['purchase' => $purchase])
+            ->set("receivedQuantities.{$itemId}", '11')
+            ->call('receive')
+            ->assertHasErrors("receivedQuantities.{$itemId}");
+
+        expect(GoodsReceipt::count())->toBe(0);
+        expect(Garment::count())->toBe(0);
+        expect($purchase->fresh()->status)->toBe(Purchase::STATUS_CONFIRMED);
+    });
+
+    it('partial receipt via the form updates the purchase to partially_received', function () {
+        $admin = adminUser();
+        $purchase = createConfirmedPurchaseForUi(10);
+        $itemId = $purchase->items->first()->id;
+
+        Livewire::test(ReceiveGoods::class, ['purchase' => $purchase])
+            ->set("receivedQuantities.{$itemId}", '4')
+            ->call('receive')
+            ->assertHasNoErrors();
+
+        expect($purchase->fresh()->status)->toBe(Purchase::STATUS_PARTIALLY_RECEIVED);
+        expect(GoodsReceipt::count())->toBe(1);
+        expect(Garment::count())->toBe(4);
+    });
+
+    it('second receipt via the form completes a partially received purchase', function () {
+        $admin = adminUser();
+        $purchase = createConfirmedPurchaseForUi(10);
+        $itemId = $purchase->items->first()->id;
+
+        // First partial receipt through the service (as the UI does)
+        app(ReceivingService::class)->receiveGoods($purchase, [$itemId => 4], $admin);
+
+        Livewire::test(ReceiveGoods::class, ['purchase' => $purchase->fresh()])
+            ->set("receivedQuantities.{$itemId}", '6')
+            ->call('receive')
+            ->assertHasNoErrors();
+
+        expect($purchase->fresh()->status)->toBe(Purchase::STATUS_RECEIVED);
+        expect(GoodsReceipt::count())->toBe(2);
+        expect(Garment::count())->toBe(10);
+    });
+
+    it('receiving form cannot be mounted for a draft purchase (authorization denied)', function () {
+        $admin = adminUser();
+        $this->actingAs($admin);
+
+        $supplier = Supplier::factory()->create();
+        $fiscalYear = FiscalYear::active()->first();
+        $product = Product::factory()->create();
+
+        $purchase = app(PurchasingService::class)->createPurchase([
+            'supplier_id' => $supplier->id,
+            'fiscal_year_id' => $fiscalYear->id,
+            'purchase_date' => '2025-08-15',
+            'items' => [['product_id' => $product->id, 'ordered_quantity' => 5, 'unit_cost' => 100]],
+        ]);
+
+        expect($purchase->status)->toBe(Purchase::STATUS_DRAFT);
+
+        // The mount() authorize fails for a draft purchase — Livewire's test
+        // broker converts the AuthorizationException into a 403 response.
+        Livewire::test(ReceiveGoods::class, ['purchase' => $purchase])
+            ->assertForbidden();
+
+        expect(GoodsReceipt::count())->toBe(0);
+        expect(Garment::count())->toBe(0);
     });
 });
 
