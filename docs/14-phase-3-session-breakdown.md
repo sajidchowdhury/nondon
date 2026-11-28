@@ -17,7 +17,7 @@
 |---|---|---|
 | 3.1 Customer Management — Creation, Phone Search & Duplicate Detection | COMPLETE | 462eaeb |
 | 3.2 Sales Data Model & Atomic Sale Service | COMPLETE | 5192d21 |
-| 3.3 POS Interface — Barcode Lookup, Cart & Discount | COMPLETE | (this session) |
+| 3.3 POS Interface — Barcode Lookup, Cart & Discount | COMPLETE | 1895b2c |
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | PENDING | — |
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | PENDING | — |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | PENDING | — |
