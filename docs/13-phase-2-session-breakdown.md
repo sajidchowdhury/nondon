@@ -21,7 +21,7 @@
 | 2.4 Goods Receiving — Core Transaction | COMPLETE | 5ed1cf3 |
 | 2.5 Goods Receiving UI & Edge Cases | COMPLETE | 92a9170 |
 | 2.6 Barcode Label Generation | COMPLETE | 2a0370e |
-| 2.7 Label Printing UI & Printer Configuration | PENDING | — |
+| 2.7 Label Printing UI & Printer Configuration | COMPLETE | c4c027e |
 | 2.8 Phase 2 Integration & Sensitive Data Hardening | PENDING | — |
 
 ---
@@ -816,15 +816,15 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Label data does not include purchase cost (even for admin — labels never show cost)
 - Preview updates when format or show-price toggle changes
 
-### Acceptance criteria — Session 2.7
-- [ ] Print labels UI is accessible and shows garment selection
-- [ ] Label preview renders barcode + text fields before printing
-- [ ] All four label formats are selectable and render with correct @page sizes
-- [ ] Browser print dialog produces correctly-sized labels
-- [ ] Printer settings are configurable in System Settings (admin only)
-- [ ] Labels never include purchase cost
-- [ ] Only admin + supervisor can print labels; salesperson denied
-- [ ] 14+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.7 (COMPLETE)
+- [x] Print labels UI is accessible and shows garment selection
+- [x] Label preview renders barcode + text fields before printing
+- [x] All four label formats are selectable and render with correct @page sizes
+- [x] Browser print dialog produces correctly-sized labels (print sheet + auto window.print())
+- [x] Printer settings are configurable in System Settings (admin only)
+- [x] Labels never include purchase cost
+- [x] Only admin + supervisor can print labels; salesperson denied
+- [x] 32 tests written (all acceptance criteria covered)
 
 ---
 
