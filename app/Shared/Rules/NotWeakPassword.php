@@ -53,19 +53,18 @@ class NotWeakPassword implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
-     * @param mixed $value
-     * @return bool
+     * @param  string  $attribute
+     * @param  mixed  $value
      */
     public function passes($attribute, $value): bool
     {
-        if (!$value) {
+        if (! $value) {
             return true;
         }
 
         $lowercase = strtolower($value);
 
-        return !in_array($lowercase, self::WEAK_PASSWORDS);
+        return ! in_array($lowercase, self::WEAK_PASSWORDS);
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Roles;
 
-use Livewire\Component;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\PermissionOverrideService;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
+use Spatie\Permission\Models\Permission;
 
 class PermissionOverride extends Component
 {
@@ -39,6 +39,7 @@ class PermissionOverride extends Component
      * Current grants and revokes.
      */
     public $grants;
+
     public $revokes;
 
     /**
@@ -120,7 +121,7 @@ class PermissionOverride extends Component
 
         $permission = Permission::find($permissionId);
 
-        if (!$permission) {
+        if (! $permission) {
             return;
         }
 

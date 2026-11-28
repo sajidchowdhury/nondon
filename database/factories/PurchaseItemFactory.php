@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Modules\Purchasing\Models\PurchaseItem;
-use App\Modules\Purchasing\Models\Purchase;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\PurchaseItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -45,6 +45,7 @@ class PurchaseItemFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $ordered = $attributes['ordered_quantity'];
+
             return [
                 'received_quantity' => (int) floor($ordered / 2),
             ];

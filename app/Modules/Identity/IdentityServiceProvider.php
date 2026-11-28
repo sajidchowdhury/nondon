@@ -2,8 +2,9 @@
 
 namespace App\Modules\Identity;
 
+use App\Modules\Identity\Http\Livewire\Roles\PermissionOverride;
+use App\Modules\Identity\Http\Livewire\Roles\RoleAssignment;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\File;
 use Livewire\Livewire;
 
 class IdentityServiceProvider extends ServiceProvider
@@ -32,8 +33,8 @@ class IdentityServiceProvider extends ServiceProvider
 
         // Register Livewire component aliases so they can be referenced
         // by dot-notation in Blade views (e.g., <livewire:identity.roles.role-assignment />).
-        Livewire::component('identity.roles.role-assignment', \App\Modules\Identity\Http\Livewire\Roles\RoleAssignment::class);
-        Livewire::component('identity.roles.permission-override', \App\Modules\Identity\Http\Livewire\Roles\PermissionOverride::class);
+        Livewire::component('identity.roles.role-assignment', RoleAssignment::class);
+        Livewire::component('identity.roles.permission-override', PermissionOverride::class);
 
         // Register module-specific configurations
         $this->registerModuleConfig();

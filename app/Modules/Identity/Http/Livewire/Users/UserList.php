@@ -2,11 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Users;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\UserService;
 use App\Modules\Organization\Models\Branch;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
 
 class UserList extends Component
@@ -97,6 +97,6 @@ class UserList extends Component
             'branches' => $branches,
             'roles' => $roles,
         ])
-        ->layout('layouts.app');
+            ->layout('layouts.app');
     }
 }

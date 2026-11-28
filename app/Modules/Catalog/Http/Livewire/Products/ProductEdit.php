@@ -2,19 +2,23 @@
 
 namespace App\Modules\Catalog\Http\Livewire\Products;
 
-use Livewire\Component;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Services\ProductService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class ProductEdit extends Component
 {
     public Product $product;
 
     public string $code = '';
+
     public string $name = '';
+
     public string $description = '';
+
     public string $category = '';
+
     public string $newSize = '';
 
     public function mount(Product $product): void
@@ -31,7 +35,7 @@ class ProductEdit extends Component
     protected function rules(): array
     {
         return [
-            'code' => ['required', 'string', 'max:50', 'unique:products,code,' . $this->product->id],
+            'code' => ['required', 'string', 'max:50', 'unique:products,code,'.$this->product->id],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'category' => ['nullable', 'string', 'max:100'],
@@ -44,7 +48,7 @@ class ProductEdit extends Component
         $this->authorize('update', $this->product);
 
         $validated = $this->validate([
-            'code' => ['required', 'string', 'max:50', 'unique:products,code,' . $this->product->id],
+            'code' => ['required', 'string', 'max:50', 'unique:products,code,'.$this->product->id],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'category' => ['nullable', 'string', 'max:100'],

@@ -2,10 +2,10 @@
 
 namespace App\Modules\Organization\Http\Livewire\FiscalYears;
 
-use Livewire\Component;
 use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Organization\Services\FiscalYearService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class FiscalYearCreate extends Component
 {
@@ -18,7 +18,9 @@ class FiscalYearCreate extends Component
      * Computed properties for display.
      */
     public string $previewName = '';
+
     public string $previewPrefix = '';
+
     public string $previewDateRange = '';
 
     protected function rules(): array

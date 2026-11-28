@@ -1,5 +1,8 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\AuthServiceProvider;
+
 /**
  * Laravel 11 Application Service Providers
  *
@@ -18,6 +21,6 @@
  * The AuthServiceProvider registers model policies and authorization gates.
  */
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\AuthServiceProvider::class,
+    AppServiceProvider::class,
+    AuthServiceProvider::class,
 ];

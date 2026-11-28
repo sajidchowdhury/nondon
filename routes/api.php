@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Identity\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,14 +30,14 @@ Route::prefix('v1')->group(function () {
     });
 
     // Authentication
-    Route::post('/auth/login', [\App\Modules\Identity\Http\Controllers\Api\AuthController::class, 'login']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
 
     // Protected routes (require authentication)
     Route::middleware('auth:sanctum')->group(function () {
 
-        Route::post('/auth/logout', [\App\Modules\Identity\Http\Controllers\Api\AuthController::class, 'logout']);
-        Route::get('/auth/me', [\App\Modules\Identity\Http\Controllers\Api\AuthController::class, 'me']);
-        Route::post('/auth/role-switch', [\App\Modules\Identity\Http\Controllers\Api\AuthController::class, 'switchRole']);
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::post('/auth/role-switch', [AuthController::class, 'switchRole']);
 
         // Offline POS sync (Phase 8)
         // Route::prefix('sync')->group(function () {

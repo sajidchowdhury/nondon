@@ -2,13 +2,13 @@
 
 namespace App\Modules\Identity\Http\Livewire\Users;
 
-use Livewire\Component;
 use App\Modules\Identity\Models\User;
-use App\Modules\Identity\Services\UserService;
 use App\Modules\Identity\Services\AuthService;
+use App\Modules\Identity\Services\UserService;
 use App\Modules\Organization\Models\Branch;
-use Spatie\Permission\Models\Role;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class UserEdit extends Component
 {
@@ -21,9 +21,13 @@ class UserEdit extends Component
      * Form fields.
      */
     public string $username = '';
+
     public string $full_name = '';
+
     public string $email = '';
+
     public ?int $assigned_branch_id = null;
+
     public bool $is_online_channel = false;
     // Note: Role management is now handled by the RoleAssignment Livewire component
     // embedded in the edit view. Permission overrides are handled by PermissionOverride.
@@ -32,7 +36,9 @@ class UserEdit extends Component
      * Password reset fields (optional, admin-initiated).
      */
     public string $new_password = '';
+
     public string $new_password_confirmation = '';
+
     public bool $show_password_reset = false;
 
     /**
@@ -57,7 +63,7 @@ class UserEdit extends Component
     protected function rules(): array
     {
         return [
-            'username' => ['required', 'string', 'min:3', 'max:100', 'unique:users,username,' . $this->user->id],
+            'username' => ['required', 'string', 'min:3', 'max:100', 'unique:users,username,'.$this->user->id],
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'assigned_branch_id' => ['required_unless:is_online_channel,true'],
@@ -111,7 +117,7 @@ class UserEdit extends Component
             ]);
 
             // Handle branch assignment if changed
-            if (!$this->is_online_channel && $validated['assigned_branch_id']
+            if (! $this->is_online_channel && $validated['assigned_branch_id']
                 && $validated['assigned_branch_id'] != $this->user->assigned_branch_id) {
                 $branch = Branch::find($validated['assigned_branch_id']);
                 if ($branch) {
@@ -205,6 +211,6 @@ class UserEdit extends Component
             'branches' => $branches,
             'onlineBranch' => $onlineBranch,
         ])
-        ->layout('layouts.app');
+            ->layout('layouts.app');
     }
 }

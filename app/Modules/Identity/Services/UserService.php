@@ -15,15 +15,15 @@ class UserService
     /**
      * Create a new user.
      *
-     * @param array $data User data including:
-     *   - username (string, required, unique)
-     *   - full_name (string, required)
-     *   - email (string, nullable)
-     *   - password (string, required)
-     *   - assigned_branch_id (int, nullable for online channel)
-     *   - is_online_channel (bool, default false)
-     *   - roles (array of role names, optional)
-     * @return User
+     * @param  array  $data  User data including:
+     *                       - username (string, required, unique)
+     *                       - full_name (string, required)
+     *                       - email (string, nullable)
+     *                       - password (string, required)
+     *                       - assigned_branch_id (int, nullable for online channel)
+     *                       - is_online_channel (bool, default false)
+     *                       - roles (array of role names, optional)
+     *
      * @throws ValidationException
      */
     public function create(array $data): User
@@ -36,7 +36,7 @@ class UserService
         }
 
         // Validate branch assignment for physical branch users
-        if (!($data['is_online_channel'] ?? false) && empty($data['assigned_branch_id'])) {
+        if (! ($data['is_online_channel'] ?? false) && empty($data['assigned_branch_id'])) {
             throw ValidationException::withMessages([
                 'assigned_branch_id' => __('Physical branch users must be assigned to a branch.'),
             ]);
@@ -57,7 +57,7 @@ class UserService
             ]);
 
             // Assign roles if provided
-            if (!empty($data['roles'])) {
+            if (! empty($data['roles'])) {
                 $user->assignRole($data['roles']);
             }
 
@@ -67,10 +67,6 @@ class UserService
 
     /**
      * Update user details (not password — use resetPassword for that).
-     *
-     * @param User $user
-     * @param array $data
-     * @return User
      */
     public function update(User $user, array $data): User
     {
@@ -134,14 +130,14 @@ class UserService
     public function assignToBranch(User $user, Branch $branch): User
     {
         // Online channel users must be assigned to the online channel branch
-        if ($user->is_online_channel && !$branch->is_online_channel) {
+        if ($user->is_online_channel && ! $branch->is_online_channel) {
             throw ValidationException::withMessages([
                 'assigned_branch_id' => __('Online channel users must be assigned to the online channel branch.'),
             ]);
         }
 
         // Physical branch users cannot be assigned to the online channel
-        if (!$user->is_online_channel && $branch->is_online_channel) {
+        if (! $user->is_online_channel && $branch->is_online_channel) {
             throw ValidationException::withMessages([
                 'assigned_branch_id' => __('Physical branch users cannot be assigned to the online channel.'),
             ]);
@@ -171,26 +167,25 @@ class UserService
     /**
      * Get paginated list of users with filters.
      *
-     * @param array $filters {
-     *   - search: string (search by username, full_name, email)
-     *   - branch_id: int (filter by branch)
-     *   - role: string (filter by role name)
-     *   - status: string ('active', 'inactive', 'locked')
-     *   - per_page: int (default 25)
-     * }
-     * @return LengthAwarePaginator
+     * @param  array  $filters  {
+     *                          - search: string (search by username, full_name, email)
+     *                          - branch_id: int (filter by branch)
+     *                          - role: string (filter by role name)
+     *                          - status: string ('active', 'inactive', 'locked')
+     *                          - per_page: int (default 25)
+     *                          }
      */
     public function getPaginatedList(array $filters = []): LengthAwarePaginator
     {
         $query = User::query()->with(['roles', 'assignedBranch']);
 
         // Search filter
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
         // Branch filter
-        if (!empty($filters['branch_id'])) {
+        if (! empty($filters['branch_id'])) {
             $query->forBranch((int) $filters['branch_id']);
         }
 
@@ -200,14 +195,14 @@ class UserService
         }
 
         // Role filter
-        if (!empty($filters['role'])) {
+        if (! empty($filters['role'])) {
             $query->whereHas('roles', function ($q) use ($filters) {
                 $q->where('name', $filters['role']);
             });
         }
 
         // Status filter
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             switch ($filters['status']) {
                 case 'active':
                     $query->active();

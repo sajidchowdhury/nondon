@@ -2,9 +2,9 @@
 
 namespace App\Shared;
 
+use App\Modules\Identity\Models\User;
 use App\Shared\Rules\NotSameAsCurrent;
 use App\Shared\Rules\NotWeakPassword;
-use App\Modules\Identity\Models\User;
 
 /**
  * Provides password validation rules for use in Form Requests and Livewire components.
@@ -20,8 +20,8 @@ class PasswordRules
     /**
      * Get the validation rules for a new password.
      *
-     * @param User|null $user The user whose password is being changed (for not-same-as-current check)
-     * @param bool $requireCurrent Whether to include the current password field
+     * @param  User|null  $user  The user whose password is being changed (for not-same-as-current check)
+     * @param  bool  $requireCurrent  Whether to include the current password field
      * @return array<string, array<int, mixed>>
      */
     public static function rules(?User $user = null, bool $requireCurrent = false): array
@@ -34,7 +34,7 @@ class PasswordRules
                 'max:255',
                 'regex:/[a-zA-Z]/',      // must contain at least one letter
                 'regex:/[0-9]/',          // must contain at least one number
-                new NotWeakPassword(),
+                new NotWeakPassword,
                 new NotSameAsCurrent($user),
             ],
             'password_confirmation' => [
@@ -71,9 +71,6 @@ class PasswordRules
 
     /**
      * Get the rules for a forced password change (no current password required).
-     *
-     * @param User|null $user
-     * @return array
      */
     public static function forcedChangeRules(?User $user = null): array
     {
@@ -82,9 +79,6 @@ class PasswordRules
 
     /**
      * Get the rules for a self-service password change (current password required).
-     *
-     * @param User|null $user
-     * @return array
      */
     public static function selfServiceRules(?User $user = null): array
     {

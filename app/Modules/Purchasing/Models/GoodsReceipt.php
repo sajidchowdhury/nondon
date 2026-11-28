@@ -2,27 +2,29 @@
 
 namespace App\Modules\Purchasing\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Modules\Audit\Traits\Auditable;
 use App\Modules\Identity\Models\User;
 use App\Modules\Inventory\Models\Garment;
+use Database\Factories\GoodsReceiptFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GoodsReceipt extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\GoodsReceiptFactory::new();
+        return GoodsReceiptFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'goods_receipt';
+
     protected string $auditCategory = 'purchasing';
 
     /**
@@ -106,9 +108,9 @@ class GoodsReceipt extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('receipt_number', 'ILIKE', "%{$term}%")
-              ->orWhereHas('purchase', function ($pq) use ($term) {
-                  $pq->where('purchase_number', 'ILIKE', "%{$term}%");
-              });
+                ->orWhereHas('purchase', function ($pq) use ($term) {
+                    $pq->where('purchase_number', 'ILIKE', "%{$term}%");
+                });
         });
     }
 }

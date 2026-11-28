@@ -2,19 +2,21 @@
 
 namespace App\Modules\Identity\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
-use App\Modules\Organization\Models\Branch;
 use App\Modules\Audit\Traits\Auditable;
+use App\Modules\Organization\Models\Branch;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, Auditable;
+    /** @use HasFactory<UserFactory> */
+    use Auditable, HasFactory, HasRoles, Notifiable;
 
     /**
      * Resolve factory for modular model location.
@@ -24,14 +26,16 @@ class User extends Authenticatable
      */
     protected static function newFactory()
     {
-        return \Database\Factories\UserFactory::new();
+        return UserFactory::new();
     }
 
     /**
      * Audit configuration for the User model.
      */
     protected string $auditPrefix = 'user';
+
     protected string $auditCategory = 'identity';
+
     protected array $auditHidden = ['password_hash', 'remember_token'];
 
     /**
@@ -123,7 +127,7 @@ class User extends Authenticatable
      */
     public function activeRole()
     {
-        return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'active_role_id');
+        return $this->belongsTo(Role::class, 'active_role_id');
     }
 
     /**
@@ -147,7 +151,7 @@ class User extends Authenticatable
      */
     public function isActive(): bool
     {
-        return $this->is_active && !$this->isLocked();
+        return $this->is_active && ! $this->isLocked();
     }
 
     /**
@@ -277,8 +281,8 @@ class User extends Authenticatable
     {
         return $query->where(function ($q) use ($term) {
             $q->where('username', 'ILIKE', "%{$term}%")
-              ->orWhere('full_name', 'ILIKE', "%{$term}%")
-              ->orWhere('email', 'ILIKE', "%{$term}%");
+                ->orWhere('full_name', 'ILIKE', "%{$term}%")
+                ->orWhere('email', 'ILIKE', "%{$term}%");
         });
     }
 }

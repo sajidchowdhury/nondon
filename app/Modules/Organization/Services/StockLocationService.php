@@ -13,13 +13,12 @@ class StockLocationService
     /**
      * Create a new stock location for a branch.
      *
-     * @param Branch $branch
-     * @param array $data {
-     *   - code: string (required, unique per branch)
-     *   - name: string (required)
-     *   - type: string ('retail', 'warehouse', 'damaged', 'inspection', 'online_transient')
-     * }
-     * @return StockLocation
+     * @param  array  $data  {
+     *                       - code: string (required, unique per branch)
+     *                       - name: string (required)
+     *                       - type: string ('retail', 'warehouse', 'damaged', 'inspection', 'online_transient')
+     *                       }
+     *
      * @throws ValidationException
      */
     public function create(Branch $branch, array $data): StockLocation
@@ -47,9 +46,6 @@ class StockLocationService
     /**
      * Update a stock location.
      *
-     * @param StockLocation $location
-     * @param array $data
-     * @return StockLocation
      * @throws ValidationException
      */
     public function update(StockLocation $location, array $data): StockLocation
@@ -100,10 +96,6 @@ class StockLocationService
 
     /**
      * Get all stock locations for a branch.
-     *
-     * @param Branch $branch
-     * @param bool $activeOnly
-     * @return Collection
      */
     public function getForBranch(Branch $branch, bool $activeOnly = false): Collection
     {

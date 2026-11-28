@@ -2,21 +2,26 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Purchases;
 
-use Livewire\Component;
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Organization\Models\FiscalYear;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Services\PurchasingService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class PurchaseCreate extends Component
 {
     public ?int $supplier_id = null;
+
     public ?int $fiscal_year_id = null;
+
     public string $purchase_date = '';
+
     public string $expected_delivery_date = '';
+
     public string $notes = '';
+
     public array $items = [];
 
     public function mount(): void
@@ -62,6 +67,7 @@ class PurchaseCreate extends Component
             $cost = (float) ($item['unit_cost'] ?? 0);
             $total += $qty * $cost;
         }
+
         return number_format($total, 2, '.', '');
     }
 

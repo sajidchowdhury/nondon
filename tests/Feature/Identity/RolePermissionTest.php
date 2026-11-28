@@ -2,13 +2,15 @@
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Models\UserPermission;
+use App\Modules\Identity\Services\PermissionOverrideService;
+use App\Modules\Identity\Services\RoleAssignmentService;
 use App\Modules\Organization\Models\Branch;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
-use Spatie\Permission\Models\Role;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -23,7 +25,7 @@ describe('RoleAssignmentService — assign role', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'branch_supervisor')->first();
 
         $updated = $service->assignRole($user, $role);
@@ -37,7 +39,7 @@ describe('RoleAssignmentService — assign role', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'salesperson')->first();
 
         $updated = $service->assignRole($user, $role);
@@ -51,7 +53,7 @@ describe('RoleAssignmentService — assign role', function () {
         $user->assignRole('salesperson');
         $user->update(['active_role_id' => null]);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'salesperson')->first();
 
         $updated = $service->assignRole($user, $role);
@@ -66,7 +68,7 @@ describe('RoleAssignmentService — remove role', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole(['salesperson', 'branch_supervisor']);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'branch_supervisor')->first();
 
         $updated = $service->removeRole($user, $role);
@@ -80,11 +82,11 @@ describe('RoleAssignmentService — remove role', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'salesperson')->first();
 
-        expect(fn() => $service->removeRole($user, $role))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->removeRole($user, $role))
+            ->toThrow(ValidationException::class);
     });
 
     it('updates active role when the active role is removed', function () {
@@ -94,7 +96,7 @@ describe('RoleAssignmentService — remove role', function () {
         $supervisorRole = Role::where('name', 'branch_supervisor')->first();
         $user->update(['active_role_id' => $supervisorRole->id]);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
 
         $updated = $service->removeRole($user, $supervisorRole);
 
@@ -110,7 +112,7 @@ describe('RoleAssignmentService — sync roles', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $roleIds = Role::whereIn('name', ['salesperson', 'branch_supervisor'])->pluck('id')->toArray();
 
         $updated = $service->syncRoles($user, $roleIds);
@@ -125,10 +127,10 @@ describe('RoleAssignmentService — sync roles', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
 
-        expect(fn() => $service->syncRoles($user, []))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->syncRoles($user, []))
+            ->toThrow(ValidationException::class);
     });
 
     it('updates active role when it is removed during sync', function () {
@@ -138,7 +140,7 @@ describe('RoleAssignmentService — sync roles', function () {
         $supervisorRole = Role::where('name', 'branch_supervisor')->first();
         $user->update(['active_role_id' => $supervisorRole->id]);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $salespersonRole = Role::where('name', 'salesperson')->first();
 
         $updated = $service->syncRoles($user, [$salespersonRole->id]);
@@ -154,7 +156,7 @@ describe('RoleAssignmentService — active role', function () {
         $user->assignRole(['salesperson', 'branch_supervisor']);
         $user->update(['active_role_id' => null]);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'branch_supervisor')->first();
 
         $updated = $service->setActiveRole($user, $role);
@@ -167,11 +169,11 @@ describe('RoleAssignmentService — active role', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
         $role = Role::where('name', 'main_branch_admin')->first();
 
-        expect(fn() => $service->setActiveRole($user, $role))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->setActiveRole($user, $role))
+            ->toThrow(ValidationException::class);
     });
 
     it('checks if user has multiple roles', function () {
@@ -182,7 +184,7 @@ describe('RoleAssignmentService — active role', function () {
         $multiRoleUser = User::factory()->forBranch($branch)->create();
         $multiRoleUser->assignRole(['salesperson', 'branch_supervisor']);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
 
         expect($service->hasMultipleRoles($singleRoleUser))->toBeFalse();
         expect($service->hasMultipleRoles($multiRoleUser))->toBeTrue();
@@ -198,7 +200,7 @@ describe('RoleSwitcher — role switching', function () {
         $supervisorRole = Role::where('name', 'branch_supervisor')->first();
         $user->update(['active_role_id' => $salespersonRole->id]);
 
-        $service = app(\App\Modules\Identity\Services\RoleAssignmentService::class);
+        $service = app(RoleAssignmentService::class);
 
         // Switch to supervisor
         $updated = $service->setActiveRole($user, $supervisorRole);
@@ -229,7 +231,7 @@ describe('PermissionOverrideService — grant permission', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
         $permission = Permission::where('name', 'transfer.request.create')->first();
 
         $updated = $service->grantPermission($user, $permission);
@@ -247,11 +249,11 @@ describe('PermissionOverrideService — grant permission', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
         $permission = Permission::where('name', 'purchase.cost.view')->first();
 
-        expect(fn() => $service->grantPermission($user, $permission))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->grantPermission($user, $permission))
+            ->toThrow(ValidationException::class);
     });
 
     it('updates existing revoke to grant when re-granting', function () {
@@ -259,7 +261,7 @@ describe('PermissionOverrideService — grant permission', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
         $permission = Permission::where('name', 'pos.discount.apply')->first();
 
         // First revoke
@@ -280,7 +282,7 @@ describe('PermissionOverrideService — revoke permission', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
         $permission = Permission::where('name', 'pos.sale.create')->first();
 
         // Salesperson has pos.sale.create via role
@@ -302,7 +304,7 @@ describe('PermissionOverrideService — revoke permission', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
         $permission = Permission::where('name', 'pos.discount.apply')->first();
 
         $service->grantPermission($user, $permission);
@@ -319,7 +321,7 @@ describe('PermissionOverrideService — effective permissions', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
 
         // Grant a permission not in the salesperson role
         $grantedPermission = Permission::where('name', 'transfer.request.create')->first();
@@ -342,7 +344,7 @@ describe('PermissionOverrideService — effective permissions', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
 
         // Salesperson has pos.sale.create via role
         expect($service->hasEffectivePermission($user, 'pos.sale.create'))->toBeTrue();
@@ -360,7 +362,7 @@ describe('PermissionOverrideService — effective permissions', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('branch_supervisor');
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
 
         // Supervisor should not have admin-only permissions
         expect($service->hasEffectivePermission($user, 'purchase.cost.view'))->toBeFalse();
@@ -370,7 +372,7 @@ describe('PermissionOverrideService — effective permissions', function () {
 
     it('admin-only permissions are true for admin users', function () {
         $admin = adminUser();
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
 
         expect($service->hasEffectivePermission($admin, 'purchase.cost.view'))->toBeTrue();
         expect($service->hasEffectivePermission($admin, 'supplier.manage'))->toBeTrue();
@@ -384,12 +386,12 @@ describe('sensitive data restrictions', function () {
         $user->assignRole('salesperson');
 
         // Try to grant purchase.cost.view via override
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
         $permission = Permission::where('name', 'purchase.cost.view')->first();
 
         // Grant should be rejected
-        expect(fn() => $service->grantPermission($user, $permission))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->grantPermission($user, $permission))
+            ->toThrow(ValidationException::class);
 
         // Even if we manually insert a grant record, effective permissions should filter it out
         UserPermission::create([
@@ -404,7 +406,7 @@ describe('sensitive data restrictions', function () {
 
     it('purchase cost visible to admin', function () {
         $admin = adminUser();
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
 
         expect($service->hasEffectivePermission($admin, 'purchase.cost.view'))->toBeTrue();
     });
@@ -415,7 +417,7 @@ describe('sensitive data restrictions', function () {
         // Give user both salesperson and supervisor roles
         $user->assignRole(['salesperson', 'branch_supervisor']);
 
-        $service = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $service = app(PermissionOverrideService::class);
 
         // Should NOT have admin-only permissions despite having supervisor role
         expect($service->hasEffectivePermission($user, 'purchase.cost.view'))->toBeFalse();

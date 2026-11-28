@@ -1,11 +1,15 @@
 <?php
 
+use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\StockLocation;
-use App\Modules\Identity\Models\User;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Organization\Services\BranchService;
+use App\Modules\Organization\Services\StockLocationService;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -70,7 +74,7 @@ describe('branch create', function () {
     it('allows admin to create a branch', function () {
         $admin = adminUser();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $branch = $service->create([
             'code' => 'B4',
             'name' => 'Branch 4',
@@ -88,7 +92,7 @@ describe('branch create', function () {
     it('creates a default stock location when branch is created', function () {
         $admin = adminUser();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $branch = $service->create([
             'code' => 'B5',
             'name' => 'Branch 5',
@@ -104,7 +108,7 @@ describe('branch create', function () {
     it('auto-sets is_online_channel for online type', function () {
         $admin = adminUser();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $branch = $service->create([
             'code' => 'ONL2',
             'name' => 'Online Channel 2',
@@ -115,9 +119,9 @@ describe('branch create', function () {
     });
 
     it('rejects duplicate branch code', function () {
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
 
-        expect(fn() => $service->create([
+        expect(fn () => $service->create([
             'code' => 'M', // Already exists from seeder
             'name' => 'Duplicate',
             'type' => 'physical',
@@ -125,7 +129,7 @@ describe('branch create', function () {
     });
 
     it('creates online_transient location for online channel branch', function () {
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $branch = $service->create([
             'code' => 'ONL3',
             'name' => 'Online 3',
@@ -142,7 +146,7 @@ describe('branch update', function () {
         $admin = adminUser();
         $branch = Branch::where('code', 'B1')->first();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $updated = $service->update($branch, [
             'name' => 'Updated Branch 1',
         ]);
@@ -151,10 +155,10 @@ describe('branch update', function () {
     });
 
     it('rejects duplicate code on update', function () {
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $branch = Branch::where('code', 'B1')->first();
 
-        expect(fn() => $service->update($branch, ['code' => 'M']))
+        expect(fn () => $service->update($branch, ['code' => 'M']))
             ->toThrow(ValidationException::class);
     });
 
@@ -162,7 +166,7 @@ describe('branch update', function () {
         $admin = adminUser();
         $branch = Branch::where('code', 'B1')->first();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $updated = $service->update($branch, ['code' => 'B1NEW']);
 
         expect($updated->code)->toBe('B1NEW');
@@ -174,7 +178,7 @@ describe('activate / deactivate', function () {
         $admin = adminUser();
         $branch = Branch::factory()->create(['is_active' => false]);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $activated = $service->activate($branch);
 
         expect($activated->is_active)->toBeTrue();
@@ -184,7 +188,7 @@ describe('activate / deactivate', function () {
         $admin = adminUser();
         $branch = Branch::factory()->create(['is_active' => true]);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $deactivated = $service->deactivate($branch);
 
         expect($deactivated->is_active)->toBeFalse();
@@ -195,9 +199,9 @@ describe('activate / deactivate', function () {
         $branch = Branch::factory()->create(['is_active' => true]);
         User::factory()->forBranch($branch)->create(['is_active' => true]);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
 
-        expect(fn() => $service->deactivate($branch))
+        expect(fn () => $service->deactivate($branch))
             ->toThrow(ValidationException::class);
     });
 
@@ -206,7 +210,7 @@ describe('activate / deactivate', function () {
         $branch = Branch::factory()->create(['is_active' => true]);
         User::factory()->forBranch($branch)->create(['is_active' => false]);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
 
         $deactivated = $service->deactivate($branch);
         expect($deactivated->is_active)->toBeFalse();
@@ -217,7 +221,7 @@ describe('stock locations', function () {
     it('can create a stock location for a branch', function () {
         $branch = Branch::where('code', 'B1')->first();
 
-        $service = app(\App\Modules\Organization\Services\StockLocationService::class);
+        $service = app(StockLocationService::class);
         $location = $service->create($branch, [
             'code' => 'WH1',
             'name' => 'Warehouse 1',
@@ -232,10 +236,10 @@ describe('stock locations', function () {
     it('rejects duplicate location code within same branch', function () {
         $branch = Branch::where('code', 'B1')->first();
 
-        $service = app(\App\Modules\Organization\Services\StockLocationService::class);
+        $service = app(StockLocationService::class);
         $service->create($branch, ['code' => 'WH1', 'name' => 'Warehouse 1', 'type' => 'warehouse']);
 
-        expect(fn() => $service->create($branch, ['code' => 'WH1', 'name' => 'Duplicate', 'type' => 'warehouse']))
+        expect(fn () => $service->create($branch, ['code' => 'WH1', 'name' => 'Duplicate', 'type' => 'warehouse']))
             ->toThrow(ValidationException::class);
     });
 
@@ -243,7 +247,7 @@ describe('stock locations', function () {
         $branchA = Branch::where('code', 'B1')->first();
         $branchB = Branch::where('code', 'B2')->first();
 
-        $service = app(\App\Modules\Organization\Services\StockLocationService::class);
+        $service = app(StockLocationService::class);
 
         $locationA = $service->create($branchA, ['code' => 'WH1', 'name' => 'Warehouse A', 'type' => 'warehouse']);
         $locationB = $service->create($branchB, ['code' => 'WH1', 'name' => 'Warehouse B', 'type' => 'warehouse']);
@@ -255,7 +259,7 @@ describe('stock locations', function () {
     it('can deactivate a stock location', function () {
         $branch = Branch::where('code', 'B1')->first();
 
-        $service = app(\App\Modules\Organization\Services\StockLocationService::class);
+        $service = app(StockLocationService::class);
         $location = $service->create($branch, ['code' => 'WH1', 'name' => 'Warehouse 1', 'type' => 'warehouse']);
 
         $deactivated = $service->deactivate($location);
@@ -266,7 +270,7 @@ describe('stock locations', function () {
     it('can get all stock locations for a branch', function () {
         $branch = Branch::where('code', 'B1')->first();
 
-        $service = app(\App\Modules\Organization\Services\StockLocationService::class);
+        $service = app(StockLocationService::class);
         $service->create($branch, ['code' => 'WH1', 'name' => 'Warehouse 1', 'type' => 'warehouse']);
         $service->create($branch, ['code' => 'WH2', 'name' => 'Warehouse 2', 'type' => 'warehouse']);
 
@@ -280,10 +284,10 @@ describe('branch search and list', function () {
     it('returns paginated list of branches', function () {
         Branch::factory()->count(5)->create();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $result = $service->getPaginatedList(['per_page' => 10]);
 
-        expect($result)->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class);
+        expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
         expect($result->count())->toBeLessThanOrEqual(10);
     });
 
@@ -291,14 +295,14 @@ describe('branch search and list', function () {
         Branch::factory()->create(['code' => 'TEST1', 'name' => 'Test Branch 1']);
         Branch::factory()->create(['code' => 'OTHER', 'name' => 'Other Branch']);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $results = $service->getPaginatedList(['search' => 'TEST1', 'per_page' => 100]);
 
         expect($results->total())->toBe(1);
     });
 
     it('filters by type', function () {
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
 
         $physicalCount = $service->getPaginatedList(['type' => 'physical', 'per_page' => 100])->total();
         $onlineCount = $service->getPaginatedList(['type' => 'online', 'per_page' => 100])->total();
@@ -310,7 +314,7 @@ describe('branch search and list', function () {
     it('filters by status', function () {
         Branch::factory()->create(['is_active' => false]);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
 
         $activeCount = $service->getPaginatedList(['status' => 'active', 'per_page' => 100])->total();
         $inactiveCount = $service->getPaginatedList(['status' => 'inactive', 'per_page' => 100])->total();
@@ -374,14 +378,14 @@ describe('auditing', function () {
         $admin = adminUser();
         $this->actingAs($admin);
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $branch = $service->create([
             'code' => 'AUDIT',
             'name' => 'Audit Test Branch',
             'type' => 'physical',
         ]);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'branch.create')
+        $auditLog = AuditLog::where('action', 'branch.create')
             ->where('reference_type', 'branch')
             ->where('reference_id', $branch->id)
             ->first();
@@ -397,12 +401,12 @@ describe('auditing', function () {
         $branch = Branch::where('code', 'B1')->first();
 
         // Clear audit logs from branch creation (seeder)
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $service->update($branch, ['name' => 'Updated B1 Name']);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'branch.update')
+        $auditLog = AuditLog::where('action', 'branch.update')
             ->where('reference_id', $branch->id)
             ->first();
 
@@ -415,12 +419,12 @@ describe('auditing', function () {
         $this->actingAs($admin);
 
         $branch = Branch::factory()->create(['is_active' => false]);
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
-        $service = app(\App\Modules\Organization\Services\BranchService::class);
+        $service = app(BranchService::class);
         $service->activate($branch);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'branch.activate')
+        $auditLog = AuditLog::where('action', 'branch.activate')
             ->where('reference_id', $branch->id)
             ->first();
 
@@ -432,16 +436,16 @@ describe('auditing', function () {
         $this->actingAs($admin);
 
         $branch = Branch::where('code', 'B1')->first();
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
-        $service = app(\App\Modules\Organization\Services\StockLocationService::class);
+        $service = app(StockLocationService::class);
         $location = $service->create($branch, [
             'code' => 'AUDIT_WH',
             'name' => 'Audit Warehouse',
             'type' => 'warehouse',
         ]);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'stock_location.create')
+        $auditLog = AuditLog::where('action', 'stock_location.create')
             ->where('reference_id', $location->id)
             ->first();
 

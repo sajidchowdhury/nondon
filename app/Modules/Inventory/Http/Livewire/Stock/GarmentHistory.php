@@ -2,9 +2,9 @@
 
 namespace App\Modules\Inventory\Http\Livewire\Stock;
 
-use Livewire\Component;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Services\MovementHistoryService;
+use Livewire\Component;
 
 class GarmentHistory extends Component
 {

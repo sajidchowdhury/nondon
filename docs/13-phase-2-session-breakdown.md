@@ -620,15 +620,15 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Goods receipt detail shows garment identities (barcode, serial)
 - Purchase cost is not visible in goods receipt detail for non-admin (supervisor sees garments but not cost)
 
-### Acceptance criteria — Session 2.5
-- [ ] Receiving form is accessible for confirmed/partially_received purchases
-- [ ] Staff can enter received quantities per line item and generate garment identities
-- [ ] Excess quantity is flagged and blocked
-- [ ] Partial receipts work and allow subsequent receipts
-- [ ] Goods receipt list and detail views work
-- [ ] Only admin + supervisor can access receiving; salesperson is denied
-- [ ] Purchase cost is hidden from supervisor in receipt views
-- [ ] 13+ tests written (all acceptance criteria covered)
+### Acceptance criteria — Session 2.5 (COMPLETE)
+- [x] Receiving form is accessible for confirmed/partially_received purchases
+- [x] Staff can enter received quantities per line item and generate garment identities
+- [x] Excess quantity is flagged and blocked
+- [x] Partial receipts work and allow subsequent receipts
+- [x] Goods receipt list and detail views work
+- [x] Only admin + supervisor can access receiving; salesperson is denied
+- [x] Purchase cost is hidden from supervisor in receipt views
+- [x] 13+ tests written (all acceptance criteria covered)
 
 ---
 
@@ -988,6 +988,18 @@ Phase 2 is complete when:
    - Audit all purchasing actions (supplier, purchase, receiving, label printing).
    - Preserve garment identity across fiscal-year boundaries (carry-forward).
 7. Phase 3 (POS & Transfers) can begin.
+
+### Verification record (Phase 2 exit audit)
+
+All seven exit criteria verified on `main` before opening Phase 3:
+
+1. All 8 sessions COMPLETE (see Progress Tracker); 630 tests / 1574 assertions pass on PostgreSQL.
+2. Full lifecycle integration test passes (`Phase2IntegrationTest — supplier → purchase → confirm → receive → identities → labels → receipt view → audit`).
+3. All acceptance criteria across Sessions 2.1–2.8 ticked and verified. Session 2.5's submit-path gap was found during the exit audit and closed: the `ReceiveGoods` Livewire component's `wire:submit` flow (identities generation, empty/excess-quantity blocking, partial receipt → second receipt, draft denial) is now covered by 6 dedicated tests — a gap rendering-level and service-level tests had missed.
+4. No linting errors: repo-wide `vendor/bin/pint --test` passes (196 files). Historical style debt cleared in a style-only commit; full suite re-run green afterwards.
+5. Code committed and pushed to GitHub (branch merged to `main`).
+6. The ten functional capabilities are each backed by passing tests: suppliers CRUD/search (`SupplierManagementTest`, 30 tests), purchases confirm/cancel (`PurchaseFoundationTest`, `PurchaseManagementUITest`), receiving + identity generation (`GoodsReceivingCoreTest`, `GoodsReceivingUITest`), partial/multiple receipts (`Phase2IntegrationTest`), concurrency-safe serials (100-unique-serial and interleaved-receipt tests on PostgreSQL advisory locks), Code 128 labels in four formats (`BarcodeLabelGenerationTest`, `LabelPrintingUITest`), label/printer defaults in System Settings (`LabelPrintingUITest`), cost/supplier restriction to Main-Branch Admin across views/serialization/queries (`Phase2IntegrationTest` hardening block: StockQueryService, model serialization, admin-only pages), audit of all purchasing actions (`AuditLogTest` + `Phase2IntegrationTest` audit blocks), and fiscal-year carry-forward (`Phase2IntegrationTest`).
+7. Phase 3 (POS & Transfers) is unblocked.
 
 ---
 

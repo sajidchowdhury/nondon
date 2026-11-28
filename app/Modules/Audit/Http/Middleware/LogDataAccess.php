@@ -2,10 +2,10 @@
 
 namespace App\Modules\Audit\Http\Middleware;
 
+use App\Modules\Audit\Services\AuditService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Modules\Audit\Services\AuditService;
 
 /**
  * Middleware that logs when a user accesses sensitive data.
@@ -49,18 +49,15 @@ class LogDataAccess
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
-     * @param string $dataType The type of sensitive data being accessed (e.g., 'purchase_cost')
-     * @param string|null $referenceType The reference type (e.g., 'garment'). If null, inferred from route.
-     * @return Response
+     * @param  string  $dataType  The type of sensitive data being accessed (e.g., 'purchase_cost')
+     * @param  string|null  $referenceType  The reference type (e.g., 'garment'). If null, inferred from route.
      */
     public function handle(Request $request, Closure $next, string $dataType, ?string $referenceType = null): Response
     {
         $response = $next($request);
 
         // Only log for authenticated users
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return $response;
         }
 
@@ -70,7 +67,7 @@ class LogDataAccess
         }
 
         // Infer reference type from route parameters if not provided
-        if (!$referenceType) {
+        if (! $referenceType) {
             $referenceType = $this->inferReferenceType($request);
         }
 
@@ -93,7 +90,7 @@ class LogDataAccess
     {
         $params = $request->route()?->parameters();
 
-        if (!$params) {
+        if (! $params) {
             return null;
         }
 
@@ -116,7 +113,7 @@ class LogDataAccess
     {
         $params = $request->route()?->parameters();
 
-        if (!$params) {
+        if (! $params) {
             return null;
         }
 

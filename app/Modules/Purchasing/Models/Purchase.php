@@ -2,27 +2,29 @@
 
 namespace App\Modules\Purchasing\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Modules\Audit\Traits\Auditable;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\FiscalYear;
+use Database\Factories\PurchaseFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Purchase extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\PurchaseFactory::new();
+        return PurchaseFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'purchase';
+
     protected string $auditCategory = 'purchasing';
 
     /**
@@ -31,9 +33,13 @@ class Purchase extends Model
      *               draft | confirmed → cancelled
      */
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_CONFIRMED = 'confirmed';
+
     public const STATUS_RECEIVED = 'received';
+
     public const STATUS_PARTIALLY_RECEIVED = 'partially_received';
+
     public const STATUS_CANCELLED = 'cancelled';
 
     public const STATUSES = [
@@ -106,12 +112,11 @@ class Purchase extends Model
      *   if ($user->can('purchase.cost.view')) {
      *       $purchase->withTotalCost();
      *   }
-     *
-     * @return self
      */
     public function withTotalCost(): self
     {
         $this->makeVisible('total_cost');
+
         return $this;
     }
 
@@ -218,10 +223,10 @@ class Purchase extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('purchase_number', 'ILIKE', "%{$term}%")
-              ->orWhereHas('supplier', function ($sq) use ($term) {
-                  $sq->where('name', 'ILIKE', "%{$term}%")
-                    ->orWhere('code', 'ILIKE', "%{$term}%");
-              });
+                ->orWhereHas('supplier', function ($sq) use ($term) {
+                    $sq->where('name', 'ILIKE', "%{$term}%")
+                        ->orWhere('code', 'ILIKE', "%{$term}%");
+                });
         });
     }
 

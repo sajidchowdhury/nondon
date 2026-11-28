@@ -1,20 +1,22 @@
 <?php
 
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Models\PurchaseItem;
-use App\Modules\Purchasing\Models\GoodsReceipt;
-use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Purchasing\Services\ReceivingService;
+use App\Modules\Catalog\Models\Product;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\GarmentCurrentStock;
 use App\Modules\Inventory\Models\InventoryMovement;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Catalog\Models\Product;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Purchasing\Events\PurchaseReceived;
+use App\Modules\Purchasing\Models\GoodsReceipt;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\PurchaseItem;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Services\PurchasingService;
+use App\Modules\Purchasing\Services\ReceivingService;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -46,6 +48,7 @@ function createConfirmedPurchase(int $quantity = 10, float $unitCost = 250.00): 
     ]);
 
     $service->confirmPurchase($purchase);
+
     return $purchase->fresh('items');
 }
 
@@ -129,7 +132,7 @@ describe('goods receiving — basic flow', function () {
         $lastSerial = $garments->last()->fiscal_year_serial;
 
         // Serial starts with fiscal year prefix
-        expect($firstSerial)->toStartWith($fiscalYear->serial_prefix . '-');
+        expect($firstSerial)->toStartWith($fiscalYear->serial_prefix.'-');
         // Serials are 5-digit padded
         expect(strlen($firstSerial))->toBe(8); // e.g., "25-00001"
     });
@@ -483,7 +486,7 @@ describe('receiving — audit logging', function () {
             'reference_type' => 'garment',
         ]);
 
-        $garmentAudits = \DB::table('audit_logs')
+        $garmentAudits = DB::table('audit_logs')
             ->where('action', 'purchase.receive')
             ->where('reference_type', 'garment')
             ->count();
@@ -648,7 +651,7 @@ describe('receiving — multiple line items', function () {
 
 describe('PurchaseReceived event', function () {
     it('PurchaseReceived event is dispatched on receiving', function () {
-        \Illuminate\Support\Facades\Event::fake([\App\Modules\Purchasing\Events\PurchaseReceived::class]);
+        Event::fake([PurchaseReceived::class]);
 
         $admin = adminUser();
         $this->actingAs($admin);
@@ -659,6 +662,6 @@ describe('PurchaseReceived event', function () {
         $service = app(ReceivingService::class);
         $service->receiveGoods($purchase, [$itemId => 2], $admin);
 
-        \Illuminate\Support\Facades\Event::assertDispatched(\App\Modules\Purchasing\Events\PurchaseReceived::class);
+        Event::assertDispatched(PurchaseReceived::class);
     });
 });

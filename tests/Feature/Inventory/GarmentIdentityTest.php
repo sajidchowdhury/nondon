@@ -1,16 +1,17 @@
 <?php
 
+use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductSize;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\GarmentCurrentStock;
 use App\Modules\Inventory\Services\GarmentIdentityService;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Catalog\Models\Product;
-use App\Modules\Catalog\Models\ProductSize;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
-use Illuminate\Support\Facades\DB;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -75,7 +76,7 @@ describe('garment creation via GarmentIdentityService', function () {
         $garment = $service->createGarment($product, null, $fiscalYear, $branch);
 
         expect($garment->fiscal_year_serial)->toMatch('/^\d{2}-\d{5}$/');
-        expect($garment->fiscal_year_serial)->toStartWith($fiscalYear->serial_prefix . '-');
+        expect($garment->fiscal_year_serial)->toStartWith($fiscalYear->serial_prefix.'-');
     });
 
     it('barcode embeds the serial', function () {
@@ -86,7 +87,7 @@ describe('garment creation via GarmentIdentityService', function () {
         $service = app(GarmentIdentityService::class);
         $garment = $service->createGarment($product, null, $fiscalYear, $branch);
 
-        expect($garment->barcode)->toBe('NND-' . $garment->fiscal_year_serial);
+        expect($garment->barcode)->toBe('NND-'.$garment->fiscal_year_serial);
     });
 
     it('creates garment with status available', function () {
@@ -124,7 +125,7 @@ describe('garment creation via GarmentIdentityService', function () {
 
         $service = app(GarmentIdentityService::class);
 
-        expect(fn() => $service->createGarment($product, null, $closedFY, $branch))
+        expect(fn () => $service->createGarment($product, null, $closedFY, $branch))
             ->toThrow(ValidationException::class);
     });
 
@@ -159,15 +160,15 @@ describe('uniqueness constraints', function () {
         $garment = $service->createGarment($product, null, $fiscalYear, $branch);
 
         // Try to create another with the same barcode
-        expect(fn() => Garment::create([
-            'internal_id' => \Illuminate\Support\Str::uuid(),
+        expect(fn () => Garment::create([
+            'internal_id' => Illuminate\Support\Str::uuid(),
             'barcode' => $garment->barcode,
             'fiscal_year_id' => $fiscalYear->id,
             'fiscal_year_serial' => '99-99999',
             'product_id' => $product->id,
             'current_status' => 'available',
             'current_branch_id' => $branch->id,
-        ]))->toThrow(\Illuminate\Database\QueryException::class);
+        ]))->toThrow(QueryException::class);
     });
 
     it('prevents duplicate fiscal_year_serial within same fiscal year', function () {
@@ -179,15 +180,15 @@ describe('uniqueness constraints', function () {
         $garment = $service->createGarment($product, null, $fiscalYear, $branch);
 
         // Try to create another with the same serial in the same fiscal year
-        expect(fn() => Garment::create([
-            'internal_id' => \Illuminate\Support\Str::uuid(),
+        expect(fn () => Garment::create([
+            'internal_id' => Illuminate\Support\Str::uuid(),
             'barcode' => 'NND-UNIQUE-DIFFERENT',
             'fiscal_year_id' => $fiscalYear->id,
             'fiscal_year_serial' => $garment->fiscal_year_serial,
             'product_id' => $product->id,
             'current_status' => 'available',
             'current_branch_id' => $branch->id,
-        ]))->toThrow(\Illuminate\Database\QueryException::class);
+        ]))->toThrow(QueryException::class);
     });
 });
 
@@ -419,7 +420,7 @@ describe('auditing', function () {
         $service = app(GarmentIdentityService::class);
         $garment = $service->createGarment($product, null, $fiscalYear, $branch);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'garment.create')
+        $auditLog = AuditLog::where('action', 'garment.create')
             ->where('reference_type', 'garment')
             ->where('reference_id', $garment->id)
             ->first();

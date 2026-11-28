@@ -2,8 +2,8 @@
 
 namespace App\Modules\Catalog\Policies;
 
-use App\Modules\Identity\Models\User;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Identity\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 

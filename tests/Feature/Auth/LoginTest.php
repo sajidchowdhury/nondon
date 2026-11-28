@@ -1,11 +1,10 @@
 <?php
 
 use App\Modules\Identity\Models\User;
-use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {

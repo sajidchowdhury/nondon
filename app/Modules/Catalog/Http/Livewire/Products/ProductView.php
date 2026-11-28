@@ -2,8 +2,8 @@
 
 namespace App\Modules\Catalog\Http\Livewire\Products;
 
-use Livewire\Component;
 use App\Modules\Catalog\Models\Product;
+use Livewire\Component;
 
 class ProductView extends Component
 {

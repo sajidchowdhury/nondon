@@ -16,14 +16,14 @@ class ProductService
     /**
      * Create a new product with optional sizes.
      *
-     * @param array $data {
-     *   - code: string (required, unique)
-     *   - name: string (required)
-     *   - description: string|null
-     *   - category: string|null
-     *   - sizes: array (optional, list of size labels)
-     * }
-     * @return Product
+     * @param  array  $data  {
+     *                       - code: string (required, unique)
+     *                       - name: string (required)
+     *                       - description: string|null
+     *                       - category: string|null
+     *                       - sizes: array (optional, list of size labels)
+     *                       }
+     *
      * @throws ValidationException
      */
     public function create(array $data): Product
@@ -46,7 +46,7 @@ class ProductService
             ]);
 
             // Add sizes if provided
-            if (!empty($data['sizes'])) {
+            if (! empty($data['sizes'])) {
                 foreach ($data['sizes'] as $sizeLabel) {
                     $this->addSize($product, $sizeLabel);
                 }
@@ -59,9 +59,6 @@ class ProductService
     /**
      * Update product details (not sizes — use addSize/removeSize for that).
      *
-     * @param Product $product
-     * @param array $data
-     * @return Product
      * @throws ValidationException
      */
     public function update(Product $product, array $data): Product
@@ -90,9 +87,6 @@ class ProductService
     /**
      * Add a size to a product.
      *
-     * @param Product $product
-     * @param string $sizeLabel
-     * @return ProductSize
      * @throws ValidationException if the size already exists for this product
      */
     public function addSize(Product $product, string $sizeLabel): ProductSize
@@ -120,9 +114,6 @@ class ProductService
      * Note: In later phases, this will check if any garments use this size
      * before allowing removal. For now, it's a simple delete.
      *
-     * @param Product $product
-     * @param string $sizeLabel
-     * @return void
      * @throws ValidationException if the size doesn't exist
      */
     public function removeSize(Product $product, string $sizeLabel): void
@@ -131,7 +122,7 @@ class ProductService
             ->where('size_label', $sizeLabel)
             ->first();
 
-        if (!$size) {
+        if (! $size) {
             throw ValidationException::withMessages([
                 'size_label' => __('Size :label does not exist for this product.', ['label' => $sizeLabel]),
             ]);
@@ -185,26 +176,26 @@ class ProductService
     /**
      * Get a paginated list of products with filters.
      *
-     * @param array $filters {
-     *   - search: string
-     *   - category: string
-     *   - status: string ('active', 'inactive')
-     *   - per_page: int (default 25)
-     * }
+     * @param  array  $filters  {
+     *                          - search: string
+     *                          - category: string
+     *                          - status: string ('active', 'inactive')
+     *                          - per_page: int (default 25)
+     *                          }
      */
     public function getPaginatedList(array $filters = []): LengthAwarePaginator
     {
         $query = Product::query()->with('sizes');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
-        if (!empty($filters['category'])) {
+        if (! empty($filters['category'])) {
             $query->byCategory($filters['category']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             if ($filters['status'] === 'active') {
                 $query->active();
             } elseif ($filters['status'] === 'inactive') {

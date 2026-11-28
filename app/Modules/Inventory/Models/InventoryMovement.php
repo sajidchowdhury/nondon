@@ -2,12 +2,13 @@
 
 namespace App\Modules\Inventory\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\StockLocation;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InventoryMovement extends Model
 {
@@ -15,23 +16,41 @@ class InventoryMovement extends Model
      * Movement type constants.
      */
     public const TYPE_GOODS_RECEIPT = 'goods_receipt';
+
     public const TYPE_TRANSFER_DISPATCH = 'transfer_dispatch';
+
     public const TYPE_TRANSFER_RECEIVE = 'transfer_receive';
+
     public const TYPE_RESERVATION = 'reservation';
+
     public const TYPE_RESERVATION_RELEASE = 'reservation_release';
+
     public const TYPE_SALE = 'sale';
+
     public const TYPE_SALE_OFFLINE = 'sale_offline';
+
     public const TYPE_RETURN_FROM_CUSTOMER = 'return_from_customer';
+
     public const TYPE_RETURN_TO_SUPPLIER = 'return_to_supplier';
+
     public const TYPE_DAMAGE_REPORT = 'damage_report';
+
     public const TYPE_INSPECTION_START = 'inspection_start';
+
     public const TYPE_INSPECTION_COMPLETE = 'inspection_complete';
+
     public const TYPE_STOCK_ADJUSTMENT = 'stock_adjustment';
+
     public const TYPE_STOCK_COUNT_FREEZE = 'stock_count_freeze';
+
     public const TYPE_STOCK_COUNT_RELEASE = 'stock_count_release';
+
     public const TYPE_MISSING_REPORT = 'missing_report';
+
     public const TYPE_RECOVERY = 'recovery';
+
     public const TYPE_CLEARANCE_MARK = 'clearance_mark';
+
     public const TYPE_DISPOSAL = 'disposal';
 
     /**
@@ -117,8 +136,6 @@ class InventoryMovement extends Model
      * Override save() to prevent updates.
      * Only INSERT is allowed; UPDATE is blocked.
      *
-     * @param array $options
-     * @return bool
      * @throws \RuntimeException if attempting to update an existing record
      */
     public function save(array $options = []): bool
@@ -135,7 +152,6 @@ class InventoryMovement extends Model
     /**
      * Override delete() to prevent deletion.
      *
-     * @return bool
      * @throws \RuntimeException always
      */
     public function delete(): bool
@@ -206,7 +222,7 @@ class InventoryMovement extends Model
     {
         return $query->where(function ($q) use ($branchId) {
             $q->where('from_branch_id', $branchId)
-              ->orWhere('to_branch_id', $branchId);
+                ->orWhere('to_branch_id', $branchId);
         });
     }
 
@@ -222,8 +238,8 @@ class InventoryMovement extends Model
         }
 
         return $query->whereBetween('performed_at', [
-            \Carbon\Carbon::parse($startDate)->startOfDay(),
-            \Carbon\Carbon::parse($endDate)->endOfDay(),
+            Carbon::parse($startDate)->startOfDay(),
+            Carbon::parse($endDate)->endOfDay(),
         ]);
     }
 

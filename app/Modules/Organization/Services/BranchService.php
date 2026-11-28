@@ -14,15 +14,15 @@ class BranchService
     /**
      * Create a new branch.
      *
-     * @param array $data {
-     *   - code: string (required, unique)
-     *   - name: string (required)
-     *   - type: string ('main', 'physical', 'online')
-     *   - address: string|null
-     *   - phone: string|null
-     *   - is_online_channel: bool (auto-set based on type if not provided)
-     * }
-     * @return Branch
+     * @param  array  $data  {
+     *                       - code: string (required, unique)
+     *                       - name: string (required)
+     *                       - type: string ('main', 'physical', 'online')
+     *                       - address: string|null
+     *                       - phone: string|null
+     *                       - is_online_channel: bool (auto-set based on type if not provided)
+     *                       }
+     *
      * @throws ValidationException
      */
     public function create(array $data): Branch
@@ -35,7 +35,7 @@ class BranchService
         }
 
         // Auto-set is_online_channel based on type
-        if (!isset($data['is_online_channel'])) {
+        if (! isset($data['is_online_channel'])) {
             $data['is_online_channel'] = ($data['type'] ?? 'physical') === 'online';
         }
 
@@ -56,7 +56,7 @@ class BranchService
             StockLocation::create([
                 'branch_id' => $branch->id,
                 'code' => 'DEFAULT',
-                'name' => $branch->name . ' - Default Location',
+                'name' => $branch->name.' - Default Location',
                 'type' => $locationType,
                 'is_active' => true,
             ]);
@@ -68,9 +68,6 @@ class BranchService
     /**
      * Update branch details.
      *
-     * @param Branch $branch
-     * @param array $data
-     * @return Branch
      * @throws ValidationException
      */
     public function update(Branch $branch, array $data): Branch
@@ -114,8 +111,6 @@ class BranchService
      * Cannot deactivate if there are active users assigned to the branch.
      * This prevents orphaning users.
      *
-     * @param Branch $branch
-     * @return Branch
      * @throws ValidationException
      */
     public function deactivate(Branch $branch): Branch
@@ -172,12 +167,12 @@ class BranchService
     /**
      * Get a paginated list of branches with filters.
      *
-     * @param array $filters {
-     *   - search: string
-     *   - type: string
-     *   - status: string ('active', 'inactive')
-     *   - per_page: int (default 25)
-     * }
+     * @param  array  $filters  {
+     *                          - search: string
+     *                          - type: string
+     *                          - status: string ('active', 'inactive')
+     *                          - per_page: int (default 25)
+     *                          }
      */
     public function getPaginatedList(array $filters = []): LengthAwarePaginator
     {
@@ -185,15 +180,15 @@ class BranchService
             $q->where('is_active', true);
         }]);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->ofType($filters['type']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             if ($filters['status'] === 'active') {
                 $query->active();
             } elseif ($filters['status'] === 'inactive') {

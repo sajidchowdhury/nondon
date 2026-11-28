@@ -2,8 +2,8 @@
 
 namespace App\Modules\Identity\Http\Livewire\Users;
 
-use Livewire\Component;
 use App\Modules\Identity\Models\User;
+use Livewire\Component;
 
 class UserView extends Component
 {
@@ -35,6 +35,6 @@ class UserView extends Component
         return view('livewire.identity.users.view', [
             'loginAttempts' => $loginAttempts,
         ])
-        ->layout('layouts.app');
+            ->layout('layouts.app');
     }
 }

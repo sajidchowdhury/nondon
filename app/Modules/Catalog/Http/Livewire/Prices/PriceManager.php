@@ -2,10 +2,12 @@
 
 namespace App\Modules\Catalog\Http\Livewire\Prices;
 
-use Livewire\Component;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductPrice;
+use App\Modules\Catalog\Models\ProductSize;
 use App\Modules\Catalog\Services\PriceService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class PriceManager extends Component
 {
@@ -13,11 +15,14 @@ class PriceManager extends Component
 
     // Form fields
     public ?int $product_size_id = null;
+
     public string $standard_price = '';
+
     public string $minimum_price = '';
 
     // Display data
     public $currentPrices;
+
     public $priceHistory;
 
     public function mount(Product $product): void
@@ -59,12 +64,12 @@ class PriceManager extends Component
      */
     public function setPrice(PriceService $priceService)
     {
-        $this->authorize('create', \App\Modules\Catalog\Models\ProductPrice::class);
+        $this->authorize('create', ProductPrice::class);
 
         $validated = $this->validate();
 
         $size = $validated['product_size_id']
-            ? \App\Modules\Catalog\Models\ProductSize::find($validated['product_size_id'])
+            ? ProductSize::find($validated['product_size_id'])
             : null;
 
         try {

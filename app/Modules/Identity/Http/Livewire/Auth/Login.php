@@ -2,9 +2,9 @@
 
 namespace App\Modules\Identity\Http\Livewire\Auth;
 
-use Livewire\Component;
 use App\Modules\Identity\Services\AuthService;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class Login extends Component
 {
@@ -67,13 +67,13 @@ class Login extends Component
             }
 
             // If user has multiple roles and no active role set, show role selector
-            if ($user->roles->count() > 1 && !$user->active_role_id) {
+            if ($user->roles->count() > 1 && ! $user->active_role_id) {
                 return $this->redirect(route('role.select'), navigate: true);
             }
 
             return $this->redirect(route('dashboard'), navigate: true);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->addError('username', $e->getMessage());
         } catch (\Exception $e) {
             $this->addError('username', __('An error occurred during login. Please try again.'));

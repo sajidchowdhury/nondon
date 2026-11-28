@@ -1,16 +1,15 @@
 <?php
 
-use App\Modules\Inventory\Models\Garment;
-use App\Modules\Inventory\Services\StockQueryService;
-use App\Modules\Inventory\Services\MovementHistoryService;
-use App\Modules\Inventory\Services\InventoryMovementService;
-use App\Modules\Inventory\Models\InventoryMovement;
-use App\Modules\Organization\Models\Branch;
 use App\Modules\Catalog\Models\Product;
-use App\Modules\Catalog\Models\ProductSize;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Inventory\Models\Garment;
+use App\Modules\Inventory\Models\InventoryMovement;
+use App\Modules\Inventory\Services\InventoryMovementService;
+use App\Modules\Inventory\Services\MovementHistoryService;
+use App\Modules\Inventory\Services\StockQueryService;
+use App\Modules\Organization\Models\Branch;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);

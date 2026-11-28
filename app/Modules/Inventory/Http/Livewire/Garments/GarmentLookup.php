@@ -2,14 +2,16 @@
 
 namespace App\Modules\Inventory\Http\Livewire\Garments;
 
-use Livewire\Component;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Services\GarmentIdentityService;
+use Livewire\Component;
 
 class GarmentLookup extends Component
 {
     public string $searchTerm = '';
+
     public $garment = null;
+
     public string $searchType = 'barcode';
 
     public function lookup(GarmentIdentityService $service)
@@ -28,7 +30,7 @@ class GarmentLookup extends Component
             $this->garment = $service->lookupBySerial($term);
         }
 
-        if (!$this->garment) {
+        if (! $this->garment) {
             $this->addError('searchTerm', __('Garment not found.'));
         }
     }

@@ -2,26 +2,28 @@
 
 namespace App\Modules\Catalog\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Audit\Traits\Auditable;
 use App\Modules\Identity\Models\User;
 use Carbon\Carbon;
+use Database\Factories\ProductPriceFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductPrice extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\ProductPriceFactory::new();
+        return ProductPriceFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'price';
+
     protected string $auditCategory = 'catalog';
 
     /**
@@ -97,7 +99,7 @@ class ProductPrice extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('effective_to')
-              ->orWhere('effective_to', '>', now());
+                ->orWhere('effective_to', '>', now());
         });
     }
 
@@ -129,7 +131,7 @@ class ProductPrice extends Model
         return $query->where('effective_from', '<=', $date)
             ->where(function ($q) use ($date) {
                 $q->whereNull('effective_to')
-                  ->orWhere('effective_to', '>', $date);
+                    ->orWhere('effective_to', '>', $date);
             });
     }
 

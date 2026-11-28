@@ -1,11 +1,14 @@
 <?php
 
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\UserService;
 use App\Modules\Organization\Models\Branch;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -84,7 +87,7 @@ describe('user create', function () {
         ]);
 
         // Test via the service directly
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $user = $userService->create([
             'username' => 'newuser',
             'full_name' => 'New User',
@@ -107,7 +110,7 @@ describe('user create', function () {
         $admin = adminUser();
         $branch = Branch::where('code', 'B1')->first();
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $userService->create([
             'username' => 'existinguser',
             'full_name' => 'Existing',
@@ -116,30 +119,30 @@ describe('user create', function () {
             'roles' => ['salesperson'],
         ]);
 
-        expect(fn() => $userService->create([
+        expect(fn () => $userService->create([
             'username' => 'existinguser',
             'full_name' => 'Another',
             'password' => 'password123',
             'assigned_branch_id' => $branch->id,
             'roles' => ['salesperson'],
-        ]))->toThrow(\Illuminate\Validation\ValidationException::class);
+        ]))->toThrow(ValidationException::class);
     });
 
     it('requires branch for physical branch users', function () {
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
-        expect(fn() => $userService->create([
+        expect(fn () => $userService->create([
             'username' => 'nobranch',
             'full_name' => 'No Branch',
             'password' => 'password123',
             'is_online_channel' => false,
             'assigned_branch_id' => null,
-        ]))->toThrow(\Illuminate\Validation\ValidationException::class);
+        ]))->toThrow(ValidationException::class);
     });
 
     it('allows online channel user without physical branch', function () {
         $onlineBranch = Branch::where('is_online_channel', true)->first();
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
         $user = $userService->create([
             'username' => 'onlineuser',
@@ -156,7 +159,7 @@ describe('user create', function () {
 
     it('hashes the password correctly', function () {
         $branch = Branch::where('code', 'B1')->first();
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
         $user = $userService->create([
             'username' => 'hashtest',
@@ -176,7 +179,7 @@ describe('user update', function () {
         $branch = Branch::where('code', 'B1')->first();
         $user = User::factory()->forBranch($branch)->create();
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $updated = $userService->update($user, [
             'username' => $user->username,
             'full_name' => 'Updated Name',
@@ -191,7 +194,7 @@ describe('user update', function () {
         $branch = Branch::where('code', 'B1')->first();
         $user = User::factory()->forBranch($branch)->create(['username' => 'oldname']);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $updated = $userService->update($user, ['username' => 'newname']);
 
         expect($updated->username)->toBe('newname');
@@ -202,10 +205,10 @@ describe('user update', function () {
         $user1 = User::factory()->forBranch($branch)->create(['username' => 'user1']);
         $user2 = User::factory()->forBranch($branch)->create(['username' => 'user2']);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
-        expect(fn() => $userService->update($user2, ['username' => 'user1']))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $userService->update($user2, ['username' => 'user1']))
+            ->toThrow(ValidationException::class);
     });
 
     it('allows admin to sync roles', function () {
@@ -214,7 +217,7 @@ describe('user update', function () {
         $user = User::factory()->forBranch($branch)->create();
         $user->assignRole('salesperson');
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $updated = $userService->update($user, [
             'username' => $user->username,
             'roles' => ['salesperson', 'branch_supervisor'],
@@ -231,7 +234,7 @@ describe('activate / deactivate', function () {
         $branch = Branch::where('code', 'B1')->first();
         $user = User::factory()->forBranch($branch)->create(['is_active' => false]);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $activated = $userService->activate($user);
 
         expect($activated->is_active)->toBeTrue();
@@ -242,7 +245,7 @@ describe('activate / deactivate', function () {
         $branch = Branch::where('code', 'B1')->first();
         $user = User::factory()->forBranch($branch)->create(['is_active' => true]);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $deactivated = $userService->deactivate($user);
 
         expect($deactivated->is_active)->toBeFalse();
@@ -252,10 +255,10 @@ describe('activate / deactivate', function () {
         $admin = adminUser();
         $this->actingAs($admin);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
-        expect(fn() => $userService->deactivate($admin))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $userService->deactivate($admin))
+            ->toThrow(ValidationException::class);
     });
 });
 
@@ -266,7 +269,7 @@ describe('branch assignment', function () {
         $branchB = Branch::where('code', 'B2')->first();
         $user = User::factory()->forBranch($branchA)->create();
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $updated = $userService->assignToBranch($user, $branchB);
 
         expect($updated->assigned_branch_id)->toBe($branchB->id);
@@ -278,10 +281,10 @@ describe('branch assignment', function () {
         $onlineBranch = Branch::where('is_online_channel', true)->first();
         $user = User::factory()->forBranch($branchB1)->create(['is_online_channel' => false]);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
-        expect(fn() => $userService->assignToBranch($user, $onlineBranch))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $userService->assignToBranch($user, $onlineBranch))
+            ->toThrow(ValidationException::class);
     });
 
     it('prevents assigning online channel user to physical branch', function () {
@@ -289,10 +292,10 @@ describe('branch assignment', function () {
         $branchB1 = Branch::where('code', 'B1')->first();
         $user = User::factory()->forBranch($onlineBranch)->create(['is_online_channel' => true]);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
-        expect(fn() => $userService->assignToBranch($user, $branchB1))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $userService->assignToBranch($user, $branchB1))
+            ->toThrow(ValidationException::class);
     });
 });
 
@@ -300,10 +303,10 @@ describe('user search and list', function () {
     it('returns paginated list of users', function () {
         User::factory()->count(30)->create();
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $result = $userService->getPaginatedList(['per_page' => 25]);
 
-        expect($result)->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class);
+        expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
         expect($result->count())->toBeLessThanOrEqual(25);
     });
 
@@ -311,7 +314,7 @@ describe('user search and list', function () {
         User::factory()->create(['username' => 'johnsmith']);
         User::factory()->create(['username' => 'janedoe']);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $results = $userService->search('john');
 
         expect($results)->toHaveCount(1);
@@ -322,7 +325,7 @@ describe('user search and list', function () {
         User::factory()->create(['full_name' => 'Alice Johnson']);
         User::factory()->create(['full_name' => 'Bob Smith']);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $results = $userService->search('alice');
 
         expect($results)->toHaveCount(1);
@@ -335,7 +338,7 @@ describe('user search and list', function () {
         User::factory()->count(3)->forBranch($branchA)->create();
         User::factory()->count(2)->forBranch($branchB)->create();
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
         $results = $userService->getPaginatedList(['branch_id' => $branchA->id, 'per_page' => 100]);
 
         expect($results->total())->toBe(3);
@@ -346,7 +349,7 @@ describe('user search and list', function () {
         User::factory()->create(['is_active' => false]);
         User::factory()->create(['locked_at' => now()]);
 
-        $userService = app(\App\Modules\Identity\Services\UserService::class);
+        $userService = app(UserService::class);
 
         $active = $userService->getPaginatedList(['status' => 'active', 'per_page' => 100]);
         $inactive = $userService->getPaginatedList(['status' => 'inactive', 'per_page' => 100]);

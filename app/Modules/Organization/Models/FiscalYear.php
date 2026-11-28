@@ -2,23 +2,26 @@
 
 namespace App\Modules\Organization\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Modules\Audit\Traits\Auditable;
+use Carbon\Carbon;
+use Database\Factories\FiscalYearFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class FiscalYear extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\FiscalYearFactory::new();
+        return FiscalYearFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'fiscal_year';
+
     protected string $auditCategory = 'organization';
 
     /**
@@ -113,7 +116,7 @@ class FiscalYear extends Model
     {
         $next = $this->current_serial_sequence + 1;
 
-        return $this->serial_prefix . '-' . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+        return $this->serial_prefix.'-'.str_pad((string) $next, 5, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -125,6 +128,7 @@ class FiscalYear extends Model
     public function incrementSequence(): int
     {
         $this->increment('current_serial_sequence');
+
         return $this->fresh()->current_serial_sequence;
     }
 
@@ -139,14 +143,13 @@ class FiscalYear extends Model
      */
     public function containsDate(\DateTimeInterface $date): bool
     {
-        $date = \Carbon\Carbon::instance($date);
+        $date = Carbon::instance($date);
+
         return $date->between($this->start_date, $this->end_date);
     }
 
     /**
      * Get the current active fiscal year.
-     *
-     * @return self|null
      */
     public static function current(): ?self
     {
@@ -158,7 +161,7 @@ class FiscalYear extends Model
      */
     public function isCurrent(): bool
     {
-        return $this->is_active && !$this->is_closed;
+        return $this->is_active && ! $this->is_closed;
     }
 
     /**
@@ -175,7 +178,7 @@ class FiscalYear extends Model
      */
     public function getDateRangeAttribute(): string
     {
-        return $this->start_date->format('M d, Y') . ' — ' . $this->end_date->format('M d, Y');
+        return $this->start_date->format('M d, Y').' — '.$this->end_date->format('M d, Y');
     }
 
     /**

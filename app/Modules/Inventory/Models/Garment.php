@@ -2,44 +2,56 @@
 
 namespace App\Modules\Inventory\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Audit\Traits\Auditable;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductSize;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Organization\Models\StockLocation;
-use App\Modules\Catalog\Models\Product;
-use App\Modules\Catalog\Models\ProductSize;
+use Database\Factories\GarmentFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Garment extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\GarmentFactory::new();
+        return GarmentFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'garment';
+
     protected string $auditCategory = 'inventory';
 
     /**
      * Inventory status constants.
      */
     public const STATUS_AVAILABLE = 'available';
+
     public const STATUS_RESERVED = 'reserved';
+
     public const STATUS_IN_TRANSIT = 'in_transit';
+
     public const STATUS_SOLD = 'sold';
+
     public const STATUS_DAMAGED = 'damaged';
+
     public const STATUS_UNDER_INSPECTION = 'under_inspection';
+
     public const STATUS_MISSING = 'missing';
+
     public const STATUS_FROZEN = 'frozen';
+
     public const STATUS_CLEARANCE = 'clearance';
+
     public const STATUS_DISPOSED = 'disposed';
+
     public const STATUS_RETURNED_TO_SUPPLIER = 'returned_to_supplier';
 
     /**
@@ -209,6 +221,7 @@ class Garment extends Model
         if ($sizeId === null) {
             return $query->whereNull('product_size_id');
         }
+
         return $query->where('product_size_id', $sizeId);
     }
 
@@ -216,7 +229,7 @@ class Garment extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('barcode', 'ILIKE', "%{$term}%")
-              ->orWhere('fiscal_year_serial', 'ILIKE', "%{$term}%");
+                ->orWhere('fiscal_year_serial', 'ILIKE', "%{$term}%");
         });
     }
 
@@ -343,6 +356,7 @@ class Garment extends Model
     {
         $this->update(['current_status' => self::STATUS_DAMAGED]);
         $this->updateCurrentStock();
+
         return $this->fresh();
     }
 
@@ -353,6 +367,7 @@ class Garment extends Model
     {
         $this->update(['current_status' => self::STATUS_MISSING]);
         $this->updateCurrentStock();
+
         return $this->fresh();
     }
 
@@ -366,6 +381,7 @@ class Garment extends Model
         ]);
 
         $this->updateCurrentStock();
+
         return $this->fresh();
     }
 
@@ -380,6 +396,7 @@ class Garment extends Model
         ]);
 
         $this->updateCurrentStock();
+
         return $this->fresh();
     }
 
@@ -410,7 +427,7 @@ class Garment extends Model
      */
     public function getDisplayNameAttribute(): string
     {
-        return $this->barcode . ' (' . $this->fiscal_year_serial . ')';
+        return $this->barcode.' ('.$this->fiscal_year_serial.')';
     }
 
     /**
@@ -442,6 +459,7 @@ class Garment extends Model
     public function withPurchaseCost(): self
     {
         $this->makeVisible('purchase_cost');
+
         return $this;
     }
 }

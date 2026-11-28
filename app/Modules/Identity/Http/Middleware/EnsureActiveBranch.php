@@ -21,7 +21,7 @@ class EnsureActiveBranch
     {
         $user = auth()->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -31,7 +31,7 @@ class EnsureActiveBranch
         }
 
         // Physical branch users must have an assigned branch
-        if (!$user->assigned_branch_id) {
+        if (! $user->assigned_branch_id) {
             return redirect()->route('dashboard')
                 ->with('error', __('No branch assigned. Contact administrator.'));
         }

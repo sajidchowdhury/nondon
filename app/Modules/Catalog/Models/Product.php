@@ -2,26 +2,28 @@
 
 namespace App\Modules\Catalog\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Audit\Traits\Auditable;
 use App\Modules\Identity\Models\User;
+use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\ProductFactory::new();
+        return ProductFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'product';
+
     protected string $auditCategory = 'catalog';
 
     /**
@@ -72,7 +74,7 @@ class Product extends Model
      */
     public function prices(): HasMany
     {
-        return $this->hasMany(\App\Modules\Catalog\Models\ProductPrice::class);
+        return $this->hasMany(ProductPrice::class);
     }
 
     /**
@@ -120,7 +122,7 @@ class Product extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('code', 'ILIKE', "%{$term}%")
-              ->orWhere('name', 'ILIKE', "%{$term}%");
+                ->orWhere('name', 'ILIKE', "%{$term}%");
         });
     }
 

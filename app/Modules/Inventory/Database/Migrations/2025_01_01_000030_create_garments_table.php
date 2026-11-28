@@ -62,7 +62,7 @@ return new class extends Migration
 
             // Partial index: available garments by product/size/branch (common POS query)
             $table->index(['product_id', 'product_size_id', 'current_branch_id'], 'idx_garments_available')
-                  ->where('current_status', 'available');
+                ->where('current_status', 'available');
         });
     }
 

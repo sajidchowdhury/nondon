@@ -2,17 +2,19 @@
 
 namespace App\Modules\Organization\Http\Livewire\Branches;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Services\BranchService;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class BranchList extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public ?string $typeFilter = null;
+
     public string $statusFilter = '';
 
     protected function rules(): array
@@ -24,9 +26,20 @@ class BranchList extends Component
         ];
     }
 
-    public function updatingSearch(): void { $this->resetPage(); }
-    public function updatingTypeFilter(): void { $this->resetPage(); }
-    public function updatingStatusFilter(): void { $this->resetPage(); }
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingTypeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
 
     public function clearFilters(): void
     {

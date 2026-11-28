@@ -2,12 +2,11 @@
 
 namespace App\Modules\Inventory\Services;
 
-use App\Modules\Inventory\Models\Garment;
-use App\Modules\Inventory\Models\GarmentCurrentStock;
-use App\Modules\Inventory\Models\InventoryMovement;
-use App\Modules\Organization\Models\Branch;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
+use App\Modules\Inventory\Models\Garment;
+use App\Modules\Inventory\Models\GarmentCurrentStock;
+use App\Modules\Organization\Models\Branch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
@@ -19,10 +18,6 @@ class StockProjectionService
      * Update the GarmentCurrentStock projection for a single garment.
      *
      * Called within the same transaction as the movement record.
-     *
-     * @param Garment $garment
-     * @param int|null $lastMovementId
-     * @return void
      */
     public function update(Garment $garment, ?int $lastMovementId = null): void
     {
@@ -64,7 +59,7 @@ class StockProjectionService
         foreach ($latestMovements as $garmentId => $latest) {
             $projection = GarmentCurrentStock::find($garmentId);
 
-            if (!$projection) {
+            if (! $projection) {
                 // Projection missing — drift
                 $drift[] = [
                     'garment_id' => $garmentId,
@@ -72,6 +67,7 @@ class StockProjectionService
                     'ledger_status' => $latest->to_status,
                     'ledger_branch_id' => $latest->to_branch_id,
                 ];
+
                 continue;
             }
 
@@ -106,7 +102,7 @@ class StockProjectionService
             ];
         }
 
-        if (!empty($drift)) {
+        if (! empty($drift)) {
             Log::warning('Stock projection drift detected', [
                 'drift_count' => count($drift),
                 'drift' => $drift,
@@ -121,9 +117,6 @@ class StockProjectionService
      *
      * Uses the garment_current_stock projection for fast reads.
      * Does NOT scan the movement ledger.
-     *
-     * @param Branch $branch
-     * @return Collection
      */
     public function getAvailableStockForBranch(Branch $branch): Collection
     {
@@ -137,8 +130,6 @@ class StockProjectionService
     /**
      * Get available stock for a specific product across all branches.
      *
-     * @param Product $product
-     * @param ProductSize|null $size
      * @return SupportCollection<int, Collection<int, Garment>> Grouped by branch
      */
     public function getAvailableStockForProduct(Product $product, ?ProductSize $size = null): SupportCollection
@@ -156,8 +147,6 @@ class StockProjectionService
 
     /**
      * Get available stock across all branches (for cross-branch visibility).
-     *
-     * @return Collection
      */
     public function getAvailableStockAllBranches(): Collection
     {
@@ -196,8 +185,6 @@ class StockProjectionService
 
     /**
      * Get a stock summary: per product, per size, per branch, available count.
-     *
-     * @return array
      */
     public function getStockSummary(): array
     {
@@ -212,7 +199,7 @@ class StockProjectionService
             $sizeKey = $garment->productSize?->id ?? 'no_size';
             $branchKey = $garment->currentBranch?->id ?? 'no_branch';
 
-            if (!isset($summary[$productKey])) {
+            if (! isset($summary[$productKey])) {
                 $summary[$productKey] = [
                     'product' => $garment->product?->name ?? 'Unknown',
                     'code' => $garment->product?->code ?? 'N/A',
@@ -220,7 +207,7 @@ class StockProjectionService
                 ];
             }
 
-            if (!isset($summary[$productKey]['branches'][$branchKey])) {
+            if (! isset($summary[$productKey]['branches'][$branchKey])) {
                 $summary[$productKey]['branches'][$branchKey] = [
                     'branch' => $garment->currentBranch?->name ?? 'Unassigned',
                     'code' => $garment->currentBranch?->code ?? 'N/A',
@@ -229,7 +216,7 @@ class StockProjectionService
             }
 
             $sizeLabel = $garment->productSize?->size_label ?? 'N/A';
-            if (!isset($summary[$productKey]['branches'][$branchKey]['sizes'][$sizeLabel])) {
+            if (! isset($summary[$productKey]['branches'][$branchKey]['sizes'][$sizeLabel])) {
                 $summary[$productKey]['branches'][$branchKey]['sizes'][$sizeLabel] = 0;
             }
             $summary[$productKey]['branches'][$branchKey]['sizes'][$sizeLabel]++;

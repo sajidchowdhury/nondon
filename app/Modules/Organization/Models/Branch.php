@@ -2,26 +2,28 @@
 
 namespace App\Modules\Organization\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Modules\Identity\Models\User;
 use App\Modules\Audit\Traits\Auditable;
+use App\Modules\Identity\Models\User;
 use App\Modules\Inventory\Models\Garment;
+use Database\Factories\BranchFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Branch extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\BranchFactory::new();
+        return BranchFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'branch';
+
     protected string $auditCategory = 'organization';
 
     /**
@@ -97,7 +99,7 @@ class Branch extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('code', 'ILIKE', "%{$term}%")
-              ->orWhere('name', 'ILIKE', "%{$term}%");
+                ->orWhere('name', 'ILIKE', "%{$term}%");
         });
     }
 

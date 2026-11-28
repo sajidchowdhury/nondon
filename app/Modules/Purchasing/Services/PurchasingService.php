@@ -2,12 +2,11 @@
 
 namespace App\Modules\Purchasing\Services;
 
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Purchasing\Models\Purchase;
 use App\Modules\Purchasing\Models\PurchaseItem;
 use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Catalog\Models\Product;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,39 +17,39 @@ class PurchasingService
     /**
      * Create a new draft purchase with line items.
      *
-     * @param array $data {
-     *   - supplier_id: int (required, must be active)
-     *   - fiscal_year_id: int (required, must not be closed)
-     *   - purchase_date: string (required, date)
-     *   - expected_delivery_date: string|null
-     *   - notes: string|null
-     *   - items: array (required, at least 1) {
-     *     - product_id: int
-     *     - product_size_id: int|null
-     *     - ordered_quantity: int (> 0)
-     *     - unit_cost: float (>= 0)
-     *   }
-     * }
-     * @return Purchase
+     * @param  array  $data  {
+     *                       - supplier_id: int (required, must be active)
+     *                       - fiscal_year_id: int (required, must not be closed)
+     *                       - purchase_date: string (required, date)
+     *                       - expected_delivery_date: string|null
+     *                       - notes: string|null
+     *                       - items: array (required, at least 1) {
+     *                       - product_id: int
+     *                       - product_size_id: int|null
+     *                       - ordered_quantity: int (> 0)
+     *                       - unit_cost: float (>= 0)
+     *                       }
+     *                       }
+     *
      * @throws ValidationException
      */
     public function createPurchase(array $data): Purchase
     {
         $supplier = Supplier::find($data['supplier_id']);
-        if (!$supplier) {
+        if (! $supplier) {
             throw ValidationException::withMessages([
                 'supplier_id' => __('Selected supplier does not exist.'),
             ]);
         }
 
-        if (!$supplier->is_active) {
+        if (! $supplier->is_active) {
             throw ValidationException::withMessages([
                 'supplier_id' => __('Cannot create purchase for an inactive supplier.'),
             ]);
         }
 
         $fiscalYear = FiscalYear::find($data['fiscal_year_id']);
-        if (!$fiscalYear) {
+        if (! $fiscalYear) {
             throw ValidationException::withMessages([
                 'fiscal_year_id' => __('Selected fiscal year does not exist.'),
             ]);
@@ -70,19 +69,19 @@ class PurchasingService
 
         // Validate each line item
         foreach ($data['items'] as $index => $item) {
-            if (empty($item['product_id']) || !Product::where('id', $item['product_id'])->where('is_active', true)->exists()) {
+            if (empty($item['product_id']) || ! Product::where('id', $item['product_id'])->where('is_active', true)->exists()) {
                 throw ValidationException::withMessages([
                     "items.{$index}.product_id" => __('Product is invalid or inactive.'),
                 ]);
             }
 
-            if (!isset($item['ordered_quantity']) || $item['ordered_quantity'] <= 0) {
+            if (! isset($item['ordered_quantity']) || $item['ordered_quantity'] <= 0) {
                 throw ValidationException::withMessages([
                     "items.{$index}.ordered_quantity" => __('Ordered quantity must be greater than zero.'),
                 ]);
             }
 
-            if (!isset($item['unit_cost']) || $item['unit_cost'] < 0) {
+            if (! isset($item['unit_cost']) || $item['unit_cost'] < 0) {
                 throw ValidationException::withMessages([
                     "items.{$index}.unit_cost" => __('Unit cost cannot be negative.'),
                 ]);
@@ -127,14 +126,11 @@ class PurchasingService
      * Update a draft purchase (line items, dates, notes).
      * Only draft purchases can be edited.
      *
-     * @param Purchase $purchase
-     * @param array $data
-     * @return Purchase
      * @throws ValidationException
      */
     public function updateDraftPurchase(Purchase $purchase, array $data): Purchase
     {
-        if (!$purchase->isDraft()) {
+        if (! $purchase->isDraft()) {
             throw ValidationException::withMessages([
                 'status' => __('Only draft purchases can be edited.'),
             ]);
@@ -153,15 +149,15 @@ class PurchasingService
             }
 
             // If items are provided, replace them
-            if (!empty($data['items'])) {
+            if (! empty($data['items'])) {
                 // Validate new items
                 foreach ($data['items'] as $index => $item) {
-                    if (!isset($item['ordered_quantity']) || $item['ordered_quantity'] <= 0) {
+                    if (! isset($item['ordered_quantity']) || $item['ordered_quantity'] <= 0) {
                         throw ValidationException::withMessages([
                             "items.{$index}.ordered_quantity" => __('Ordered quantity must be greater than zero.'),
                         ]);
                     }
-                    if (!isset($item['unit_cost']) || $item['unit_cost'] < 0) {
+                    if (! isset($item['unit_cost']) || $item['unit_cost'] < 0) {
                         throw ValidationException::withMessages([
                             "items.{$index}.unit_cost" => __('Unit cost cannot be negative.'),
                         ]);
@@ -186,7 +182,7 @@ class PurchasingService
                 $updates['total_cost'] = $totalCost;
             }
 
-            if (!empty($updates)) {
+            if (! empty($updates)) {
                 $purchase->update($updates);
             }
 
@@ -198,13 +194,11 @@ class PurchasingService
      * Confirm a draft purchase.
      * Sets status to confirmed, records confirmed_at and confirmed_by.
      *
-     * @param Purchase $purchase
-     * @return Purchase
      * @throws ValidationException if not draft
      */
     public function confirmPurchase(Purchase $purchase): Purchase
     {
-        if (!$purchase->canBeConfirmed()) {
+        if (! $purchase->canBeConfirmed()) {
             throw ValidationException::withMessages([
                 'status' => __('Only draft purchases can be confirmed.'),
             ]);
@@ -230,14 +224,11 @@ class PurchasingService
     /**
      * Cancel a draft or confirmed purchase.
      *
-     * @param Purchase $purchase
-     * @param string $reason
-     * @return Purchase
      * @throws ValidationException
      */
     public function cancelPurchase(Purchase $purchase, string $reason): Purchase
     {
-        if (!$purchase->canBeCancelled()) {
+        if (! $purchase->canBeCancelled()) {
             throw ValidationException::withMessages([
                 'status' => __('Only draft or confirmed purchases can be cancelled.'),
             ]);
@@ -248,7 +239,7 @@ class PurchasingService
 
             $purchase->update([
                 'status' => Purchase::STATUS_CANCELLED,
-                'notes' => $purchase->notes . "\n[Cancellation reason: {$reason}]",
+                'notes' => $purchase->notes."\n[Cancellation reason: {$reason}]",
             ]);
 
             $purchase->auditCustomAction(
@@ -265,31 +256,31 @@ class PurchasingService
     /**
      * Get a paginated list of purchases with filters.
      *
-     * @param array $filters {
-     *   - search: string
-     *   - supplier_id: int
-     *   - status: string
-     *   - fiscal_year_id: int
-     *   - per_page: int (default 25)
-     * }
+     * @param  array  $filters  {
+     *                          - search: string
+     *                          - supplier_id: int
+     *                          - status: string
+     *                          - fiscal_year_id: int
+     *                          - per_page: int (default 25)
+     *                          }
      */
     public function getPurchaseList(array $filters = []): LengthAwarePaginator
     {
         $query = Purchase::query()->with(['supplier', 'items']);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
-        if (!empty($filters['supplier_id'])) {
+        if (! empty($filters['supplier_id'])) {
             $query->forSupplier((int) $filters['supplier_id']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['fiscal_year_id'])) {
+        if (! empty($filters['fiscal_year_id'])) {
             $query->forFiscalYear((int) $filters['fiscal_year_id']);
         }
 
@@ -299,9 +290,6 @@ class PurchasingService
 
     /**
      * Get purchase detail with items, supplier, and goods receipts.
-     *
-     * @param Purchase $purchase
-     * @return Purchase
      */
     public function getPurchaseDetail(Purchase $purchase): Purchase
     {
@@ -318,15 +306,12 @@ class PurchasingService
      * (low concurrency). For higher concurrency, an advisory lock or
      * dedicated counter column would be needed — documented as a known
      * limitation for Phase 2.
-     *
-     * @param FiscalYear $fiscalYear
-     * @return string
      */
     protected function generatePurchaseNumber(FiscalYear $fiscalYear): string
     {
         $count = Purchase::forFiscalYear($fiscalYear->id)->count();
         $next = $count + 1;
 
-        return 'PO-' . $fiscalYear->serial_prefix . '-' . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+        return 'PO-'.$fiscalYear->serial_prefix.'-'.str_pad((string) $next, 5, '0', STR_PAD_LEFT);
     }
 }
