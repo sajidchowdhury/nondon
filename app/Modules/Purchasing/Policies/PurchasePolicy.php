@@ -73,12 +73,26 @@ class PurchasePolicy
      * The purchase must be confirmed or partially_received.
      *
      * Per Security §4.1: "Receive goods" is permitted for Main Admin AND
-     * Branch Supervisor. In practice, receiving only happens at Main Branch.
+     * Branch Supervisor. In practice, receiving only happens at Main Branch:
+     * supervisors must be assigned to the Main Branch (branch scope —
+     * non-Main-Branch staff cannot receive even with the receive role).
      */
     public function receive(User $user, Purchase $purchase): bool
     {
-        return $user->hasRole(['main_branch_admin', 'branch_supervisor'])
-            && $purchase->canBeReceived();
+        if (! $user->hasRole(['main_branch_admin', 'branch_supervisor'])) {
+            return false;
+        }
+
+        if (! $purchase->canBeReceived()) {
+            return false;
+        }
+
+        // Admins are Main-Branch staff by definition of their role.
+        if ($user->hasRole('main_branch_admin')) {
+            return true;
+        }
+
+        return $user->assignedBranch?->type === 'main';
     }
 
     /**

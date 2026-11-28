@@ -1,14 +1,15 @@
 <?php
 
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Organization\Models\Branch;
+use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Purchasing\Models\Purchase;
 use App\Modules\Purchasing\Models\PurchaseItem;
 use App\Modules\Purchasing\Models\Supplier;
 use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Catalog\Models\Product;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -73,7 +74,7 @@ describe('purchase creation', function () {
         $purchase2 = $service->createPurchase(validPurchaseData($supplier, $fiscalYear, $product));
 
         expect($purchase1->purchase_number)->not->toBe($purchase2->purchase_number);
-        expect($purchase1->purchase_number)->toStartWith('PO-' . $fiscalYear->serial_prefix . '-');
+        expect($purchase1->purchase_number)->toStartWith('PO-'.$fiscalYear->serial_prefix.'-');
     });
 
     it('cannot create purchase with inactive supplier', function () {
@@ -477,13 +478,13 @@ describe('authorization — policy enforcement', function () {
     });
 
     it('supervisor cannot create purchases', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         expect($supervisor->can('create', Purchase::class))->toBeFalse();
     });
 
     it('salesperson cannot create purchases', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         expect($salesperson->can('create', Purchase::class))->toBeFalse();
     });
@@ -496,7 +497,7 @@ describe('authorization — policy enforcement', function () {
     });
 
     it('supervisor cannot view purchases', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $purchase = Purchase::factory()->create();
         expect($supervisor->can('view', $purchase))->toBeFalse();
@@ -529,15 +530,26 @@ describe('authorization — policy enforcement', function () {
         expect($admin->can('cancel', $purchase))->toBeFalse();
     });
 
-    it('supervisor can receive goods (purchase.receive permission)', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
-        $supervisor = supervisor($branch);
+    // Session 2.8 refined this authorization: receiving is restricted to the
+    // Main Branch (branch scope). A supervisor assigned to the Main Branch
+    // can receive; supervisors of other branches cannot, even with the
+    // supervisor role (docs/13 Session 2.8 deliverable 1, branch scope).
+    it('supervisor assigned to the Main Branch can receive goods (purchase.receive permission)', function () {
+        $mainBranch = Branch::where('code', 'M')->first();
+        $supervisor = supervisor($mainBranch);
         $purchase = Purchase::factory()->confirmed()->create();
         expect($supervisor->can('receive', $purchase))->toBeTrue();
     });
 
+    it('supervisor assigned to a non-main branch cannot receive goods (branch scope)', function () {
+        $branch = Branch::where('code', 'B1')->first();
+        $supervisor = supervisor($branch);
+        $purchase = Purchase::factory()->confirmed()->create();
+        expect($supervisor->can('receive', $purchase))->toBeFalse();
+    });
+
     it('salesperson cannot receive goods', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         $purchase = Purchase::factory()->confirmed()->create();
         expect($salesperson->can('receive', $purchase))->toBeFalse();
@@ -550,7 +562,7 @@ describe('authorization — policy enforcement', function () {
     });
 
     it('supervisor cannot view purchase cost', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $purchase = Purchase::factory()->create();
         expect($supervisor->can('viewCost', $purchase))->toBeFalse();
