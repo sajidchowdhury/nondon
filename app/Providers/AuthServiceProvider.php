@@ -2,6 +2,26 @@
 
 namespace App\Providers;
 
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductPrice;
+use App\Modules\Catalog\Models\ProductSize;
+use App\Modules\Catalog\Policies\PricePolicy;
+use App\Modules\Catalog\Policies\ProductPolicy;
+use App\Modules\Catalog\Policies\ProductSizePolicy;
+use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Policies\UserPolicy;
+use App\Modules\Inventory\Models\Garment;
+use App\Modules\Inventory\Policies\GarmentPolicy;
+use App\Modules\Organization\Models\Branch;
+use App\Modules\Organization\Models\FiscalYear;
+use App\Modules\Organization\Models\StockLocation;
+use App\Modules\Organization\Policies\BranchPolicy;
+use App\Modules\Organization\Policies\FiscalYearPolicy;
+use App\Modules\Organization\Policies\StockLocationPolicy;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Policies\PurchasePolicy;
+use App\Modules\Purchasing\Policies\SupplierPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,16 +33,16 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<string, string>
      */
     protected $policies = [
-        \App\Modules\Identity\Models\User::class => \App\Modules\Identity\Policies\UserPolicy::class,
-        \App\Modules\Organization\Models\Branch::class => \App\Modules\Organization\Policies\BranchPolicy::class,
-        \App\Modules\Organization\Models\StockLocation::class => \App\Modules\Organization\Policies\StockLocationPolicy::class,
-        \App\Modules\Organization\Models\FiscalYear::class => \App\Modules\Organization\Policies\FiscalYearPolicy::class,
-        \App\Modules\Catalog\Models\Product::class => \App\Modules\Catalog\Policies\ProductPolicy::class,
-        \App\Modules\Catalog\Models\ProductSize::class => \App\Modules\Catalog\Policies\ProductSizePolicy::class,
-        \App\Modules\Catalog\Models\ProductPrice::class => \App\Modules\Catalog\Policies\PricePolicy::class,
-        \App\Modules\Inventory\Models\Garment::class => \App\Modules\Inventory\Policies\GarmentPolicy::class,
-        \App\Modules\Purchasing\Models\Supplier::class => \App\Modules\Purchasing\Policies\SupplierPolicy::class,
-        \App\Modules\Purchasing\Models\Purchase::class => \App\Modules\Purchasing\Policies\PurchasePolicy::class,
+        User::class => UserPolicy::class,
+        Branch::class => BranchPolicy::class,
+        StockLocation::class => StockLocationPolicy::class,
+        FiscalYear::class => FiscalYearPolicy::class,
+        Product::class => ProductPolicy::class,
+        ProductSize::class => ProductSizePolicy::class,
+        ProductPrice::class => PricePolicy::class,
+        Garment::class => GarmentPolicy::class,
+        Supplier::class => SupplierPolicy::class,
+        Purchase::class => PurchasePolicy::class,
     ];
 
     /**
@@ -49,6 +69,19 @@ class AuthServiceProvider extends ServiceProvider
 
         // Gate: Determine if user can view profit reports (admin only)
         Gate::define('view-profit-reports', function ($user) {
+            return $user->hasRole('main_branch_admin');
+        });
+
+        // Gate: Determine if user can print garment labels (admin + receiving
+        // staff). Mirrors PurchasePolicy::receive — label printing is part of
+        // the goods receiving workflow (WF-2), so the same staff can print.
+        Gate::define('print-labels', function ($user) {
+            return $user->hasRole(['main_branch_admin', 'branch_supervisor']);
+        });
+
+        // Gate: Determine if user can manage printer/barcode settings
+        // (admin only — equivalent to the system_settings.manage permission).
+        Gate::define('manage-printer-settings', function ($user) {
             return $user->hasRole('main_branch_admin');
         });
     }
