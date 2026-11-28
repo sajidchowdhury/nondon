@@ -22,7 +22,7 @@
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | 2ce0a72 |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | COMPLETE | 7a44429 |
 | 3.7 Transfers UI — Request Creation, Approval & Dispatch | COMPLETE | a66dbca |
-| 3.8 Transfer Receiving & Discrepancy Handling | COMPLETE | (this session) |
+| 3.8 Transfer Receiving & Discrepancy Handling | COMPLETE | 7c88d51 |
 | 3.9 Cross-Branch Stock Visibility Browser & Reservation Board | PENDING | — |
 | 3.10 Customer History & Duplicate Merge | PENDING | — |
 | 3.11 Phase 3 Integration & Sensitive-Data Hardening | PENDING | — |
