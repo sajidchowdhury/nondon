@@ -167,7 +167,7 @@
                 </div>
             </div>
 
-            {{-- Proceed to checkout (wired in Session 3.4) --}}
+            {{-- Proceed to checkout (emits to the inline Checkout component) --}}
             <button
                 wire:click="proceedToCheckout"
                 wire:loading.attr="disabled"
@@ -176,8 +176,12 @@
                 <span wire:loading.remove>{{ __('Proceed to Checkout') }}</span>
                 <span wire:loading>{{ __('...') }}</span>
             </button>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">{{ __('Checkout is wired up in Session 3.4.') }}</p>
             @endif
         </div>
+    </div>
+
+    {{-- Checkout panel (Session 3.4). Mounts inline; listens for openCheckout. --}}
+    <div class="mt-6">
+        <livewire:checkout />
     </div>
 </div>

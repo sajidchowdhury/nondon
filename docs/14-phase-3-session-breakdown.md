@@ -18,7 +18,7 @@
 | 3.1 Customer Management — Creation, Phone Search & Duplicate Detection | COMPLETE | 462eaeb |
 | 3.2 Sales Data Model & Atomic Sale Service | COMPLETE | 5192d21 |
 | 3.3 POS Interface — Barcode Lookup, Cart & Discount | COMPLETE | 1895b2c |
-| 3.4 POS Checkout — Payment, Completion & Customer Linking | PENDING | — |
+| 3.4 POS Checkout — Payment, Completion & Customer Linking | COMPLETE | (this session) |
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | PENDING | — |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | PENDING | — |
 | 3.7 Transfers UI — Request Creation, Approval & Dispatch | PENDING | — |
@@ -577,15 +577,15 @@ Constructor injects `InventoryMovementService`, `PriceService`, `SaleNumberServi
 - Sale is audited (`sale.complete`).
 - Branch scope: completing a sale for another branch's garment is rejected.
 
-### Acceptance criteria — Session 3.4
-- [ ] Customer can be looked up by phone or created as walk-in at checkout.
-- [ ] Multiple payment methods supported with correct summation.
-- [ ] `total_paid >= total_amount` enforced; change-due shown when overpaid.
-- [ ] Reference required for non-cash methods.
-- [ ] Atomic completion via `SaleService::complete()`; on any garment conflict, the specific garment is flagged and the sale rolls back (no partial deduction).
-- [ ] On success, cart clears and invoice number is shown.
-- [ ] Branch scope and `pos.sale.complete` enforced.
-- [ ] ~20 tests written.
+### Acceptance criteria — Session 3.4 (COMPLETE)
+- [x] Customer can be looked up by phone (`lookupCustomer` → existing card) or created as walk-in at checkout (`CustomerService::findOrCreateByPhone` on completion); a true-walk-in toggle allows no-customer sales.
+- [x] Multiple payment methods supported with correct summation (cash + bkash test asserts `total_paid` = sum; add/remove payment lines tested).
+- [x] `total_paid >= total_amount` enforced (blocked with a "short by X" message); change-due shown when overpaid (overpayment accepted, change displayed).
+- [x] Reference required for non-cash methods (bkash without reference rejected; the reference field only renders for methods with `requires_reference = true`).
+- [x] Atomic completion via `SaleService::complete()`; on a mid-checkout garment conflict the specific garment id is flagged ("no longer available") and the sale rolls back — 0 invoices, 0 items, 0 payments, the other garment stays available (no partial deduction).
+- [x] On success, cart clears (both Checkout's `cartItems` and PointOfSale's via `checkoutClosed` event) and the invoice number (INV-YY-NNNNN) + "Print receipt"/"New sale" actions are shown.
+- [x] Branch scope enforced (SaleService rejects a garment at another branch; checkout uses the salesperson's active branch) and `pos.sale.complete` required (a role without it is denied).
+- [x] 21 tests written (66 assertions) — all acceptance criteria covered.
 
 ---
 

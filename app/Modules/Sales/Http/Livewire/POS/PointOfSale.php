@@ -317,9 +317,8 @@ class PointOfSale extends Component
     }
 
     /**
-     * Emit to the checkout component (Session 3.4). For 3.3 this is a
-     * no-op trigger the view wires; the checkout component will be added
-     * in the next session and listen for `openCheckout`.
+     * Emit to the checkout component (Session 3.4). The Checkout component
+     * is mounted inline on the POS page and listens for `openCheckout`.
      */
     public function proceedToCheckout(): void
     {
@@ -332,18 +331,28 @@ class PointOfSale extends Component
             return;
         }
 
-        $this->emit('openCheckout', ['items' => $cart->toArray(), 'saleType' => $this->saleType]);
+        $this->dispatch('openCheckout', [
+            'items' => $cart->toArray(),
+            'saleType' => $this->saleType,
+        ]);
     }
 
     /**
      * Re-sync the cart from the checkout component after it closes
      * (e.g., after a completed sale the checkout clears the cart).
      */
-    public function refreshCart(array $items = []): void
+    public function refreshCart(array $payload = []): void
     {
-        // Rebuild CartState from the array payload.
+        // The Checkout dispatches a payload shaped ['items' => [...cartRows]].
+        // Accept that shape, or a flat array of cart rows for direct testing.
+        $items = $payload['items'] ?? $payload;
+
+        // Rebuild CartState from the items array.
         $rebuilt = [];
         foreach ($items as $row) {
+            if (! is_array($row) || ! isset($row['garment_id'])) {
+                continue;
+            }
             $rebuilt[$row['garment_id']] = new CartItem(
                 garmentId: $row['garment_id'],
                 barcode: $row['barcode'],
