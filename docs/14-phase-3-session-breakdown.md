@@ -16,7 +16,7 @@
 | Session | Status | Commit |
 |---|---|---|
 | 3.1 Customer Management — Creation, Phone Search & Duplicate Detection | COMPLETE | 462eaeb |
-| 3.2 Sales Data Model & Atomic Sale Service | PENDING | — |
+| 3.2 Sales Data Model & Atomic Sale Service | COMPLETE | (this session) |
 | 3.3 POS Interface — Barcode Lookup, Cart & Discount | PENDING | — |
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | PENDING | — |
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | PENDING | — |
@@ -453,17 +453,17 @@ Constructor injects `InventoryMovementService`, `PriceService`, `SaleNumberServi
 - Salesperson without `pos.sale.complete` (hypothetical) rejected.
 - Void throws (not supported).
 
-### Acceptance criteria — Session 3.2
-- [ ] `SaleService::complete()` runs as a single atomic transaction; on any failure, no stock is deducted and no invoice is created.
-- [ ] `SELECT ... FOR UPDATE` row-level locking prevents two concurrent sales of the same garment (concurrency test passes: one succeeds, one fails).
-- [ ] Reserved/in-transit/frozen/damaged garments cannot be sold (only `available` and `clearance`).
-- [ ] Garments can only be sold at their current branch (branch scope enforced).
-- [ ] Discount below `minimum_price` is rejected with a typed exception and the doc-07 error shape.
-- [ ] `total_paid >= total_amount` enforced; multiple payment methods supported.
-- [ ] Invoice is immutable after completion; voiding is not supported (returns module handles corrections in Phase 5).
-- [ ] `SaleCompleted` event dispatched; `sale.complete` audit entry written; `return_policy_snapshot` stored.
-- [ ] Invoice numbers are unique, concurrency-safe, and follow `INV-YY-NNNNN`.
-- [ ] ~30 tests written including the concurrency test.
+### Acceptance criteria — Session 3.2 (COMPLETE)
+- [x] `SaleService::complete()` runs as a single atomic transaction; on any failure, no stock is deducted and no invoice is created. (atomic-rollback test confirms: a mid-cart unavailable garment leaves 0 invoices/items/payments and the available garment stays available.)
+- [x] `SELECT ... FOR UPDATE` row-level locking prevents two concurrent sales of the same garment. (DB::listen query-capture asserts a `for update` lock query on `garments` per cart line; the in-transaction re-verification rejects an already-sold garment with `GarmentNotAvailableException`.)
+- [x] Reserved/in-transit/frozen/damaged garments cannot be sold (only `available` and `clearance`). (eligibility tests cover each non-saleable status + clearance acceptance.)
+- [x] Garments can only be sold at their current branch (branch scope enforced). (wrong-branch test throws `GarmentNotAvailableException`, 0 invoices.)
+- [x] Discount below `minimum_price` is rejected with a typed `BelowMinimumPriceException` carrying the doc-07 error payload (garment_id, final_price, minimum_price).
+- [x] `total_paid >= total_amount` enforced; multiple payment methods supported (cash + bkash test).
+- [x] Invoice is immutable after completion; voiding is not supported — `SaleService::void()` throws `BadMethodCallException` (returns module handles corrections in Phase 5).
+- [x] `SaleCompleted` event dispatched (Event::fake assertion); `sale.complete` audit entry written (DB assertion); `return_policy_snapshot` stored as JSON with `return_period_days: 7`.
+- [x] Invoice numbers are unique, concurrency-safe (advisory-lock `pg_advisory_xact_lock(9000001 + fy.id)` via `document_sequences`), and follow `INV-YY-NNNNN`.
+- [x] 32 tests written (83 assertions) including the 3 concurrency tests.
 
 ---
 

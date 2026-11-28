@@ -9,6 +9,7 @@ use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Inventory\InventoryServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
 use App\Modules\Purchasing\PurchasingServiceProvider;
+use App\Modules\Sales\SalesServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -53,8 +54,8 @@ class AppServiceProvider extends ServiceProvider
             // Business modules
             PurchasingServiceProvider::class,
             CustomersServiceProvider::class,
+            SalesServiceProvider::class,
             // \App\Modules\Transfers\TransfersServiceProvider::class,
-            // \App\Modules\Sales\SalesServiceProvider::class,
             // \App\Modules\OnlineOrders\OnlineOrdersServiceProvider::class,
             // \App\Modules\Returns\ReturnsServiceProvider::class,
             // \App\Modules\Cash\CashServiceProvider::class,

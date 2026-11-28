@@ -24,6 +24,8 @@ use App\Modules\Purchasing\Models\Purchase;
 use App\Modules\Purchasing\Models\Supplier;
 use App\Modules\Purchasing\Policies\PurchasePolicy;
 use App\Modules\Purchasing\Policies\SupplierPolicy;
+use App\Modules\Sales\Models\SaleInvoice;
+use App\Modules\Sales\Policies\SaleInvoicePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -46,6 +48,7 @@ class AuthServiceProvider extends ServiceProvider
         Supplier::class => SupplierPolicy::class,
         Purchase::class => PurchasePolicy::class,
         Customer::class => CustomerPolicy::class,
+        SaleInvoice::class => SaleInvoicePolicy::class,
     ];
 
     /**
