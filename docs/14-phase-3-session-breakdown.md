@@ -19,7 +19,7 @@
 | 3.2 Sales Data Model & Atomic Sale Service | COMPLETE | 5192d21 |
 | 3.3 POS Interface — Barcode Lookup, Cart & Discount | COMPLETE | 1895b2c |
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | COMPLETE | 94c7903 |
-| 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | (this session) |
+| 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | 2ce0a72 |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | PENDING | — |
 | 3.7 Transfers UI — Request Creation, Approval & Dispatch | PENDING | — |
 | 3.8 Transfer Receiving & Discrepancy Handling | PENDING | — |
