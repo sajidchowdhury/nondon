@@ -2,23 +2,28 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Purchases;
 
-use Livewire\Component;
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Organization\Models\FiscalYear;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Services\PurchasingService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class PurchaseEdit extends Component
 {
     public Purchase $purchase;
 
     public ?int $supplier_id = null;
+
     public ?int $fiscal_year_id = null;
+
     public string $purchase_date = '';
+
     public string $expected_delivery_date = '';
+
     public string $notes = '';
+
     public array $items = [];
 
     public function mount(Purchase $purchase): void
@@ -86,6 +91,7 @@ class PurchaseEdit extends Component
             $cost = (float) ($item['unit_cost'] ?? 0);
             $total += $qty * $cost;
         }
+
         return number_format($total, 2, '.', '');
     }
 
@@ -152,6 +158,7 @@ class PurchaseEdit extends Component
         try {
             $purchasingService->confirmPurchase($this->purchase);
             session()->flash('success', __('Purchase confirmed.'));
+
             return $this->redirect(route('purchases.show', $this->purchase->fresh()), navigate: true);
         } catch (ValidationException $e) {
             foreach ($e->errors() as $field => $messages) {
@@ -178,6 +185,7 @@ class PurchaseEdit extends Component
         try {
             $purchasingService->cancelPurchase($this->purchase, $reason);
             session()->flash('success', __('Purchase cancelled.'));
+
             return $this->redirect(route('purchases.show', $this->purchase->fresh()), navigate: true);
         } catch (ValidationException $e) {
             foreach ($e->errors() as $field => $messages) {

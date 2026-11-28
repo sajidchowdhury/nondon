@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Modules\Identity\Models\User;
 use App\Modules\Purchasing\Models\GoodsReceipt;
 use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class GoodsReceiptFactory extends Factory
 
         return [
             'purchase_id' => $purchase->id,
-            'receipt_number' => 'GR-' . fake()->unique()->numberBetween(10000, 99999),
+            'receipt_number' => 'GR-'.fake()->unique()->numberBetween(10000, 99999),
             'received_date' => fake()->date(),
             'received_by' => $user->id,
             'total_received_quantity' => fake()->numberBetween(1, 50),

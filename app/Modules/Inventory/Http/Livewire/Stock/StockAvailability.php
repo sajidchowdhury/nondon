@@ -2,27 +2,48 @@
 
 namespace App\Modules\Inventory\Http\Livewire\Stock;
 
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Modules\Inventory\Services\StockQueryService;
-use App\Modules\Organization\Models\Branch;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
+use App\Modules\Inventory\Models\Garment;
+use App\Modules\Inventory\Services\StockQueryService;
+use App\Modules\Organization\Models\Branch;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class StockAvailability extends Component
 {
     use WithPagination;
 
     public ?int $branchFilter = null;
+
     public ?int $productFilter = null;
+
     public ?int $sizeFilter = null;
+
     public string $search = '';
+
     public int $perPage = 50;
 
-    public function updatingBranchFilter(): void { $this->resetPage(); }
-    public function updatingProductFilter(): void { $this->resetPage(); }
-    public function updatingSizeFilter(): void { $this->resetPage(); }
-    public function updatingSearch(): void { $this->resetPage(); }
+    public function updatingBranchFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingProductFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSizeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function clearFilters(): void
     {
@@ -35,12 +56,12 @@ class StockAvailability extends Component
 
     public function render(StockQueryService $stockQueryService)
     {
-        $this->authorize('viewAny', \App\Modules\Inventory\Models\Garment::class);
+        $this->authorize('viewAny', Garment::class);
 
         // If search term is provided, use search instead of paginated list
         if ($this->search) {
             $garments = $stockQueryService->searchGarments($this->search);
-            $garments = new \Illuminate\Pagination\LengthAwarePaginator(
+            $garments = new LengthAwarePaginator(
                 $garments->forPage(request()->input('page', 1), $this->perPage),
                 $garments->count(),
                 $this->perPage,

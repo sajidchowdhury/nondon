@@ -2,26 +2,45 @@
 
 namespace App\Modules\Inventory\Http\Livewire\Garments;
 
-use Livewire\Component;
-use Livewire\WithPagination;
+use App\Modules\Catalog\Models\Product;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Organization\Models\Branch;
-use App\Modules\Catalog\Models\Product;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class GarmentList extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public ?int $branchFilter = null;
+
     public ?string $statusFilter = null;
+
     public ?int $productFilter = null;
+
     public int $perPage = 25;
 
-    public function updatingSearch(): void { $this->resetPage(); }
-    public function updatingBranchFilter(): void { $this->resetPage(); }
-    public function updatingStatusFilter(): void { $this->resetPage(); }
-    public function updatingProductFilter(): void { $this->resetPage(); }
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingBranchFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingProductFilter(): void
+    {
+        $this->resetPage();
+    }
 
     public function clearFilters(): void
     {

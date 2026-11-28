@@ -2,16 +2,17 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Suppliers;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Modules\Purchasing\Models\Supplier;
 use App\Modules\Purchasing\Services\SupplierService;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class SupplierList extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public string $statusFilter = '';
 
     public function updatingSearch(): void

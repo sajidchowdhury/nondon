@@ -2,11 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Password;
 
-use Livewire\Component;
 use App\Modules\Identity\Services\AuthService;
 use App\Shared\PasswordRules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 /**
  * Forced password change component.
@@ -46,7 +46,7 @@ class ForcePasswordChange extends Component
         $this->user = Auth::user();
 
         // If user doesn't need to change password, redirect to dashboard
-        if ($this->user && !$this->user->force_password_change) {
+        if ($this->user && ! $this->user->force_password_change) {
             $this->redirect(route('dashboard'), navigate: true);
         }
     }
@@ -83,7 +83,7 @@ class ForcePasswordChange extends Component
 
             // Redirect to dashboard (or role select if multi-role)
             $user = Auth::user()->fresh();
-            if ($user->roles->count() > 1 && !$user->active_role_id) {
+            if ($user->roles->count() > 1 && ! $user->active_role_id) {
                 return $this->redirect(route('role.select'), navigate: true);
             }
 

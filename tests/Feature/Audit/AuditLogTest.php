@@ -1,14 +1,13 @@
 <?php
 
+use App\Modules\Audit\Events\AuditableEvent;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Audit\Services\AuditService;
-use App\Modules\Audit\Events\AuditableEvent;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
-use Illuminate\Support\Facades\Auth;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {
@@ -148,8 +147,8 @@ describe('AuditLog — append-only enforcement', function () {
         $service = app(AuditService::class);
         $log = $service->log('test.action', ['category' => 'test']);
 
-        expect(fn() => $log->update(['action' => 'modified.action']))
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $log->update(['action' => 'modified.action']))
+            ->toThrow(RuntimeException::class);
     });
 
     it('cannot be deleted', function () {
@@ -159,8 +158,8 @@ describe('AuditLog — append-only enforcement', function () {
         $service = app(AuditService::class);
         $log = $service->log('test.action', ['category' => 'test']);
 
-        expect(fn() => $log->delete())
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $log->delete())
+            ->toThrow(RuntimeException::class);
     });
 
     it('cannot be force deleted', function () {
@@ -170,8 +169,8 @@ describe('AuditLog — append-only enforcement', function () {
         $service = app(AuditService::class);
         $log = $service->log('test.action', ['category' => 'test']);
 
-        expect(fn() => $log->forceDelete())
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $log->forceDelete())
+            ->toThrow(RuntimeException::class);
     });
 
     it('save() throws when updating existing record', function () {
@@ -183,8 +182,8 @@ describe('AuditLog — append-only enforcement', function () {
 
         $log->action = 'modified';
 
-        expect(fn() => $log->save())
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $log->save())
+            ->toThrow(RuntimeException::class);
     });
 });
 

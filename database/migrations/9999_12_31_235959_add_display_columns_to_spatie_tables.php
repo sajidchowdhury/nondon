@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Adds display_name, module, and description columns to the Spatie
@@ -26,23 +25,23 @@ return new class extends Migration
     {
         // Add columns to permissions table
         if (Schema::hasTable('permissions')) {
-            if (!Schema::hasColumn('permissions', 'display_name')) {
+            if (! Schema::hasColumn('permissions', 'display_name')) {
                 DB::statement('ALTER TABLE permissions ADD COLUMN display_name VARCHAR(255) NULL');
             }
-            if (!Schema::hasColumn('permissions', 'module')) {
+            if (! Schema::hasColumn('permissions', 'module')) {
                 DB::statement('ALTER TABLE permissions ADD COLUMN module VARCHAR(50) NULL');
             }
-            if (!Schema::hasColumn('permissions', 'description')) {
+            if (! Schema::hasColumn('permissions', 'description')) {
                 DB::statement('ALTER TABLE permissions ADD COLUMN description TEXT NULL');
             }
         }
 
         // Add columns to roles table
         if (Schema::hasTable('roles')) {
-            if (!Schema::hasColumn('roles', 'display_name')) {
+            if (! Schema::hasColumn('roles', 'display_name')) {
                 DB::statement('ALTER TABLE roles ADD COLUMN display_name VARCHAR(255) NULL');
             }
-            if (!Schema::hasColumn('roles', 'description')) {
+            if (! Schema::hasColumn('roles', 'description')) {
                 DB::statement('ALTER TABLE roles ADD COLUMN description TEXT NULL');
             }
         }

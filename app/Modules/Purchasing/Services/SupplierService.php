@@ -14,15 +14,15 @@ class SupplierService
     /**
      * Create a new supplier.
      *
-     * @param array $data {
-     *   - code: string (required, unique)
-     *   - name: string (required)
-     *   - contact_person: string|null
-     *   - phone: string|null
-     *   - email: string|null
-     *   - address: string|null
-     * }
-     * @return Supplier
+     * @param  array  $data  {
+     *                       - code: string (required, unique)
+     *                       - name: string (required)
+     *                       - contact_person: string|null
+     *                       - phone: string|null
+     *                       - email: string|null
+     *                       - address: string|null
+     *                       }
+     *
      * @throws ValidationException
      */
     public function create(array $data): Supplier
@@ -52,9 +52,6 @@ class SupplierService
     /**
      * Update supplier details.
      *
-     * @param Supplier $supplier
-     * @param array $data
-     * @return Supplier
      * @throws ValidationException
      */
     public function update(Supplier $supplier, array $data): Supplier
@@ -95,8 +92,6 @@ class SupplierService
      *
      * Refuses if the supplier has a non-zero outstanding balance.
      *
-     * @param Supplier $supplier
-     * @return Supplier
      * @throws ValidationException
      */
     public function deactivate(Supplier $supplier): Supplier
@@ -106,8 +101,6 @@ class SupplierService
 
     /**
      * Search suppliers by code, name, or phone.
-     *
-     * @return Collection
      */
     public function search(string $term): Collection
     {
@@ -127,21 +120,21 @@ class SupplierService
     /**
      * Get a paginated list of suppliers with filters.
      *
-     * @param array $filters {
-     *   - search: string
-     *   - status: string ('active', 'inactive')
-     *   - per_page: int (default 25)
-     * }
+     * @param  array  $filters  {
+     *                          - search: string
+     *                          - status: string ('active', 'inactive')
+     *                          - per_page: int (default 25)
+     *                          }
      */
     public function getPaginatedList(array $filters = []): LengthAwarePaginator
     {
         $query = Supplier::query();
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             if ($filters['status'] === 'active') {
                 $query->active();
             } elseif ($filters['status'] === 'inactive') {

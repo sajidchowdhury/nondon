@@ -2,11 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Password;
 
-use Livewire\Component;
 use App\Modules\Identity\Services\AuthService;
 use App\Shared\PasswordRules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 /**
  * Self-service password change component.

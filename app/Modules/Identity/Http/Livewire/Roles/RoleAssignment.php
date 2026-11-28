@@ -2,11 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Roles;
 
-use Livewire\Component;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\RoleAssignmentService;
-use Spatie\Permission\Models\Role;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class RoleAssignment extends Component
 {
@@ -81,8 +81,9 @@ class RoleAssignment extends Component
 
         $role = Role::find($roleId);
 
-        if (!$role) {
+        if (! $role) {
             $this->addError('roles', __('Role not found.'));
+
             return;
         }
 
@@ -108,8 +109,9 @@ class RoleAssignment extends Component
 
         $role = Role::find($roleId);
 
-        if (!$role) {
+        if (! $role) {
             $this->addError('roles', __('Role not found.'));
+
             return;
         }
 

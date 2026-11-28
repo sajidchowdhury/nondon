@@ -1,10 +1,12 @@
 <?php
 
+use App\Modules\Identity\Models\User;
+use App\Modules\Organization\Models\Branch;
 use App\Modules\Purchasing\Models\Supplier;
 use App\Modules\Purchasing\Services\SupplierService;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -22,28 +24,28 @@ describe('supplier list — viewAny', function () {
     });
 
     it('denies supervisor access to supplier list', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $response = $this->actingAs($supervisor)->get(route('suppliers.index'));
         $response->assertForbidden();
     });
 
     it('denies salesperson access to supplier list', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         $response = $this->actingAs($salesperson)->get(route('suppliers.index'));
         $response->assertForbidden();
     });
 
     it('denies online team access to supplier list', function () {
-        $user = \App\Modules\Identity\Models\User::factory()->onlineChannel()->create();
+        $user = User::factory()->onlineChannel()->create();
         $user->assignRole('online_team');
         $response = $this->actingAs($user)->get(route('suppliers.index'));
         $response->assertForbidden();
     });
 
     it('denies online supervisor access to supplier list', function () {
-        $user = \App\Modules\Identity\Models\User::factory()->onlineChannel()->create();
+        $user = User::factory()->onlineChannel()->create();
         $user->assignRole('online_supervisor');
         $response = $this->actingAs($user)->get(route('suppliers.index'));
         $response->assertForbidden();
@@ -64,7 +66,7 @@ describe('supplier create', function () {
     });
 
     it('denies supervisor access to create form', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $response = $this->actingAs($supervisor)->get(route('suppliers.create'));
         $response->assertForbidden();
@@ -330,7 +332,7 @@ describe('sensitive data restrictions', function () {
     });
 
     it('non-admin roles get 403 and never see supplier data', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
 
         Supplier::factory()->create([
@@ -421,7 +423,7 @@ describe('supplier view — detail', function () {
     });
 
     it('denies supervisor access to supplier detail', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $supplier = Supplier::factory()->create();
 
@@ -441,7 +443,7 @@ describe('supplier edit — UI access', function () {
     });
 
     it('denies supervisor access to edit form', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $supplier = Supplier::factory()->create();
 

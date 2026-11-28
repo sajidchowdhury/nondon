@@ -2,6 +2,7 @@
 
 namespace App\Modules\Inventory\Services;
 
+use App\Modules\Audit\Events\AuditableEvent;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\GarmentCurrentStock;
 use App\Modules\Inventory\Models\InventoryMovement;
@@ -23,17 +24,15 @@ class InventoryMovementService
      * 4. Updates the GarmentCurrentStock projection
      * 5. Dispatches InventoryMovementRecorded event for audit
      *
-     * @param Garment $garment
-     * @param string $movementType One of InventoryMovement::TYPES
-     * @param array $context {
-     *   - to_branch_id: int|null
-     *   - to_location_id: int|null
-     *   - reference_type: string|null
-     *   - reference_id: int|null
-     *   - notes: string|null
-     *   - performed_by: int|null (defaults to authenticated user)
-     * }
-     * @return InventoryMovement
+     * @param  string  $movementType  One of InventoryMovement::TYPES
+     * @param  array  $context  {
+     *                          - to_branch_id: int|null
+     *                          - to_location_id: int|null
+     *                          - reference_type: string|null
+     *                          - reference_id: int|null
+     *                          - notes: string|null
+     *                          - performed_by: int|null (defaults to authenticated user)
+     *                          }
      */
     public function record(Garment $garment, string $movementType, array $context = []): InventoryMovement
     {
@@ -79,7 +78,7 @@ class InventoryMovementService
             $this->updateProjection($garment, $movement, $context);
 
             // Dispatch event for audit logging
-            event(new \App\Modules\Audit\Events\AuditableEvent('inventory.movement', [
+            event(new AuditableEvent('inventory.movement', [
                 'category' => 'inventory',
                 'reference_type' => 'garment',
                 'reference_id' => $garment->id,
@@ -150,9 +149,6 @@ class InventoryMovementService
 
     /**
      * Get the full movement history for a garment.
-     *
-     * @param Garment $garment
-     * @return Collection
      */
     public function getHistory(Garment $garment): Collection
     {
@@ -164,10 +160,6 @@ class InventoryMovementService
 
     /**
      * Get recent movements for a branch.
-     *
-     * @param Branch $branch
-     * @param int $limit
-     * @return Collection
      */
     public function getRecentMovements(Branch $branch, int $limit = 50): Collection
     {
@@ -180,10 +172,6 @@ class InventoryMovementService
 
     /**
      * Get movements for a specific reference (e.g., a transfer request or sale invoice).
-     *
-     * @param string $referenceType
-     * @param int $referenceId
-     * @return Collection
      */
     public function getForReference(string $referenceType, int $referenceId): Collection
     {

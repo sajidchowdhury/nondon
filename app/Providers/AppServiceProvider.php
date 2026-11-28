@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Modules\Audit\AuditServiceProvider;
+use App\Modules\Catalog\CatalogServiceProvider;
+use App\Modules\Identity\IdentityServiceProvider;
+use App\Modules\Inventory\InventoryServiceProvider;
+use App\Modules\Organization\OrganizationServiceProvider;
+use App\Modules\Purchasing\PurchasingServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,14 +43,14 @@ class AppServiceProvider extends ServiceProvider
     {
         $modules = [
             // Foundation modules
-            \App\Modules\Identity\IdentityServiceProvider::class,
-            \App\Modules\Organization\OrganizationServiceProvider::class,
-            \App\Modules\Audit\AuditServiceProvider::class,
-            \App\Modules\Catalog\CatalogServiceProvider::class,
-            \App\Modules\Inventory\InventoryServiceProvider::class,
+            IdentityServiceProvider::class,
+            OrganizationServiceProvider::class,
+            AuditServiceProvider::class,
+            CatalogServiceProvider::class,
+            InventoryServiceProvider::class,
 
             // Business modules (to be added in later phases)
-            \App\Modules\Purchasing\PurchasingServiceProvider::class,
+            PurchasingServiceProvider::class,
             // \App\Modules\Transfers\TransfersServiceProvider::class,
             // \App\Modules\Sales\SalesServiceProvider::class,
             // \App\Modules\OnlineOrders\OnlineOrdersServiceProvider::class,

@@ -2,17 +2,21 @@
 
 namespace App\Modules\Organization\Http\Livewire\Branches;
 
-use Livewire\Component;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Services\BranchService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class BranchCreate extends Component
 {
     public string $code = '';
+
     public string $name = '';
+
     public string $type = 'physical';
+
     public string $address = '';
+
     public string $phone = '';
 
     protected function rules(): array

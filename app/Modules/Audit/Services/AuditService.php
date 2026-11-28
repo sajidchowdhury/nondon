@@ -5,6 +5,7 @@ namespace App\Modules\Audit\Services;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -18,17 +19,16 @@ class AuditService
      * This is the primary method for recording business actions.
      * It automatically captures the current user, branch, IP, and user agent.
      *
-     * @param string $action The action identifier (e.g., 'user.create', 'sale.complete')
-     * @param array $context Additional context:
-     *   - category: string (e.g., 'inventory', 'sales', 'security', 'admin')
-     *   - reference_type: string|null (e.g., 'user', 'garment', 'sale_invoice')
-     *   - reference_id: int|null
-     *   - previous_values: array|null (for updates — old field values)
-     *   - new_values: array|null (for creates/updates — new field values)
-     *   - reason: string|null (user-provided reason for the action)
-     *   - user_id: int|null (override the authenticated user, for system actions)
-     *   - branch_id: int|null (override the branch context)
-     * @return AuditLog
+     * @param  string  $action  The action identifier (e.g., 'user.create', 'sale.complete')
+     * @param  array  $context  Additional context:
+     *                          - category: string (e.g., 'inventory', 'sales', 'security', 'admin')
+     *                          - reference_type: string|null (e.g., 'user', 'garment', 'sale_invoice')
+     *                          - reference_id: int|null
+     *                          - previous_values: array|null (for updates — old field values)
+     *                          - new_values: array|null (for creates/updates — new field values)
+     *                          - reason: string|null (user-provided reason for the action)
+     *                          - user_id: int|null (override the authenticated user, for system actions)
+     *                          - branch_id: int|null (override the branch context)
      */
     public function log(string $action, array $context = []): AuditLog
     {
@@ -54,18 +54,17 @@ class AuditService
     /**
      * Query audit logs with filters.
      *
-     * @param array $filters {
-     *   - user_id: int
-     *   - branch_id: int
-     *   - action: string
-     *   - category: string
-     *   - reference_type: string
-     *   - reference_id: int
-     *   - date_from: string|Carbon
-     *   - date_to: string|Carbon
-     *   - per_page: int (default 50)
-     * }
-     * @return Builder
+     * @param  array  $filters  {
+     *                          - user_id: int
+     *                          - branch_id: int
+     *                          - action: string
+     *                          - category: string
+     *                          - reference_type: string
+     *                          - reference_id: int
+     *                          - date_from: string|Carbon
+     *                          - date_to: string|Carbon
+     *                          - per_page: int (default 50)
+     *                          }
      */
     public function query(array $filters = []): Builder
     {
@@ -81,36 +80,36 @@ class AuditService
             ->orderBy('performed_at', 'desc')
             ->orderBy('id', 'desc');
 
-        if (!empty($filters['user_id'])) {
+        if (! empty($filters['user_id'])) {
             $query->forUser((int) $filters['user_id']);
         }
 
-        if (!empty($filters['branch_id'])) {
+        if (! empty($filters['branch_id'])) {
             $query->forBranch((int) $filters['branch_id']);
         }
 
-        if (!empty($filters['action'])) {
+        if (! empty($filters['action'])) {
             $query->forAction($filters['action']);
         }
 
-        if (!empty($filters['category'])) {
+        if (! empty($filters['category'])) {
             $query->forCategory($filters['category']);
         }
 
-        if (!empty($filters['reference_type'])) {
+        if (! empty($filters['reference_type'])) {
             $query->where('reference_type', $filters['reference_type']);
 
-            if (!empty($filters['reference_id'])) {
+            if (! empty($filters['reference_id'])) {
                 $query->where('reference_id', $filters['reference_id']);
             }
         }
 
-        if (!empty($filters['date_from'])) {
-            $query->where('performed_at', '>=', \Carbon\Carbon::parse($filters['date_from'])->startOfDay());
+        if (! empty($filters['date_from'])) {
+            $query->where('performed_at', '>=', Carbon::parse($filters['date_from'])->startOfDay());
         }
 
-        if (!empty($filters['date_to'])) {
-            $query->where('performed_at', '<=', \Carbon\Carbon::parse($filters['date_to'])->endOfDay());
+        if (! empty($filters['date_to'])) {
+            $query->where('performed_at', '<=', Carbon::parse($filters['date_to'])->endOfDay());
         }
 
         return $query;
@@ -119,9 +118,7 @@ class AuditService
     /**
      * Get audit entries for a specific user.
      *
-     * @param User $user
-     * @param int $limit = 100
-     * @return Collection
+     * @param  int  $limit  = 100
      */
     public function forUser(User $user, int $limit = 100): Collection
     {
@@ -134,9 +131,7 @@ class AuditService
     /**
      * Get audit entries for a branch on a specific date.
      *
-     * @param Branch $branch
-     * @param \DateTimeInterface|string $date
-     * @return Collection
+     * @param  \DateTimeInterface|string  $date
      */
     public function forBranch(Branch $branch, $date = null): Collection
     {
@@ -152,9 +147,8 @@ class AuditService
     /**
      * Get audit entries for a specific entity (reference).
      *
-     * @param string $type The reference type (e.g., 'user', 'garment')
-     * @param int $id The reference ID
-     * @return Collection
+     * @param  string  $type  The reference type (e.g., 'user', 'garment')
+     * @param  int  $id  The reference ID
      */
     public function forReference(string $type, int $id): Collection
     {
@@ -169,10 +163,7 @@ class AuditService
      * Used by the LogDataAccess middleware when a user views
      * purchase cost, supplier information, or other restricted data.
      *
-     * @param string $dataType The type of sensitive data accessed (e.g., 'purchase_cost')
-     * @param string $referenceType
-     * @param int $referenceId
-     * @return AuditLog
+     * @param  string  $dataType  The type of sensitive data accessed (e.g., 'purchase_cost')
      */
     public function logDataAccess(string $dataType, string $referenceType, int $referenceId): AuditLog
     {
@@ -193,6 +184,7 @@ class AuditService
     {
         try {
             $branch = app('active.branch');
+
             return $branch?->id;
         } catch (\Exception $e) {
             return null;
@@ -201,9 +193,6 @@ class AuditService
 
     /**
      * Infer the category from the action prefix.
-     *
-     * @param string $action
-     * @return string
      */
     protected function inferCategory(string $action): string
     {

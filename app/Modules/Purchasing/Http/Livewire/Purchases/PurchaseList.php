@@ -2,20 +2,23 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Purchases;
 
+use App\Modules\Organization\Models\FiscalYear;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Services\PurchasingService;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Organization\Models\FiscalYear;
 
 class PurchaseList extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public ?int $supplierFilter = null;
+
     public string $statusFilter = '';
+
     public ?int $fiscalYearFilter = null;
 
     public function updatingSearch(): void

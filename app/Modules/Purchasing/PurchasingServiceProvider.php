@@ -3,7 +3,6 @@
 namespace App\Modules\Purchasing;
 
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
 
 class PurchasingServiceProvider extends ServiceProvider
 {
@@ -21,6 +20,6 @@ class PurchasingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Load module migrations
-        $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
+        $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
     }
 }

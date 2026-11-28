@@ -2,9 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Roles;
 
+use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\PermissionOverrideService;
 use Livewire\Component;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionMatrix extends Component
 {
@@ -29,7 +31,7 @@ class PermissionMatrix extends Component
         // Only Main Branch Admin can view/manipulate the global permission matrix.
         // Using the assignRoles policy (admin-only) rather than viewAny (which
         // also allows supervisors) ensures non-admin users get a 403 here.
-        $this->authorize('assignRoles', \App\Modules\Identity\Models\User::class);
+        $this->authorize('assignRoles', User::class);
     }
 
     /**
@@ -45,16 +47,16 @@ class PermissionMatrix extends Component
      */
     public function togglePermission(int $roleId, int $permissionId)
     {
-        $this->authorize('assignRoles', \App\Modules\Identity\Models\User::class);
+        $this->authorize('assignRoles', User::class);
 
         $role = Role::find($roleId);
         $permission = Permission::find($permissionId);
 
-        if (!$role || !$permission) {
+        if (! $role || ! $permission) {
             return;
         }
 
-        $permissionOverrideService = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
+        $permissionOverrideService = app(PermissionOverrideService::class);
 
         // Prevent modifying admin-only permissions on non-admin roles
         if ($permissionOverrideService->isAdminOnlyPermission($permission->name)
@@ -62,6 +64,7 @@ class PermissionMatrix extends Component
             session()->flash('error', __(':permission is restricted to Main Branch Admin role.', [
                 'permission' => $permission->display_name ?? $permission->name,
             ]));
+
             return;
         }
 
@@ -87,7 +90,7 @@ class PermissionMatrix extends Component
      */
     public function isAdminOnlyPermission(string $permissionName): bool
     {
-        return app(\App\Modules\Identity\Services\PermissionOverrideService::class)
+        return app(PermissionOverrideService::class)
             ->isAdminOnlyPermission($permissionName);
     }
 

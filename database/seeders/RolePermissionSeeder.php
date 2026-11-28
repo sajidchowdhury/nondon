@@ -3,13 +3,10 @@
 namespace Database\Seeders;
 
 use App\Modules\Organization\Models\Branch;
-use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Organization\Models\StockLocation;
-use App\Modules\Identity\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -22,7 +19,7 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Define permissions grouped by module
         $permissions = $this->getPermissionDefinitions();
@@ -52,7 +49,7 @@ class RolePermissionSeeder extends Seeder
                 ]
             );
 
-            if (!empty($roleConfig['permissions'])) {
+            if (! empty($roleConfig['permissions'])) {
                 $role->syncPermissions($roleConfig['permissions']);
             }
         }

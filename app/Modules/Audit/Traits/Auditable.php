@@ -4,6 +4,7 @@ namespace App\Modules\Audit\Traits;
 
 use App\Modules\Audit\Events\AuditableEvent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * Trait for models that need automatic audit logging.
@@ -70,12 +71,11 @@ trait Auditable
     /**
      * Get the full audit action string.
      *
-     * @param string $operation (create, update, delete, etc.)
-     * @return string
+     * @param  string  $operation  (create, update, delete, etc.)
      */
     protected function getAuditAction(string $operation): string
     {
-        return $this->getAuditPrefix() . '.' . $operation;
+        return $this->getAuditPrefix().'.'.$operation;
     }
 
     /**
@@ -84,7 +84,7 @@ trait Auditable
      */
     protected function getAuditReferenceType(): string
     {
-        return \Illuminate\Support\Str::snake(class_basename($this));
+        return Str::snake(class_basename($this));
     }
 
     /**
@@ -105,6 +105,7 @@ trait Auditable
     protected function getAuditNewValues(): array
     {
         $values = $this->attributesToArray();
+
         return $this->filterAuditValues($values);
     }
 
@@ -133,6 +134,7 @@ trait Auditable
     protected function getAuditChangedValues(): array
     {
         $changes = $this->getChanges();
+
         return $this->filterAuditValues($changes);
     }
 
@@ -152,11 +154,6 @@ trait Auditable
 
     /**
      * Dispatch an AuditableEvent.
-     *
-     * @param string $action
-     * @param array|null $previousValues
-     * @param array|null $newValues
-     * @param string|null $reason
      */
     protected function dispatchAuditEvent(
         string $action,
@@ -193,10 +190,7 @@ trait Auditable
      * Use this for actions that don't trigger standard model events
      * (e.g., activate, deactivate, lock, unlock).
      *
-     * @param string $action The action suffix (e.g., 'activate', 'lock')
-     * @param array|null $previousValues
-     * @param array|null $newValues
-     * @param string|null $reason
+     * @param  string  $action  The action suffix (e.g., 'activate', 'lock')
      */
     public function auditCustomAction(
         string $action,
@@ -205,7 +199,7 @@ trait Auditable
         ?string $reason = null,
     ): void {
         $this->dispatchAuditEvent(
-            action: $this->getAuditPrefix() . '.' . $action,
+            action: $this->getAuditPrefix().'.'.$action,
             previousValues: $previousValues,
             newValues: $newValues,
             reason: $reason,

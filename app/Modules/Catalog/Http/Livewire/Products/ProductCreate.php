@@ -2,18 +2,23 @@
 
 namespace App\Modules\Catalog\Http\Livewire\Products;
 
-use Livewire\Component;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Services\ProductService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class ProductCreate extends Component
 {
     public string $code = '';
+
     public string $name = '';
+
     public string $description = '';
+
     public string $category = '';
+
     public array $sizes = [];
+
     public string $newSize = '';
 
     protected function rules(): array
@@ -47,7 +52,7 @@ class ProductCreate extends Component
         $sizeLabel = trim($this->newSize);
 
         // Prevent duplicates in the form
-        if (!in_array($sizeLabel, $this->sizes)) {
+        if (! in_array($sizeLabel, $this->sizes)) {
             $this->sizes[] = $sizeLabel;
         }
 

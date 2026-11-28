@@ -2,12 +2,12 @@
 
 namespace App\Modules\Organization\Http\Livewire\Branches;
 
-use Livewire\Component;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\StockLocation;
 use App\Modules\Organization\Services\BranchService;
 use App\Modules\Organization\Services\StockLocationService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class BranchEdit extends Component
 {
@@ -15,20 +15,26 @@ class BranchEdit extends Component
 
     // Branch form fields
     public string $code = '';
+
     public string $name = '';
+
     public string $type = 'physical';
+
     public string $address = '';
+
     public string $phone = '';
 
     // Stock location form fields
     public string $locationCode = '';
+
     public string $locationName = '';
+
     public string $locationType = 'retail';
 
     protected function rules(): array
     {
         return [
-            'code' => ['required', 'string', 'min:1', 'max:20', 'unique:branches,code,' . $this->branch->id],
+            'code' => ['required', 'string', 'min:1', 'max:20', 'unique:branches,code,'.$this->branch->id],
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:main,physical,online'],
             'address' => ['nullable', 'string', 'max:500'],
@@ -56,7 +62,7 @@ class BranchEdit extends Component
         $this->authorize('update', $this->branch);
 
         $validated = $this->validate([
-            'code' => ['required', 'string', 'min:1', 'max:20', 'unique:branches,code,' . $this->branch->id],
+            'code' => ['required', 'string', 'min:1', 'max:20', 'unique:branches,code,'.$this->branch->id],
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:main,physical,online'],
             'address' => ['nullable', 'string', 'max:500'],

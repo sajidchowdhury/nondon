@@ -2,9 +2,9 @@
 
 namespace App\Modules\Purchasing\Events;
 
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Models\GoodsReceipt;
 use App\Modules\Identity\Models\User;
+use App\Modules\Purchasing\Models\GoodsReceipt;
+use App\Modules\Purchasing\Models\Purchase;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;

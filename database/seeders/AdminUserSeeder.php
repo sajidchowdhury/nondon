@@ -24,15 +24,17 @@ class AdminUserSeeder extends Seeder
     {
         $mainBranch = Branch::where('code', 'M')->first();
 
-        if (!$mainBranch) {
+        if (! $mainBranch) {
             $this->command->error('Main Branch not found. Run BranchSeeder first.');
+
             return;
         }
 
         $adminRole = Role::where('name', 'main_branch_admin')->first();
 
-        if (!$adminRole) {
+        if (! $adminRole) {
             $this->command->error('Main Branch Admin role not found. Run RolePermissionSeeder first.');
+
             return;
         }
 

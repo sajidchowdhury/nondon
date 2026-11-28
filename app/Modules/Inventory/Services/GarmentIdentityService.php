@@ -2,13 +2,13 @@
 
 namespace App\Modules\Inventory\Services;
 
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductSize;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\GarmentCurrentStock;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Organization\Services\FiscalYearService;
-use App\Modules\Catalog\Models\Product;
-use App\Modules\Catalog\Models\ProductSize;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -35,14 +35,10 @@ class GarmentIdentityService
      * Sets initial status to 'available' at the specified branch.
      * Creates a garment_current_stock projection entry.
      *
-     * @param Product $product
-     * @param ProductSize|null $size
-     * @param FiscalYear $fiscalYear
-     * @param Branch $branch
-     * @param float|null $purchaseCost Restricted to admin — hidden from non-admin users
-     * @param int|null $purchaseId Optional purchase context (set during goods receiving)
-     * @param int|null $purchaseItemId Optional purchase item context (set during goods receiving)
-     * @return Garment
+     * @param  float|null  $purchaseCost  Restricted to admin — hidden from non-admin users
+     * @param  int|null  $purchaseId  Optional purchase context (set during goods receiving)
+     * @param  int|null  $purchaseItemId  Optional purchase item context (set during goods receiving)
+     *
      * @throws ValidationException if fiscal year is closed
      */
     public function createGarment(
@@ -107,18 +103,16 @@ class GarmentIdentityService
      * The barcode is globally unique because the serial is unique per fiscal year
      * and the barcode embeds the serial.
      *
-     * @param string $serial The fiscal-year serial (e.g., "25-00001")
+     * @param  string  $serial  The fiscal-year serial (e.g., "25-00001")
      * @return string The barcode (e.g., "NND-25-00001")
      */
     public function generateBarcode(string $serial): string
     {
-        return self::BARCODE_PREFIX . '-' . $serial;
+        return self::BARCODE_PREFIX.'-'.$serial;
     }
 
     /**
      * Generate a UUID v4 for the internal garment ID.
-     *
-     * @return string
      */
     public function generateInternalId(): string
     {
@@ -127,9 +121,6 @@ class GarmentIdentityService
 
     /**
      * Lookup a garment by its barcode.
-     *
-     * @param string $barcode
-     * @return Garment|null
      */
     public function lookupByBarcode(string $barcode): ?Garment
     {
@@ -139,9 +130,8 @@ class GarmentIdentityService
     /**
      * Lookup a garment by its fiscal-year serial.
      *
-     * @param string $serial (e.g., "25-00001")
-     * @param FiscalYear|null $fiscalYear If null, searches all fiscal years
-     * @return Garment|null
+     * @param  string  $serial  (e.g., "25-00001")
+     * @param  FiscalYear|null  $fiscalYear  If null, searches all fiscal years
      */
     public function lookupBySerial(string $serial, ?FiscalYear $fiscalYear = null): ?Garment
     {
@@ -156,9 +146,6 @@ class GarmentIdentityService
 
     /**
      * Lookup a garment by its internal UUID.
-     *
-     * @param string $internalId
-     * @return Garment|null
      */
     public function lookupById(string $internalId): ?Garment
     {
@@ -171,12 +158,8 @@ class GarmentIdentityService
      * Creates multiple garments for the same product/size/fiscal year/branch.
      * Uses a single transaction with advisory locking for serial generation.
      *
-     * @param Product $product
-     * @param ProductSize|null $size
-     * @param FiscalYear $fiscalYear
-     * @param Branch $branch
-     * @param int $quantity Number of garments to create
-     * @param float|null $purchaseCost Per-garment purchase cost
+     * @param  int  $quantity  Number of garments to create
+     * @param  float|null  $purchaseCost  Per-garment purchase cost
      * @return array<Garment>
      */
     public function bulkCreate(

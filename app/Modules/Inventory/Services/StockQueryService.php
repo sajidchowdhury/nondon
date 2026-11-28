@@ -2,10 +2,10 @@
 
 namespace App\Modules\Inventory\Services;
 
-use App\Modules\Inventory\Models\Garment;
-use App\Modules\Organization\Models\Branch;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
+use App\Modules\Inventory\Models\Garment;
+use App\Modules\Organization\Models\Branch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
@@ -31,9 +31,6 @@ class StockQueryService
      *
      * Uses garment scopes (not ledger scan) for fast reads.
      * Excludes purchase_cost.
-     *
-     * @param Branch $branch
-     * @return Collection
      */
     public function getAvailableStockForBranch(Branch $branch): Collection
     {
@@ -49,8 +46,6 @@ class StockQueryService
      * Get available stock across all branches.
      *
      * For cross-branch visibility (all roles can view, no supplier/cost info).
-     *
-     * @return Collection
      */
     public function getAvailableStockForAllBranches(): Collection
     {
@@ -67,8 +62,6 @@ class StockQueryService
      *
      * Returns garments grouped by branch.
      *
-     * @param Product $product
-     * @param ProductSize|null $size
      * @return SupportCollection<int, Collection<int, Garment>> Grouped by branch_id
      */
     public function getStockForProduct(Product $product, ?ProductSize $size = null): SupportCollection
@@ -92,8 +85,6 @@ class StockQueryService
 
     /**
      * Get a stock summary: per product, per size, per branch, available count.
-     *
-     * @return array
      */
     public function getStockSummary(): array
     {
@@ -102,8 +93,6 @@ class StockQueryService
 
     /**
      * Get current reservation counts per branch.
-     *
-     * @return Collection
      */
     public function getReservationCounts(): Collection
     {
@@ -115,10 +104,6 @@ class StockQueryService
      *
      * Returns matching garments with current status and branch.
      * Excludes purchase_cost.
-     *
-     * @param string $term
-     * @param int $limit
-     * @return Collection
      */
     public function searchGarments(string $term, int $limit = 50): Collection
     {
@@ -151,28 +136,27 @@ class StockQueryService
     /**
      * Get a paginated, filterable list of available garments across branches.
      *
-     * @param array $filters {
-     *   - branch_id: int|null
-     *   - product_id: int|null
-     *   - size_id: int|null
-     *   - per_page: int (default 50)
-     * }
-     * @return LengthAwarePaginator
+     * @param  array  $filters  {
+     *                          - branch_id: int|null
+     *                          - product_id: int|null
+     *                          - size_id: int|null
+     *                          - per_page: int (default 50)
+     *                          }
      */
     public function getPaginatedAvailableStock(array $filters = []): LengthAwarePaginator
     {
         $query = Garment::with(['product:id,code,name', 'productSize:id,size_label', 'currentBranch:id,code,name'])
             ->available();
 
-        if (!empty($filters['branch_id'])) {
+        if (! empty($filters['branch_id'])) {
             $query->forBranch((int) $filters['branch_id']);
         }
 
-        if (!empty($filters['product_id'])) {
+        if (! empty($filters['product_id'])) {
             $query->forProduct((int) $filters['product_id']);
         }
 
-        if (!empty($filters['size_id'])) {
+        if (! empty($filters['size_id'])) {
             $query->forSize((int) $filters['size_id']);
         }
 

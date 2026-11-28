@@ -34,7 +34,6 @@ class MovementHistoryService
      * - reference (if any)
      * - notes
      *
-     * @param Garment $garment
      * @return Collection<int, array<string, mixed>>
      */
     public function getGarmentHistory(Garment $garment): Collection
@@ -53,7 +52,7 @@ class MovementHistoryService
                 'performed_by' => $movement->performedBy?->display_name ?? __('System'),
                 'performed_at' => $movement->performed_at,
                 'reference' => $movement->reference_type
-                    ? ucfirst(str_replace('_', ' ', $movement->reference_type)) . ' #' . $movement->reference_id
+                    ? ucfirst(str_replace('_', ' ', $movement->reference_type)).' #'.$movement->reference_id
                     : null,
                 'notes' => $movement->notes,
             ];
@@ -97,7 +96,7 @@ class MovementHistoryService
      */
     protected function statusLabel(?string $status): string
     {
-        if (!$status) {
+        if (! $status) {
             return '—';
         }
 

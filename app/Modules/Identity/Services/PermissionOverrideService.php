@@ -4,10 +4,10 @@ namespace App\Modules\Identity\Services;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Models\UserPermission;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Permission;
 
 class PermissionOverrideService
 {
@@ -44,16 +44,14 @@ class PermissionOverrideService
      * If the user already has a revoke entry for this permission, it is
      * updated to a grant. If no entry exists, a new grant is created.
      *
-     * @param User $user
-     * @param Permission $permission
-     * @param string|null $reason Optional reason for the grant
-     * @return User
+     * @param  string|null  $reason  Optional reason for the grant
+     *
      * @throws ValidationException if the permission is admin-only and user is not admin
      */
     public function grantPermission(User $user, Permission $permission, ?string $reason = null): User
     {
         // Prevent granting admin-only permissions to non-admin users
-        if (in_array($permission->name, self::ADMIN_ONLY_PERMISSIONS) && !$user->hasRole('main_branch_admin')) {
+        if (in_array($permission->name, self::ADMIN_ONLY_PERMISSIONS) && ! $user->hasRole('main_branch_admin')) {
             throw ValidationException::withMessages([
                 'permission' => __('This permission is restricted to Main Branch Admin and cannot be granted to other users.'),
             ]);
@@ -86,10 +84,7 @@ class PermissionOverrideService
      * Note: Revoking a permission that the user has via their role will
      * remove it from their effective permissions.
      *
-     * @param User $user
-     * @param Permission $permission
-     * @param string|null $reason Optional reason for the revocation
-     * @return User
+     * @param  string|null  $reason  Optional reason for the revocation
      */
     public function revokePermission(User $user, Permission $permission, ?string $reason = null): User
     {
@@ -113,10 +108,6 @@ class PermissionOverrideService
 
     /**
      * Remove a permission override entirely (restore to role-based behavior).
-     *
-     * @param User $user
-     * @param Permission $permission
-     * @return User
      */
     public function removeOverride(User $user, Permission $permission): User
     {
@@ -144,7 +135,6 @@ class PermissionOverrideService
      *                       MINUS User Revokes
      *                       WITH Sensitive Data Restrictions (always applied)
      *
-     * @param User $user
      * @return Collection<int, Permission>
      */
     public function getEffectivePermissions(User $user): Collection
@@ -173,11 +163,12 @@ class PermissionOverrideService
 
         // 6. Apply sensitive data restrictions: filter out admin-only permissions
         //    for non-admin users (regardless of overrides)
-        if (!$user->hasRole('main_branch_admin')) {
+        if (! $user->hasRole('main_branch_admin')) {
             $adminOnlyPermissionNames = self::ADMIN_ONLY_PERMISSIONS;
             $effectivePermissionIds = $effectivePermissionIds->filter(function ($permissionId) use ($adminOnlyPermissionNames) {
                 $permission = Permission::find($permissionId);
-                return $permission && !in_array($permission->name, $adminOnlyPermissionNames);
+
+                return $permission && ! in_array($permission->name, $adminOnlyPermissionNames);
             });
         }
 
@@ -186,15 +177,11 @@ class PermissionOverrideService
 
     /**
      * Check if a user has a specific effective permission.
-     *
-     * @param User $user
-     * @param string $permissionName
-     * @return bool
      */
     public function hasEffectivePermission(User $user, string $permissionName): bool
     {
         // Admin-only permissions: always false for non-admin
-        if (in_array($permissionName, self::ADMIN_ONLY_PERMISSIONS) && !$user->hasRole('main_branch_admin')) {
+        if (in_array($permissionName, self::ADMIN_ONLY_PERMISSIONS) && ! $user->hasRole('main_branch_admin')) {
             return false;
         }
 
@@ -207,7 +194,6 @@ class PermissionOverrideService
      *
      * Returns grants and revokes separately for the UI.
      *
-     * @param User $user
      * @return array{grants: Collection, revokes: Collection}
      */
     public function getOverrideSummary(User $user): array
@@ -218,7 +204,7 @@ class PermissionOverrideService
 
         return [
             'grants' => $overrides->filter(fn ($override) => $override->granted),
-            'revokes' => $overrides->filter(fn ($override) => !$override->granted),
+            'revokes' => $overrides->filter(fn ($override) => ! $override->granted),
         ];
     }
 

@@ -75,7 +75,7 @@ class BranchSeeder extends Seeder
             StockLocation::firstOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'DEFAULT'],
                 [
-                    'name' => $branch->name . ' - Default Location',
+                    'name' => $branch->name.' - Default Location',
                     'type' => $locationType,
                     'is_active' => true,
                 ]

@@ -1,14 +1,16 @@
 <?php
 
+use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Catalog\Models\Product;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\GarmentCurrentStock;
 use App\Modules\Inventory\Models\InventoryMovement;
 use App\Modules\Inventory\Services\InventoryMovementService;
 use App\Modules\Inventory\Services\StockProjectionService;
 use App\Modules\Organization\Models\Branch;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -156,8 +158,8 @@ describe('append-only enforcement', function () {
         $service = app(InventoryMovementService::class);
         $movement = $service->record($garment, InventoryMovement::TYPE_DAMAGE_REPORT);
 
-        expect(fn() => $movement->update(['notes' => 'modified']))
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $movement->update(['notes' => 'modified']))
+            ->toThrow(RuntimeException::class);
     });
 
     it('cannot delete a movement record', function () {
@@ -168,8 +170,8 @@ describe('append-only enforcement', function () {
         $service = app(InventoryMovementService::class);
         $movement = $service->record($garment, InventoryMovement::TYPE_DAMAGE_REPORT);
 
-        expect(fn() => $movement->delete())
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $movement->delete())
+            ->toThrow(RuntimeException::class);
     });
 
     it('cannot force delete a movement record', function () {
@@ -180,8 +182,8 @@ describe('append-only enforcement', function () {
         $service = app(InventoryMovementService::class);
         $movement = $service->record($garment, InventoryMovement::TYPE_DAMAGE_REPORT);
 
-        expect(fn() => $movement->forceDelete())
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $movement->forceDelete())
+            ->toThrow(RuntimeException::class);
     });
 
     it('save() throws when updating existing record', function () {
@@ -194,8 +196,8 @@ describe('append-only enforcement', function () {
 
         $movement->notes = 'modified';
 
-        expect(fn() => $movement->save())
-            ->toThrow(\RuntimeException::class);
+        expect(fn () => $movement->save())
+            ->toThrow(RuntimeException::class);
     });
 });
 
@@ -316,7 +318,7 @@ describe('stock queries', function () {
     it('getAvailableStockForProduct returns garments for a product across branches', function () {
         $branchA = Branch::where('code', 'M')->first();
         $branchB = Branch::where('code', 'B1')->first();
-        $product = \App\Modules\Catalog\Models\Product::factory()->create();
+        $product = Product::factory()->create();
 
         Garment::factory()->forProduct($product)->atBranch($branchA)->available()->create();
         Garment::factory()->forProduct($product)->atBranch($branchB)->available()->create();
@@ -351,11 +353,11 @@ describe('all movements are audited', function () {
         $garment = Garment::factory()->available()->create();
         $service = app(InventoryMovementService::class);
 
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
         $service->record($garment, InventoryMovement::TYPE_SALE);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'inventory.movement')
+        $auditLog = AuditLog::where('action', 'inventory.movement')
             ->where('reference_type', 'garment')
             ->where('reference_id', $garment->id)
             ->first();

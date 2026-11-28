@@ -1,5 +1,9 @@
 <?php
 
+use App\Modules\Identity\Models\User;
+use App\Modules\Organization\Models\Branch;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Suite Configuration
@@ -26,7 +30,7 @@
 |   - RefreshDatabase trait (via Tests\TestCase)
 |
 */
-uses(Tests\TestCase::class)->in('Feature', 'Unit');
+uses(TestCase::class)->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -38,44 +42,49 @@ uses(Tests\TestCase::class)->in('Feature', 'Unit');
 |
 */
 
-function adminUser(): \App\Modules\Identity\Models\User
+function adminUser(): User
 {
-    $user = \App\Modules\Identity\Models\User::factory()->create();
+    $user = User::factory()->create();
     $user->assignRole('main_branch_admin');
+
     return $user->fresh();
 }
 
-function supervisor(\App\Modules\Organization\Models\Branch $branch): \App\Modules\Identity\Models\User
+function supervisor(Branch $branch): User
 {
-    $user = \App\Modules\Identity\Models\User::factory()->forBranch($branch)->create();
+    $user = User::factory()->forBranch($branch)->create();
     $user->assignRole('branch_supervisor');
+
     return $user->fresh();
 }
 
-function salesperson(\App\Modules\Organization\Models\Branch $branch): \App\Modules\Identity\Models\User
+function salesperson(Branch $branch): User
 {
-    $user = \App\Modules\Identity\Models\User::factory()->forBranch($branch)->create();
+    $user = User::factory()->forBranch($branch)->create();
     $user->assignRole('salesperson');
+
     return $user->fresh();
 }
 
-function onlineTeamMember(): \App\Modules\Identity\Models\User
+function onlineTeamMember(): User
 {
-    $onlineBranch = \App\Modules\Organization\Models\Branch::where('is_online_channel', true)->first();
-    $user = \App\Modules\Identity\Models\User::factory()->forBranch($onlineBranch)->onlineChannel()->create();
+    $onlineBranch = Branch::where('is_online_channel', true)->first();
+    $user = User::factory()->forBranch($onlineBranch)->onlineChannel()->create();
     $user->assignRole('online_team');
+
     return $user->fresh();
 }
 
-function onlineSupervisor(): \App\Modules\Identity\Models\User
+function onlineSupervisor(): User
 {
-    $onlineBranch = \App\Modules\Organization\Models\Branch::where('is_online_channel', true)->first();
-    $user = \App\Modules\Identity\Models\User::factory()->forBranch($onlineBranch)->onlineChannel()->create();
+    $onlineBranch = Branch::where('is_online_channel', true)->first();
+    $user = User::factory()->forBranch($onlineBranch)->onlineChannel()->create();
     $user->assignRole('online_supervisor');
+
     return $user->fresh();
 }
 
-function mainBranch(): \App\Modules\Organization\Models\Branch
+function mainBranch(): Branch
 {
-    return \App\Modules\Organization\Models\Branch::where('type', 'main')->first();
+    return Branch::where('type', 'main')->first();
 }

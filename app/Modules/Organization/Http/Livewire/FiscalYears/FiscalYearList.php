@@ -2,9 +2,9 @@
 
 namespace App\Modules\Organization\Http\Livewire\FiscalYears;
 
-use Livewire\Component;
 use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Organization\Services\FiscalYearService;
+use Livewire\Component;
 
 class FiscalYearList extends Component
 {

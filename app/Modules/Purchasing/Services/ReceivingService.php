@@ -2,19 +2,19 @@
 
 namespace App\Modules\Purchasing\Services;
 
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Models\PurchaseItem;
-use App\Modules\Purchasing\Models\GoodsReceipt;
-use App\Modules\Inventory\Services\GarmentIdentityService;
-use App\Modules\Inventory\Services\InventoryMovementService;
+use App\Modules\Audit\Events\AuditableEvent;
+use App\Modules\Identity\Models\User;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\InventoryMovement;
+use App\Modules\Inventory\Services\GarmentIdentityService;
+use App\Modules\Inventory\Services\InventoryMovementService;
 use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Identity\Models\User;
+use App\Modules\Purchasing\Events\PurchaseReceived;
+use App\Modules\Purchasing\Models\GoodsReceipt;
+use App\Modules\Purchasing\Models\Purchase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class ReceivingService
@@ -44,11 +44,11 @@ class ReceivingService
      * All steps are wrapped in a single DB transaction. If any step fails,
      * the entire operation rolls back — no partial garment identities.
      *
-     * @param Purchase $purchase Must be confirmed or partially_received
-     * @param array $receivedQuantities [purchase_item_id => received_qty]
-     * @param User $receivedBy The user performing the receiving
-     * @param string|null $notes Optional notes for the receipt
-     * @return GoodsReceipt
+     * @param  Purchase  $purchase  Must be confirmed or partially_received
+     * @param  array  $receivedQuantities  [purchase_item_id => received_qty]
+     * @param  User  $receivedBy  The user performing the receiving
+     * @param  string|null  $notes  Optional notes for the receipt
+     *
      * @throws ValidationException
      */
     public function receiveGoods(
@@ -59,14 +59,14 @@ class ReceivingService
     ): GoodsReceipt {
         // ── Validation ──────────────────────────────────────────────
 
-        if (!$purchase->canBeReceived()) {
+        if (! $purchase->canBeReceived()) {
             throw ValidationException::withMessages([
                 'purchase' => __('Only confirmed or partially received purchases can receive goods.'),
             ]);
         }
 
         // Check permission via policy
-        if (!$receivedBy->can('receive', $purchase)) {
+        if (! $receivedBy->can('receive', $purchase)) {
             throw ValidationException::withMessages([
                 'received_by' => __('You do not have permission to receive goods.'),
             ]);
@@ -82,7 +82,7 @@ class ReceivingService
         $items = $purchase->items()->whereIn('id', array_keys($receivedQuantities))->get()->keyBy('id');
 
         foreach ($receivedQuantities as $itemId => $qty) {
-            if (!isset($items[$itemId])) {
+            if (! isset($items[$itemId])) {
                 throw ValidationException::withMessages([
                     'quantities' => __('Invalid purchase item selected.'),
                 ]);
@@ -104,7 +104,7 @@ class ReceivingService
 
         // Load context
         $mainBranch = Branch::where('code', 'M')->first();
-        if (!$mainBranch) {
+        if (! $mainBranch) {
             throw ValidationException::withMessages([
                 'branch' => __('Main Branch not found. Receiving only happens at Main Branch.'),
             ]);
@@ -160,7 +160,7 @@ class ReceivingService
                     );
 
                     // Audit per garment
-                    event(new \App\Modules\Audit\Events\AuditableEvent('purchase.receive', [
+                    event(new AuditableEvent('purchase.receive', [
                         'category' => 'purchasing',
                         'reference_type' => 'garment',
                         'reference_id' => $garment->id,
@@ -207,7 +207,7 @@ class ReceivingService
             }
 
             // Audit per receipt
-            event(new \App\Modules\Audit\Events\AuditableEvent('purchase.receive', [
+            event(new AuditableEvent('purchase.receive', [
                 'category' => 'purchasing',
                 'reference_type' => 'goods_receipt',
                 'reference_id' => $receipt->id,
@@ -224,7 +224,7 @@ class ReceivingService
             ]));
 
             // Dispatch the PurchaseReceived event
-            event(new \App\Modules\Purchasing\Events\PurchaseReceived(
+            event(new PurchaseReceived(
                 $purchase->fresh(),
                 $receipt,
                 $receivedBy,
@@ -262,9 +262,6 @@ class ReceivingService
      * (low concurrency). The advisory lock in FiscalYearService protects
      * serial generation; receipt numbers are generated within the same
      * transaction so they're also protected.
-     *
-     * @param FiscalYear $fiscalYear
-     * @return string
      */
     protected function generateReceiptNumber(FiscalYear $fiscalYear): string
     {
@@ -275,6 +272,6 @@ class ReceivingService
 
         $next = $count + 1;
 
-        return 'GR-' . $fiscalYear->serial_prefix . '-' . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+        return 'GR-'.$fiscalYear->serial_prefix.'-'.str_pad((string) $next, 5, '0', STR_PAD_LEFT);
     }
 }

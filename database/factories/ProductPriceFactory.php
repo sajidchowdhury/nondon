@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductPrice;
 use App\Modules\Catalog\Models\ProductSize;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +18,7 @@ class ProductPriceFactory extends Factory
     public function definition(): array
     {
         $standardPrice = fake()->randomFloat(2, 500, 5000);
+
         return [
             'product_id' => Product::factory(),
             'product_size_id' => null,
@@ -51,7 +53,7 @@ class ProductPriceFactory extends Factory
         ]);
     }
 
-    public function effectiveAt(\Carbon\Carbon $from, ?\Carbon\Carbon $to = null): static
+    public function effectiveAt(Carbon $from, ?Carbon $to = null): static
     {
         return $this->state(fn (array $attributes) => [
             'effective_from' => $from,

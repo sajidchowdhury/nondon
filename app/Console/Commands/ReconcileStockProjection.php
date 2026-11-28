@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Modules\Inventory\Services\StockProjectionService;
+use Illuminate\Console\Command;
 
 class ReconcileStockProjection extends Command
 {
@@ -28,10 +28,11 @@ class ReconcileStockProjection extends Command
 
         if (empty($drift)) {
             $this->info('No drift detected. Stock projection is consistent with the movement ledger.');
+
             return Command::SUCCESS;
         }
 
-        $this->warn("Drift detected: " . count($drift) . " record(s) mismatched.");
+        $this->warn('Drift detected: '.count($drift).' record(s) mismatched.');
 
         $this->table(
             ['Garment ID', 'Issue', 'Projection', 'Ledger'],

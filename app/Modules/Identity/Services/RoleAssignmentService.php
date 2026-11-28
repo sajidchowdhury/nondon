@@ -3,10 +3,10 @@
 namespace App\Modules\Identity\Services;
 
 use App\Modules\Identity\Models\User;
-use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
 class RoleAssignmentService
 {
@@ -16,20 +16,16 @@ class RoleAssignmentService
      * If the user already has the role, this is a no-op.
      * If the user had only one role before, and now has two, the active role
      * remains the original one (user can switch later).
-     *
-     * @param User $user
-     * @param Role $role
-     * @return User
      */
     public function assignRole(User $user, Role $role): User
     {
         return DB::transaction(function () use ($user, $role) {
-            if (!$user->hasRole($role)) {
+            if (! $user->hasRole($role)) {
                 $user->assignRole($role);
             }
 
             // If user has only one role and no active role set, set it as active
-            if (!$user->active_role_id) {
+            if (! $user->active_role_id) {
                 $roles = $user->roles;
                 if ($roles->count() === 1) {
                     $user->update(['active_role_id' => $roles->first()->id]);
@@ -48,9 +44,6 @@ class RoleAssignmentService
      * If the user has no remaining roles, set active_role_id to null
      * (this is an invalid state — user should always have at least one role).
      *
-     * @param User $user
-     * @param Role $role
-     * @return User
      * @throws ValidationException if trying to remove the user's only role
      */
     public function removeRole(User $user, Role $role): User
@@ -91,9 +84,8 @@ class RoleAssignmentService
      * Ensures the user always has at least one role.
      * Updates the active role if it was removed.
      *
-     * @param User $user
-     * @param array $roleIds Array of role IDs
-     * @return User
+     * @param  array  $roleIds  Array of role IDs
+     *
      * @throws ValidationException if no roles provided
      */
     public function syncRoles(User $user, array $roleIds): User
@@ -112,7 +104,7 @@ class RoleAssignmentService
             ]);
         }
 
-        return DB::transaction(function () use ($user, $roles, $roleIds) {
+        return DB::transaction(function () use ($user, $roles) {
             // Get current active role before sync
             $currentActiveRoleId = $user->active_role_id;
 
@@ -161,14 +153,11 @@ class RoleAssignmentService
      * Updates the active_role_id on the user model.
      * Also updates the session if the user is currently logged in.
      *
-     * @param User $user
-     * @param Role $role
-     * @return User
      * @throws ValidationException if the user does not have the role
      */
     public function setActiveRole(User $user, Role $role): User
     {
-        if (!$user->hasRole($role)) {
+        if (! $user->hasRole($role)) {
             throw ValidationException::withMessages([
                 'role' => __('You do not have this role assigned.'),
             ]);
@@ -186,13 +175,10 @@ class RoleAssignmentService
 
     /**
      * Get the active role for a user.
-     *
-     * @param User $user
-     * @return Role|null
      */
     public function getActiveRole(User $user): ?Role
     {
-        if (!$user->active_role_id) {
+        if (! $user->active_role_id) {
             return null;
         }
 
@@ -205,9 +191,6 @@ class RoleAssignmentService
      * If the user has one role, return it.
      * If the user has multiple roles, return null (user must select).
      * If the user has no roles, return null (invalid state).
-     *
-     * @param User $user
-     * @return Role|null
      */
     public function determineDefaultActiveRole(User $user): ?Role
     {

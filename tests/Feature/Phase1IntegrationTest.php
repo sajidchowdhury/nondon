@@ -1,23 +1,26 @@
 <?php
 
-use App\Modules\Identity\Models\User;
-use App\Modules\Organization\Models\Branch;
-use App\Modules\Organization\Models\FiscalYear;
-use App\Modules\Organization\Services\FiscalYearService;
+use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Audit\Services\AuditService;
 use App\Modules\Catalog\Models\Product;
-use App\Modules\Catalog\Models\ProductSize;
-use App\Modules\Catalog\Services\ProductService;
 use App\Modules\Catalog\Services\PriceService;
+use App\Modules\Catalog\Services\ProductService;
+use App\Modules\Identity\Models\UserPermission;
+use App\Modules\Identity\Services\PermissionOverrideService;
 use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Models\InventoryMovement;
 use App\Modules\Inventory\Services\GarmentIdentityService;
 use App\Modules\Inventory\Services\InventoryMovementService;
 use App\Modules\Inventory\Services\StockQueryService;
-use App\Modules\Audit\Models\AuditLog;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Organization\Models\Branch;
+use App\Modules\Organization\Models\FiscalYear;
+use App\Modules\Organization\Services\FiscalYearService;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
-use Illuminate\Support\Facades\Hash;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Permission;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -183,15 +186,15 @@ describe('sensitive data verification', function () {
         $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
 
-        $overrideService = app(\App\Modules\Identity\Services\PermissionOverrideService::class);
-        $permission = \Spatie\Permission\Models\Permission::where('name', 'purchase.cost.view')->first();
+        $overrideService = app(PermissionOverrideService::class);
+        $permission = Permission::where('name', 'purchase.cost.view')->first();
 
         // Attempting to grant admin-only permission should fail
-        expect(fn() => $overrideService->grantPermission($supervisor, $permission))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $overrideService->grantPermission($supervisor, $permission))
+            ->toThrow(ValidationException::class);
 
         // Even with a manual override entry, effective permissions should filter it
-        \App\Modules\Identity\Models\UserPermission::create([
+        UserPermission::create([
             'user_id' => $supervisor->id,
             'permission_id' => $permission->id,
             'granted' => true,
@@ -213,7 +216,7 @@ describe('fiscal year serial generation integration', function () {
         // Generate serials via the fiscal year service
         $serials = collect();
         for ($i = 0; $i < 5; $i++) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($service, $fiscalYear, &$serials) {
+            DB::transaction(function () use ($service, $fiscalYear, &$serials) {
                 $serials->push($service->generateNextSerial($fiscalYear));
             });
         }
@@ -226,7 +229,7 @@ describe('fiscal year serial generation integration', function () {
         }
         // All start with the fiscal year prefix
         foreach ($serials as $serial) {
-            expect($serial)->toStartWith($fiscalYear->serial_prefix . '-');
+            expect($serial)->toStartWith($fiscalYear->serial_prefix.'-');
         }
     });
 });
@@ -259,7 +262,7 @@ describe('audit log visibility', function () {
             'performed_at' => now(),
         ]);
 
-        $service = app(\App\Modules\Audit\Services\AuditService::class);
+        $service = app(AuditService::class);
         $logs = $service->query(['per_page' => 100])->get();
 
         // Admin should see all 3 entries
@@ -302,7 +305,7 @@ describe('audit log visibility', function () {
         ]);
 
         // Query as supervisor — should be scoped to own branch today
-        $service = app(\App\Modules\Audit\Services\AuditService::class);
+        $service = app(AuditService::class);
         $logs = $service->query([
             'branch_id' => $branch->id,
             'date_from' => today()->toDateString(),

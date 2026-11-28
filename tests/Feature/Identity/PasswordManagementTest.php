@@ -1,12 +1,13 @@
 <?php
 
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\AuthService;
 use App\Modules\Organization\Models\Branch;
-use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -16,39 +17,39 @@ beforeEach(function () {
 
 describe('password validation rules', function () {
     it('rejects password shorter than 8 characters', function () {
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->validatePassword('short1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->validatePassword('short1'))
+            ->toThrow(ValidationException::class);
     });
 
     it('rejects password without a letter', function () {
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->validatePassword('12345678'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->validatePassword('12345678'))
+            ->toThrow(ValidationException::class);
     });
 
     it('rejects password without a number', function () {
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->validatePassword('password'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->validatePassword('password'))
+            ->toThrow(ValidationException::class);
     });
 
     it('rejects commonly-used weak passwords', function () {
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->validatePassword('password1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
-        expect(fn() => $service->validatePassword('12345678'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
-        expect(fn() => $service->validatePassword('admin123'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->validatePassword('password1'))
+            ->toThrow(ValidationException::class);
+        expect(fn () => $service->validatePassword('12345678'))
+            ->toThrow(ValidationException::class);
+        expect(fn () => $service->validatePassword('admin123'))
+            ->toThrow(ValidationException::class);
     });
 
     it('accepts a valid password with letters and numbers', function () {
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
         // Should not throw
         $service->validatePassword('securePass123');
@@ -64,7 +65,7 @@ describe('admin password reset', function () {
             'password_hash' => Hash::make('oldpassword'),
         ]);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->resetPassword($user, 'newSecure123');
 
         expect(Hash::check('newSecure123', $updated->password_hash))->toBeTrue();
@@ -78,7 +79,7 @@ describe('admin password reset', function () {
             'force_password_change' => false,
         ]);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->resetPassword($user, 'newSecure123');
 
         expect($updated->force_password_change)->toBeTrue();
@@ -92,7 +93,7 @@ describe('admin password reset', function () {
             'failed_login_attempts' => 5,
         ]);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->resetPassword($user, 'newSecure123');
 
         expect($updated->locked_at)->toBeNull();
@@ -104,15 +105,15 @@ describe('admin password reset', function () {
         $branch = Branch::where('code', 'B1')->first();
         $user = User::factory()->forBranch($branch)->create();
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
         // Weak password should be rejected
-        expect(fn() => $service->resetPassword($user, 'password1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->resetPassword($user, 'password1'))
+            ->toThrow(ValidationException::class);
 
         // Short password should be rejected
-        expect(fn() => $service->resetPassword($user, 'short1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->resetPassword($user, 'short1'))
+            ->toThrow(ValidationException::class);
     });
 });
 
@@ -126,7 +127,7 @@ describe('self-service password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->changePassword('currentPass1', 'newSecure123');
 
         expect(Hash::check('newSecure123', $updated->password_hash))->toBeTrue();
@@ -141,10 +142,10 @@ describe('self-service password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->changePassword('wrongpassword', 'newSecure123'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->changePassword('wrongpassword', 'newSecure123'))
+            ->toThrow(ValidationException::class);
     });
 
     it('new password cannot be same as current password', function () {
@@ -156,10 +157,10 @@ describe('self-service password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->changePassword('samePass123', 'samePass123'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->changePassword('samePass123', 'samePass123'))
+            ->toThrow(ValidationException::class);
     });
 
     it('change password validates the new password', function () {
@@ -171,15 +172,15 @@ describe('self-service password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
         // Weak password rejected
-        expect(fn() => $service->changePassword('currentPass1', 'password1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->changePassword('currentPass1', 'password1'))
+            ->toThrow(ValidationException::class);
 
         // Short password rejected
-        expect(fn() => $service->changePassword('currentPass1', 'short1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->changePassword('currentPass1', 'short1'))
+            ->toThrow(ValidationException::class);
     });
 
     it('change password clears force_password_change flag', function () {
@@ -192,7 +193,7 @@ describe('self-service password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->changePassword('currentPass1', 'newSecure123');
 
         expect($updated->force_password_change)->toBeFalse();
@@ -210,7 +211,7 @@ describe('forced password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->changePasswordForced('newSecure123');
 
         expect(Hash::check('newSecure123', $updated->password_hash))->toBeTrue();
@@ -227,12 +228,12 @@ describe('forced password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->changePasswordForced('password1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
-        expect(fn() => $service->changePasswordForced('short1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->changePasswordForced('password1'))
+            ->toThrow(ValidationException::class);
+        expect(fn () => $service->changePasswordForced('short1'))
+            ->toThrow(ValidationException::class);
     });
 
     it('forced change rejects same-as-current password', function () {
@@ -245,10 +246,10 @@ describe('forced password change', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->changePasswordForced('samePass123'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->changePasswordForced('samePass123'))
+            ->toThrow(ValidationException::class);
     });
 });
 
@@ -260,7 +261,7 @@ describe('force password change flag', function () {
             'force_password_change' => false,
         ]);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->forcePasswordChange($user);
 
         expect($updated->force_password_change)->toBeTrue();
@@ -278,7 +279,7 @@ describe('account unlock', function () {
             'failed_login_attempts' => 5,
         ]);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $updated = $service->unlockAccount($user);
 
         expect($updated->locked_at)->toBeNull();
@@ -295,10 +296,10 @@ describe('account unlock', function () {
         ]);
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
-        expect(fn() => $service->login('lockeduser', 'correctPass1'))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+        expect(fn () => $service->login('lockeduser', 'correctPass1'))
+            ->toThrow(ValidationException::class);
     });
 
     it('after unlock, user can login', function () {
@@ -311,7 +312,7 @@ describe('account unlock', function () {
         ]);
         $user->assignRole('salesperson');
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
 
         // Unlock
         $service->unlockAccount($user);
@@ -385,7 +386,7 @@ describe('ForcePasswordChangeMiddleware', function () {
 
         $this->actingAs($user);
 
-        $service = app(\App\Modules\Identity\Services\AuthService::class);
+        $service = app(AuthService::class);
         $service->changePasswordForced('newSecure123');
 
         // After password change, should be able to access dashboard

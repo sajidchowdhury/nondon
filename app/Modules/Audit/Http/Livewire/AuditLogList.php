@@ -2,33 +2,67 @@
 
 namespace App\Modules\Audit\Http\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Modules\Audit\Models\AuditLog;
 use App\Modules\Audit\Services\AuditService;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class AuditLogList extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public ?string $categoryFilter = null;
+
     public ?string $actionFilter = null;
+
     public ?int $userFilter = null;
+
     public ?int $branchFilter = null;
+
     public string $dateFrom = '';
+
     public string $dateTo = '';
+
     public int $perPage = 50;
 
-    public function updatingSearch(): void { $this->resetPage(); }
-    public function updatingCategoryFilter(): void { $this->resetPage(); }
-    public function updatingActionFilter(): void { $this->resetPage(); }
-    public function updatingUserFilter(): void { $this->resetPage(); }
-    public function updatingBranchFilter(): void { $this->resetPage(); }
-    public function updatingDateFrom(): void { $this->resetPage(); }
-    public function updatingDateTo(): void { $this->resetPage(); }
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCategoryFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingActionFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingUserFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingBranchFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateFrom(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingDateTo(): void
+    {
+        $this->resetPage();
+    }
 
     public function clearFilters(): void
     {
@@ -48,7 +82,7 @@ class AuditLogList extends Component
         $user = auth()->user();
 
         // Authorization: only admin and supervisors can view audit logs
-        if (!$user->hasRole(['main_branch_admin', 'branch_supervisor', 'online_supervisor'])) {
+        if (! $user->hasRole(['main_branch_admin', 'branch_supervisor', 'online_supervisor'])) {
             abort(403, __('You are not authorized to view audit logs.'));
         }
 
@@ -58,7 +92,7 @@ class AuditLogList extends Component
         ];
 
         // Non-admin users can only see today's data for their own branch
-        if (!$user->hasRole('main_branch_admin')) {
+        if (! $user->hasRole('main_branch_admin')) {
             // Force today-only filter for supervisors
             $filters['date_from'] = today()->toDateString();
             $filters['date_to'] = today()->toDateString();
@@ -96,8 +130,8 @@ class AuditLogList extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('action', 'ILIKE', "%{$this->search}%")
-                  ->orWhere('reference_type', 'ILIKE', "%{$this->search}%")
-                  ->orWhere('category', 'ILIKE', "%{$this->search}%");
+                    ->orWhere('reference_type', 'ILIKE', "%{$this->search}%")
+                    ->orWhere('category', 'ILIKE', "%{$this->search}%");
             });
         }
 

@@ -2,25 +2,28 @@
 
 namespace App\Modules\Purchasing\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Audit\Traits\Auditable;
 use App\Modules\Identity\Models\User;
+use Database\Factories\SupplierFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Validation\ValidationException;
 
 class Supplier extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\SupplierFactory::new();
+        return SupplierFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'supplier';
+
     protected string $auditCategory = 'purchasing';
 
     /**
@@ -89,8 +92,6 @@ class Supplier extends Model
      *   if ($user->can('supplier.manage')) {
      *       $supplier->withSensitiveInfo();
      *   }
-     *
-     * @return self
      */
     public function withSensitiveInfo(): self
     {
@@ -148,8 +149,8 @@ class Supplier extends Model
     {
         return $query->where(function ($q) use ($term) {
             $q->where('code', 'ILIKE', "%{$term}%")
-              ->orWhere('name', 'ILIKE', "%{$term}%")
-              ->orWhere('phone', 'ILIKE', "%{$term}%");
+                ->orWhere('name', 'ILIKE', "%{$term}%")
+                ->orWhere('phone', 'ILIKE', "%{$term}%");
         });
     }
 
@@ -161,8 +162,6 @@ class Supplier extends Model
 
     /**
      * Activate the supplier.
-     *
-     * @return self
      */
     public function activate(): self
     {
@@ -179,13 +178,12 @@ class Supplier extends Model
      * Refuses to deactivate if the supplier has a non-zero outstanding balance
      * (financial reconciliation must be resolved first).
      *
-     * @return self
-     * @throws \Illuminate\Validation\ValidationException if outstanding_balance != 0
+     * @throws ValidationException if outstanding_balance != 0
      */
     public function deactivate(): self
     {
         if ((float) $this->outstanding_balance !== 0.0) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'is_active' => __('Cannot deactivate supplier with outstanding balance of :balance.', [
                     'balance' => number_format((float) $this->outstanding_balance, 2),
                 ]),

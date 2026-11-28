@@ -2,8 +2,8 @@
 
 namespace App\Modules\Identity\Services;
 
-use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Models\LoginAttempt;
+use App\Modules\Identity\Models\User;
 use App\Shared\PasswordRules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -25,10 +25,6 @@ class AuthService
     /**
      * Attempt to log in a user with username and password.
      *
-     * @param string $username
-     * @param string $password
-     * @param bool $remember
-     * @return User
      * @throws ValidationException
      */
     public function login(string $username, string $password, bool $remember = false): User
@@ -36,7 +32,7 @@ class AuthService
         $user = User::where('username', $username)->first();
 
         // User not found
-        if (!$user) {
+        if (! $user) {
             LoginAttempt::logFailure($username, null, 'user_not_found');
             throw ValidationException::withMessages([
                 'username' => __('Invalid username or password.'),
@@ -52,7 +48,7 @@ class AuthService
         }
 
         // Check if account is active
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             LoginAttempt::logFailure($username, $user->id, 'account_inactive');
             throw ValidationException::withMessages([
                 'username' => __('This account has been deactivated. Contact administrator.'),
@@ -60,7 +56,7 @@ class AuthService
         }
 
         // Validate password
-        if (!Hash::check($password, $user->getAuthPassword())) {
+        if (! Hash::check($password, $user->getAuthPassword())) {
             $user->incrementFailedAttempts($this->maxAttempts);
             LoginAttempt::logFailure($username, $user->id, 'invalid_password');
 
@@ -68,7 +64,7 @@ class AuthService
 
             if ($remaining > 0) {
                 throw ValidationException::withMessages([
-                    'username' => __("Invalid username or password. :remaining attempts remaining.", [
+                    'username' => __('Invalid username or password. :remaining attempts remaining.', [
                         'remaining' => $remaining,
                     ]),
                 ]);
@@ -120,7 +116,7 @@ class AuthService
 
         if ($roles->count() === 1) {
             $user->update(['active_role_id' => $roles->first()->id]);
-        } elseif ($roles->count() > 1 && !$user->active_role_id) {
+        } elseif ($roles->count() > 1 && ! $user->active_role_id) {
             // Leave active_role_id null — user will be prompted to select
             // The RoleSwitcher component handles this
         }
@@ -129,22 +125,20 @@ class AuthService
     /**
      * Switch the active role for the current user.
      *
-     * @param int $roleId
-     * @return User
      * @throws ValidationException
      */
     public function switchRole(int $roleId): User
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'role' => __('Not authenticated.'),
             ]);
         }
 
         // Verify the user has the role
-        if (!$user->hasRole($roleId)) {
+        if (! $user->hasRole($roleId)) {
             throw ValidationException::withMessages([
                 'role' => __('You do not have this role assigned.'),
             ]);
@@ -186,8 +180,6 @@ class AuthService
      * - Must not be a commonly-used weak password
      * - Must not be the same as the user's current password (if user is provided)
      *
-     * @param string $password
-     * @param User|null $user
      * @throws ValidationException
      */
     public function validatePassword(string $password, ?User $user = null): void
@@ -210,9 +202,6 @@ class AuthService
      * Sets force_password_change = true so user must change it on next login.
      * Also clears any lockout state.
      *
-     * @param User $user
-     * @param string $newPassword
-     * @return User
      * @throws ValidationException if password fails validation
      */
     public function resetPassword(User $user, string $newPassword): User
@@ -239,23 +228,20 @@ class AuthService
      * Validates the new password against security rules.
      * Clears the force_password_change flag.
      *
-     * @param string $currentPassword
-     * @param string $newPassword
-     * @return User
      * @throws ValidationException if current password is wrong or new password fails validation
      */
     public function changePassword(string $currentPassword, string $newPassword): User
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'current_password' => __('Not authenticated.'),
             ]);
         }
 
         // Verify current password
-        if (!Hash::check($currentPassword, $user->getAuthPassword())) {
+        if (! Hash::check($currentPassword, $user->getAuthPassword())) {
             throw ValidationException::withMessages([
                 'current_password' => __('Current password is incorrect.'),
             ]);
@@ -280,15 +266,13 @@ class AuthService
      * The ForcePasswordChangeMiddleware ensures this is only called when
      * force_password_change = true.
      *
-     * @param string $newPassword
-     * @return User
      * @throws ValidationException if not authenticated or password fails validation
      */
     public function changePasswordForced(string $newPassword): User
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'password' => __('Not authenticated.'),
             ]);
@@ -312,9 +296,6 @@ class AuthService
      * Sets the force_password_change flag without changing the password.
      * Used when admin wants to require a password change for security reasons
      * without resetting the password themselves.
-     *
-     * @param User $user
-     * @return User
      */
     public function forcePasswordChange(User $user): User
     {
@@ -327,9 +308,6 @@ class AuthService
      * Unlock a user account (admin action).
      *
      * Clears the lockout state and resets failed login attempts.
-     *
-     * @param User $user
-     * @return User
      */
     public function unlockAccount(User $user): User
     {

@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Modules\Inventory\Models\InventoryMovement;
 use App\Modules\Inventory\Models\Garment;
+use App\Modules\Inventory\Models\InventoryMovement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

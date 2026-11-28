@@ -2,12 +2,12 @@
 
 namespace App\Modules\Identity\Http\Livewire\Users;
 
-use Livewire\Component;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\UserService;
 use App\Modules\Organization\Models\Branch;
-use Spatie\Permission\Models\Role;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class UserCreate extends Component
 {
@@ -15,13 +15,21 @@ class UserCreate extends Component
      * Form fields.
      */
     public string $username = '';
+
     public string $full_name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
+
     public ?int $assigned_branch_id = null;
+
     public bool $is_online_channel = false;
+
     public array $selectedRoles = [];
+
     public bool $force_password_change = true;
 
     /**
@@ -122,6 +130,6 @@ class UserCreate extends Component
             'onlineBranch' => $onlineBranch,
             'roles' => $roles,
         ])
-        ->layout('layouts.app');
+            ->layout('layouts.app');
     }
 }

@@ -78,7 +78,7 @@ class UserPolicy
      */
     public function toggleStatus(User $user, User $target): Response
     {
-        if (!$user->hasRole('main_branch_admin')) {
+        if (! $user->hasRole('main_branch_admin')) {
             return Response::deny(__('Only administrators can change account status.'));
         }
 

@@ -42,7 +42,7 @@ trait HasBranchScope
             $user = Auth::user();
 
             // Skip scope for guests (e.g., during testing without auth)
-            if (!$user) {
+            if (! $user) {
                 return;
             }
 
@@ -53,7 +53,7 @@ trait HasBranchScope
 
             // All other users see only their assigned branch
             if ($user->assigned_branch_id) {
-                $builder->where($builder->getModel()->getTable() . '.branch_id', $user->assigned_branch_id);
+                $builder->where($builder->getModel()->getTable().'.branch_id', $user->assigned_branch_id);
             }
         });
     }
@@ -63,8 +63,6 @@ trait HasBranchScope
      *
      * Use this for cross-branch queries (e.g., stock visibility
      * across all branches, which is allowed per the BRD).
-     *
-     * @return Builder
      */
     public static function withoutBranchScope(): Builder
     {
@@ -81,9 +79,6 @@ trait HasBranchScope
 
     /**
      * Get a query builder scoped to a specific branch.
-     *
-     * @param int $branchId
-     * @return Builder
      */
     public static function forBranch(int $branchId): Builder
     {

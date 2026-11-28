@@ -2,11 +2,12 @@
 
 namespace App\Modules\Audit\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Identity\Models\User;
 use App\Modules\Organization\Models\Branch;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditLog extends Model
 {
@@ -78,8 +79,6 @@ class AuditLog extends Model
      * Override save() to prevent updates.
      * Only INSERT is allowed; UPDATE is blocked.
      *
-     * @param array $options
-     * @return bool
      * @throws \RuntimeException if attempting to update an existing record
      */
     public function save(array $options = []): bool
@@ -96,7 +95,6 @@ class AuditLog extends Model
     /**
      * Override delete() to prevent deletion.
      *
-     * @return bool
      * @throws \RuntimeException always
      */
     public function delete(): bool
@@ -181,8 +179,8 @@ class AuditLog extends Model
         }
 
         return $query->whereBetween('performed_at', [
-            \Carbon\Carbon::parse($startDate)->startOfDay(),
-            \Carbon\Carbon::parse($endDate)->endOfDay(),
+            Carbon::parse($startDate)->startOfDay(),
+            Carbon::parse($endDate)->endOfDay(),
         ]);
     }
 

@@ -2,18 +2,23 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Suppliers;
 
-use Livewire\Component;
 use App\Modules\Purchasing\Models\Supplier;
 use App\Modules\Purchasing\Services\SupplierService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class SupplierCreate extends Component
 {
     public string $code = '';
+
     public string $name = '';
+
     public string $contact_person = '';
+
     public string $phone = '';
+
     public string $email = '';
+
     public string $address = '';
 
     protected function rules(): array

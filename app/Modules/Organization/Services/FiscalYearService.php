@@ -3,6 +3,7 @@
 namespace App\Modules\Organization\Services;
 
 use App\Modules\Organization\Models\FiscalYear;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -18,11 +19,11 @@ class FiscalYearService
      * - Serial prefix is auto-derived from start year (e.g., 2025 → "25")
      * - No date overlap with existing fiscal years
      *
-     * @param array $data {
-     *   - start_year: int (required, e.g., 2025 for FY 2025-26)
-     *   - name: string|null (auto-generated if not provided, e.g., "FY 25_26")
-     * }
-     * @return FiscalYear
+     * @param  array  $data  {
+     *                       - start_year: int (required, e.g., 2025 for FY 2025-26)
+     *                       - name: string|null (auto-generated if not provided, e.g., "FY 25_26")
+     *                       }
+     *
      * @throws ValidationException
      */
     public function create(array $data): FiscalYear
@@ -38,17 +39,17 @@ class FiscalYearService
         }
 
         // Calculate dates: July 1 to June 30 of the following year
-        $startDate = \Carbon\Carbon::create($startYear, 7, 1)->startOfDay();
-        $endDate = \Carbon\Carbon::create($endYear, 6, 30)->endOfDay();
+        $startDate = Carbon::create($startYear, 7, 1)->startOfDay();
+        $endDate = Carbon::create($endYear, 6, 30)->endOfDay();
 
         // Check for date overlap with existing fiscal years
         $overlap = FiscalYear::where(function ($query) use ($startDate, $endDate) {
             $query->whereBetween('start_date', [$startDate, $endDate])
-                  ->orWhereBetween('end_date', [$startDate, $endDate])
-                  ->orWhere(function ($q) use ($startDate, $endDate) {
-                      $q->where('start_date', '<=', $startDate)
+                ->orWhereBetween('end_date', [$startDate, $endDate])
+                ->orWhere(function ($q) use ($startDate, $endDate) {
+                    $q->where('start_date', '<=', $startDate)
                         ->where('end_date', '>=', $endDate);
-                  });
+                });
         })->exists();
 
         if ($overlap) {
@@ -95,8 +96,6 @@ class FiscalYearService
      * Note: In later phases, this will check for pending transactions
      * before allowing closure. For now, it's a simple status change.
      *
-     * @param FiscalYear $fiscalYear
-     * @return FiscalYear
      * @throws ValidationException if already closed
      */
     public function close(FiscalYear $fiscalYear): FiscalYear
@@ -133,8 +132,6 @@ class FiscalYearService
      * deactivates any other active fiscal years before activating
      * the specified one.
      *
-     * @param FiscalYear $fiscalYear
-     * @return FiscalYear
      * @throws ValidationException if the fiscal year is closed
      */
     public function activate(FiscalYear $fiscalYear): FiscalYear
@@ -167,8 +164,6 @@ class FiscalYearService
 
     /**
      * Get the currently active fiscal year.
-     *
-     * @return FiscalYear|null
      */
     public function getCurrent(): ?FiscalYear
     {
@@ -200,8 +195,8 @@ class FiscalYearService
      *
      * This method MUST be called within a database transaction.
      *
-     * @param FiscalYear $fiscalYear
      * @return string The generated serial (e.g., "25-00001")
+     *
      * @throws ValidationException if the fiscal year is closed
      */
     public function generateNextSerial(FiscalYear $fiscalYear): string
@@ -225,7 +220,7 @@ class FiscalYearService
         $fresh = $fiscalYear->fresh();
         $sequence = $fresh->current_serial_sequence;
 
-        return $fresh->serial_prefix . '-' . str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
+        return $fresh->serial_prefix.'-'.str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -233,9 +228,6 @@ class FiscalYearService
      *
      * This is useful for display purposes — shows what the next serial
      * will be when a garment is created. Does NOT use advisory locking.
-     *
-     * @param FiscalYear $fiscalYear
-     * @return string
      */
     public function previewNextSerial(FiscalYear $fiscalYear): string
     {

@@ -2,24 +2,26 @@
 
 namespace App\Modules\Catalog\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Audit\Traits\Auditable;
+use Database\Factories\ProductSizeFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductSize extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\ProductSizeFactory::new();
+        return ProductSizeFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'product_size';
+
     protected string $auditCategory = 'catalog';
 
     /**
@@ -92,6 +94,6 @@ class ProductSize extends Model
      */
     public function getDisplayNameAttribute(): string
     {
-        return $this->product?->name . ' — Size ' . $this->size_label;
+        return $this->product?->name.' — Size '.$this->size_label;
     }
 }

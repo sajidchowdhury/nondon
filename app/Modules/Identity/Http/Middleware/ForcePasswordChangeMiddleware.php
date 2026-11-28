@@ -43,12 +43,12 @@ class ForcePasswordChangeMiddleware
         $user = $request->user();
 
         // Skip for guests
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 
         // Skip if force_password_change is not set
-        if (!$user->force_password_change) {
+        if (! $user->force_password_change) {
             return $next($request);
         }
 
@@ -79,7 +79,7 @@ class ForcePasswordChangeMiddleware
         }
 
         // Redirect all other requests to the force-change page
-        if (!$request->expectsJson()) {
+        if (! $request->expectsJson()) {
             return redirect()->route('password.force-change');
         }
 

@@ -2,28 +2,30 @@
 
 namespace App\Modules\Inventory\Http\Livewire\Stock;
 
-use Livewire\Component;
+use App\Modules\Inventory\Models\Garment;
 use App\Modules\Inventory\Services\StockQueryService;
+use App\Modules\Organization\Models\Branch;
+use Livewire\Component;
 
 class StockOverview extends Component
 {
     public function render(StockQueryService $stockQueryService)
     {
-        $this->authorize('viewAny', \App\Modules\Inventory\Models\Garment::class);
+        $this->authorize('viewAny', Garment::class);
 
         $summary = $stockQueryService->getStockSummary();
         $reservations = $stockQueryService->getReservationCounts();
 
         // Count available garments per branch
-        $branches = \App\Modules\Organization\Models\Branch::active()
+        $branches = Branch::active()
             ->withCount(['garments as available_count' => function ($q) {
-                $q->where('current_status', \App\Modules\Inventory\Models\Garment::STATUS_AVAILABLE);
+                $q->where('current_status', Garment::STATUS_AVAILABLE);
             }])
             ->withCount(['garments as reserved_count' => function ($q) {
-                $q->where('current_status', \App\Modules\Inventory\Models\Garment::STATUS_RESERVED);
+                $q->where('current_status', Garment::STATUS_RESERVED);
             }])
             ->withCount(['garments as sold_count' => function ($q) {
-                $q->where('current_status', \App\Modules\Inventory\Models\Garment::STATUS_SOLD);
+                $q->where('current_status', Garment::STATUS_SOLD);
             }])
             ->orderBy('code')
             ->get();

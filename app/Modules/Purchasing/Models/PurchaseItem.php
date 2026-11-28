@@ -2,26 +2,28 @@
 
 namespace App\Modules\Purchasing\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Audit\Traits\Auditable;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductSize;
+use Database\Factories\PurchaseItemFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseItem extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected static function newFactory()
     {
-        return \Database\Factories\PurchaseItemFactory::new();
+        return PurchaseItemFactory::new();
     }
 
     /**
      * Audit configuration.
      */
     protected string $auditPrefix = 'purchase_item';
+
     protected string $auditCategory = 'purchasing';
 
     /**
@@ -82,12 +84,11 @@ class PurchaseItem extends Model
      *   if ($user->can('purchase.cost.view')) {
      *       $item->withUnitCost();
      *   }
-     *
-     * @return self
      */
     public function withUnitCost(): self
     {
         $this->makeVisible('unit_cost');
+
         return $this;
     }
 

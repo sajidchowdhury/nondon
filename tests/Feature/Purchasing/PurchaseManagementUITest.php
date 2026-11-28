@@ -1,15 +1,15 @@
 <?php
 
-use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Models\PurchaseItem;
-use App\Modules\Purchasing\Services\PurchasingService;
-use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Catalog\Models\Product;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Identity\Models\User;
+use App\Modules\Organization\Models\Branch;
+use App\Modules\Organization\Models\FiscalYear;
+use App\Modules\Purchasing\Models\Purchase;
+use App\Modules\Purchasing\Models\Supplier;
+use App\Modules\Purchasing\Services\PurchasingService;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Database\Seeders\RolePermissionSeeder;
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
@@ -48,14 +48,14 @@ describe('purchase list — UI access', function () {
     });
 
     it('denies supervisor access to purchase list', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $response = $this->actingAs($supervisor)->get(route('purchases.index'));
         $response->assertForbidden();
     });
 
     it('denies salesperson access to purchase list', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         $response = $this->actingAs($salesperson)->get(route('purchases.index'));
         $response->assertForbidden();
@@ -76,7 +76,7 @@ describe('purchase create — UI access', function () {
     });
 
     it('denies supervisor access to create form', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $response = $this->actingAs($supervisor)->get(route('purchases.create'));
         $response->assertForbidden();
@@ -110,7 +110,7 @@ describe('purchase view — UI access', function () {
     });
 
     it('denies supervisor access to purchase detail', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $purchase = createDraftPurchaseForUi();
 
@@ -156,7 +156,7 @@ describe('purchase edit — UI access', function () {
     });
 
     it('denies supervisor access to edit form', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
         $purchase = createDraftPurchaseForUi();
 
@@ -229,7 +229,7 @@ describe('purchase list — filtering', function () {
 
 describe('cost visibility in UI', function () {
     it('purchase cost fields are not rendered for non-admin roles', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
 
         // Supervisor gets 403 — never sees the page at all
@@ -258,7 +258,7 @@ describe('cost visibility in UI', function () {
 
 describe('purchase management routes are protected', function () {
     it('all purchase routes deny salesperson', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         $purchase = createDraftPurchaseForUi();
 
@@ -269,7 +269,7 @@ describe('purchase management routes are protected', function () {
     });
 
     it('all purchase routes deny online team', function () {
-        $user = \App\Modules\Identity\Models\User::factory()->onlineChannel()->create();
+        $user = User::factory()->onlineChannel()->create();
         $user->assignRole('online_team');
         $purchase = createDraftPurchaseForUi();
 

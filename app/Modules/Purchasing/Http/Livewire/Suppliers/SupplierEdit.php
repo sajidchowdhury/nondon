@@ -2,20 +2,25 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Suppliers;
 
-use Livewire\Component;
 use App\Modules\Purchasing\Models\Supplier;
 use App\Modules\Purchasing\Services\SupplierService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class SupplierEdit extends Component
 {
     public Supplier $supplier;
 
     public string $code = '';
+
     public string $name = '';
+
     public string $contact_person = '';
+
     public string $phone = '';
+
     public string $email = '';
+
     public string $address = '';
 
     public function mount(Supplier $supplier): void
@@ -46,7 +51,7 @@ class SupplierEdit extends Component
     protected function rules(): array
     {
         return [
-            'code' => ['required', 'string', 'max:50', 'unique:suppliers,code,' . $this->supplier->id],
+            'code' => ['required', 'string', 'max:50', 'unique:suppliers,code,'.$this->supplier->id],
             'name' => ['required', 'string', 'max:255'],
             'contact_person' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],

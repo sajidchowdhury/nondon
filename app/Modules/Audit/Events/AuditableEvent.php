@@ -80,17 +80,16 @@ class AuditableEvent
     /**
      * Create a new event instance.
      *
-     * @param string $action
-     * @param array $context {
-     *   - category: string
-     *   - reference_type: string|null
-     *   - reference_id: int|null
-     *   - previous_values: array|null
-     *   - new_values: array|null
-     *   - reason: string|null
-     *   - user_id: int|null
-     *   - branch_id: int|null
-     * }
+     * @param  array  $context  {
+     *                          - category: string
+     *                          - reference_type: string|null
+     *                          - reference_id: int|null
+     *                          - previous_values: array|null
+     *                          - new_values: array|null
+     *                          - reason: string|null
+     *                          - user_id: int|null
+     *                          - branch_id: int|null
+     *                          }
      */
     public function __construct(string $action, array $context = [])
     {

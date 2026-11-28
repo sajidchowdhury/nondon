@@ -2,9 +2,10 @@
 
 namespace App\Shared\Rules;
 
+use App\Modules\Identity\Models\User;
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Rule: Password must not be the same as the current password.
@@ -18,9 +19,9 @@ class NotSameAsCurrent implements Rule
      * The user whose password is being changed.
      * If null, uses the authenticated user.
      */
-    protected ?\App\Modules\Identity\Models\User $user;
+    protected ?User $user;
 
-    public function __construct(?\App\Modules\Identity\Models\User $user = null)
+    public function __construct(?User $user = null)
     {
         $this->user = $user ?? Auth::user();
     }
@@ -28,22 +29,21 @@ class NotSameAsCurrent implements Rule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
-     * @param mixed $value
-     * @return bool
+     * @param  string  $attribute
+     * @param  mixed  $value
      */
     public function passes($attribute, $value): bool
     {
-        if (!$this->user || !$value) {
+        if (! $this->user || ! $value) {
             return true;
         }
 
         // If the user has no password set yet (e.g., new account), allow any
-        if (!$this->user->getAuthPassword()) {
+        if (! $this->user->getAuthPassword()) {
             return true;
         }
 
-        return !Hash::check($value, $this->user->getAuthPassword());
+        return ! Hash::check($value, $this->user->getAuthPassword());
     }
 
     /**

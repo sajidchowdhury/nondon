@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Modules\Organization\Models\FiscalYear;
 use App\Modules\Purchasing\Models\Purchase;
 use App\Modules\Purchasing\Models\Supplier;
-use App\Modules\Organization\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +20,7 @@ class PurchaseFactory extends Factory
         $supplier = Supplier::first() ?? Supplier::factory()->create();
 
         return [
-            'purchase_number' => 'PO-' . $fiscalYear->serial_prefix . '-' . str_pad((string) fake()->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT),
+            'purchase_number' => 'PO-'.$fiscalYear->serial_prefix.'-'.str_pad((string) fake()->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT),
             'supplier_id' => $supplier->id,
             'fiscal_year_id' => $fiscalYear->id,
             'purchase_date' => fake()->date(),

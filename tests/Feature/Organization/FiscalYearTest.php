@@ -1,9 +1,13 @@
 <?php
 
+use App\Modules\Audit\Models\AuditLog;
+use App\Modules\Organization\Models\Branch;
 use App\Modules\Organization\Models\FiscalYear;
-use Database\Seeders\RolePermissionSeeder;
+use App\Modules\Organization\Services\FiscalYearService;
+use Carbon\Carbon;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\FiscalYearSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -24,7 +28,7 @@ describe('fiscal year list — viewAny', function () {
     });
 
     it('allows supervisor to view fiscal year list', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
 
         $response = $this->actingAs($supervisor)->get(route('fiscal-years.index'));
@@ -33,7 +37,7 @@ describe('fiscal year list — viewAny', function () {
     });
 
     it('denies salesperson access to fiscal year list', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
 
         $response = $this->actingAs($salesperson)->get(route('fiscal-years.index'));
@@ -53,7 +57,7 @@ describe('fiscal year create', function () {
     });
 
     it('denies supervisor access to create form', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $supervisor = supervisor($branch);
 
         $response = $this->actingAs($supervisor)->get(route('fiscal-years.create'));
@@ -64,7 +68,7 @@ describe('fiscal year create', function () {
     it('allows admin to create a fiscal year with valid start year', function () {
         $admin = adminUser();
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $fy = $service->create(['start_year' => 2027]);
 
         expect($fy)->toBeInstanceOf(FiscalYear::class);
@@ -78,56 +82,56 @@ describe('fiscal year create', function () {
     });
 
     it('auto-calculates start date as July 1', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $fy = $service->create(['start_year' => 2028]);
 
         expect($fy->start_date->format('m-d'))->toBe('07-01');
     });
 
     it('auto-calculates end date as June 30 of next year', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $fy = $service->create(['start_year' => 2028]);
 
         expect($fy->end_date->format('Y-m-d'))->toBe('2029-06-30');
     });
 
     it('auto-derives serial prefix from start year', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $fy = $service->create(['start_year' => 2025]);
 
         expect($fy->serial_prefix)->toBe('25');
     });
 
     it('auto-generates name if not provided', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $fy = $service->create(['start_year' => 2028]);
 
         expect($fy->name)->toBe('FY 28_29');
     });
 
     it('rejects overlapping fiscal years', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
         // The seeder creates the current fiscal year, so trying to create the same one should fail
         $currentYear = (int) date('Y');
         $adjustment = (date('n') >= 7) ? 0 : -1;
         $startYear = $currentYear + $adjustment;
 
-        expect(fn() => $service->create(['start_year' => $startYear]))
+        expect(fn () => $service->create(['start_year' => $startYear]))
             ->toThrow(ValidationException::class);
     });
 
     it('rejects start year before 2020', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
-        expect(fn() => $service->create(['start_year' => 2019]))
+        expect(fn () => $service->create(['start_year' => 2019]))
             ->toThrow(ValidationException::class);
     });
 
     it('rejects start year after 2100', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
-        expect(fn() => $service->create(['start_year' => 2101]))
+        expect(fn () => $service->create(['start_year' => 2101]))
             ->toThrow(ValidationException::class);
     });
 });
@@ -141,7 +145,7 @@ describe('fiscal year close', function () {
             'is_closed' => false,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $closed = $service->close($fy);
 
         expect($closed->is_closed)->toBeTrue();
@@ -153,9 +157,9 @@ describe('fiscal year close', function () {
             'is_closed' => true,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
-        expect(fn() => $service->close($fy))
+        expect(fn () => $service->close($fy))
             ->toThrow(ValidationException::class);
     });
 
@@ -165,7 +169,7 @@ describe('fiscal year close', function () {
             'is_closed' => false,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $closed = $service->close($fy);
 
         expect($closed->is_active)->toBeFalse();
@@ -180,7 +184,7 @@ describe('fiscal year activate', function () {
             'is_closed' => false,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $activated = $service->activate($fy);
 
         expect($activated->is_active)->toBeTrue();
@@ -192,9 +196,9 @@ describe('fiscal year activate', function () {
             'is_closed' => true,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
-        expect(fn() => $service->activate($fy))
+        expect(fn () => $service->activate($fy))
             ->toThrow(ValidationException::class);
     });
 
@@ -215,7 +219,7 @@ describe('fiscal year activate', function () {
             'is_closed' => false,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
         // Activate fy2
         $service->activate($fy2);
@@ -234,7 +238,7 @@ describe('fiscal year activate', function () {
 
 describe('getCurrent', function () {
     it('returns the currently active fiscal year', function () {
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
         $current = $service->getCurrent();
 
@@ -248,7 +252,7 @@ describe('getCurrent', function () {
         // Deactivate all fiscal years
         FiscalYear::query()->update(['is_active' => false]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
         expect($service->getCurrent())->toBeNull();
     });
@@ -302,7 +306,7 @@ describe('serial generation — concurrency safety', function () {
             'is_closed' => false,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
         // Generate 10 serials sequentially within transactions
         $serials = collect();
@@ -329,9 +333,9 @@ describe('serial generation — concurrency safety', function () {
             'is_closed' => true,
         ]);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
 
-        expect(fn() => DB::transaction(fn() => $service->generateNextSerial($fy)))
+        expect(fn () => DB::transaction(fn () => $service->generateNextSerial($fy)))
             ->toThrow(ValidationException::class);
     });
 });
@@ -362,7 +366,7 @@ describe('fiscal year view', function () {
     });
 
     it('denies salesperson access to fiscal year view', function () {
-        $branch = \App\Modules\Organization\Models\Branch::where('code', 'B1')->first();
+        $branch = Branch::where('code', 'B1')->first();
         $salesperson = salesperson($branch);
         $fy = FiscalYear::factory()->create();
 
@@ -377,10 +381,10 @@ describe('auditing', function () {
         $admin = adminUser();
         $this->actingAs($admin);
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $fy = $service->create(['start_year' => 2035]);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'fiscal_year.create')
+        $auditLog = AuditLog::where('action', 'fiscal_year.create')
             ->where('reference_type', 'fiscal_year')
             ->where('reference_id', $fy->id)
             ->first();
@@ -394,12 +398,12 @@ describe('auditing', function () {
         $this->actingAs($admin);
 
         $fy = FiscalYear::factory()->create(['is_active' => false, 'is_closed' => false]);
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $service->activate($fy);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'fiscal_year.activate')->first();
+        $auditLog = AuditLog::where('action', 'fiscal_year.activate')->first();
 
         expect($auditLog)->not->toBeNull();
         expect($auditLog->reference_id)->toBe($fy->id);
@@ -410,12 +414,12 @@ describe('auditing', function () {
         $this->actingAs($admin);
 
         $fy = FiscalYear::factory()->create(['is_closed' => false]);
-        \App\Modules\Audit\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
-        $service = app(\App\Modules\Organization\Services\FiscalYearService::class);
+        $service = app(FiscalYearService::class);
         $service->close($fy);
 
-        $auditLog = \App\Modules\Audit\Models\AuditLog::where('action', 'fiscal_year.close')->first();
+        $auditLog = AuditLog::where('action', 'fiscal_year.close')->first();
 
         expect($auditLog)->not->toBeNull();
         expect($auditLog->reference_id)->toBe($fy->id);
@@ -447,8 +451,8 @@ describe('model helper methods', function () {
             'end_date' => '2026-06-30',
         ]);
 
-        expect($fy->containsDate(\Carbon\Carbon::parse('2025-12-15')))->toBeTrue();
-        expect($fy->containsDate(\Carbon\Carbon::parse('2026-01-01')))->toBeTrue();
+        expect($fy->containsDate(Carbon::parse('2025-12-15')))->toBeTrue();
+        expect($fy->containsDate(Carbon::parse('2026-01-01')))->toBeTrue();
     });
 
     it('containsDate returns false for date outside fiscal year', function () {
@@ -457,7 +461,7 @@ describe('model helper methods', function () {
             'end_date' => '2026-06-30',
         ]);
 
-        expect($fy->containsDate(\Carbon\Carbon::parse('2025-06-30')))->toBeFalse();
-        expect($fy->containsDate(\Carbon\Carbon::parse('2026-07-01')))->toBeFalse();
+        expect($fy->containsDate(Carbon::parse('2025-06-30')))->toBeFalse();
+        expect($fy->containsDate(Carbon::parse('2026-07-01')))->toBeFalse();
     });
 });

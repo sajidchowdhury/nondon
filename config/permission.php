@@ -1,5 +1,8 @@
 <?php
 
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
 return [
 
     'models' => [
@@ -7,12 +10,12 @@ return [
         /*
          * The model you want to use as a Role model.
          */
-        'role' => Spatie\Permission\Models\Role::class,
+        'role' => Role::class,
 
         /*
          * The model you want to use as a Permission model.
          */
-        'permission' => Spatie\Permission\Models\Permission::class,
+        'permission' => Permission::class,
 
     ],
 

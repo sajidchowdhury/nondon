@@ -2,11 +2,11 @@
 
 namespace App\Modules\Identity\Http\Livewire\Auth;
 
-use Livewire\Component;
 use App\Modules\Identity\Services\RoleAssignmentService;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Role;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class RoleSwitcher extends Component
 {
@@ -25,7 +25,7 @@ class RoleSwitcher extends Component
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -43,8 +43,6 @@ class RoleSwitcher extends Component
      * Uses RoleAssignmentService for proper role switching with validation.
      * Stores the active role in session for middleware access.
      * Redirects to dashboard with confirmation toast.
-     *
-     * @param RoleAssignmentService $roleAssignmentService
      */
     public function switchRole(RoleAssignmentService $roleAssignmentService)
     {
