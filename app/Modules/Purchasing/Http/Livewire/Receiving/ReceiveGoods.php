@@ -2,10 +2,10 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Receiving;
 
-use Livewire\Component;
 use App\Modules\Purchasing\Models\Purchase;
 use App\Modules\Purchasing\Services\ReceivingService;
 use Illuminate\Validation\ValidationException;
+use Livewire\Component;
 
 class ReceiveGoods extends Component
 {
@@ -47,16 +47,18 @@ class ReceiveGoods extends Component
             }
         }
 
-        if (!$hasQuantity) {
+        if (! $hasQuantity) {
             $this->addError('quantities', __('At least one item must have a received quantity greater than zero.'));
+
             return;
         }
 
         // Validate each quantity against remaining
         foreach ($quantities as $itemId => $qty) {
             $item = $this->purchase->items->firstWhere('id', $itemId);
-            if (!$item) {
+            if (! $item) {
                 $this->addError("receivedQuantities.{$itemId}", __('Invalid item.'));
+
                 return;
             }
 
@@ -66,6 +68,7 @@ class ReceiveGoods extends Component
                     "receivedQuantities.{$itemId}",
                     __('Quantity :qty exceeds remaining :remaining.', ['qty' => $qty, 'remaining' => $remaining])
                 );
+
                 return;
             }
         }

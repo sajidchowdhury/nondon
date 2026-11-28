@@ -72,6 +72,21 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasRole('main_branch_admin');
         });
 
+        // Gate: Determine if user can view goods receipts. Admins see all
+        // receipts. Main-Branch receiving staff (branch supervisors assigned
+        // to the Main Branch) can view receipts — the records of their own
+        // receiving workflow (WF-2). Supplier identity and purchase cost are
+        // still stripped from these views for non-admins (Security §4.3), so
+        // access to the receipts list does not expose sensitive data.
+        Gate::define('view-goods-receipts', function ($user) {
+            if ($user->hasRole('main_branch_admin')) {
+                return true;
+            }
+
+            return $user->hasRole('branch_supervisor')
+                && $user->assignedBranch?->type === 'main';
+        });
+
         // Gate: Determine if user can print garment labels (admin + receiving
         // staff). Mirrors PurchasePolicy::receive — label printing is part of
         // the goods receiving workflow (WF-2), so the same staff can print.

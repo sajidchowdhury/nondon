@@ -21,7 +21,9 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Receipt Number') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Purchase') }}</th>
+                        @if(auth()->user()?->hasRole('main_branch_admin'))
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Supplier') }}</th>
+                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Date') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Received By') }}</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Qty') }}</th>
@@ -33,7 +35,9 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{{ $receipt->receipt_number }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $receipt->purchase?->purchase_number }}</td>
+                        @if(auth()->user()?->hasRole('main_branch_admin'))
                         <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $receipt->purchase?->supplier?->name ?? __('N/A') }}</td>
+                        @endif
                         <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $receipt->received_date->format('M d, Y') }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $receipt->receiver?->display_name ?? __('N/A') }}</td>
                         <td class="px-6 py-4 text-sm text-right text-gray-900 dark:text-white">{{ $receipt->total_received_quantity }}</td>

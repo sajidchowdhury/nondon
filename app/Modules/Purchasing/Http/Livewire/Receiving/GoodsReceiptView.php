@@ -2,9 +2,8 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Receiving;
 
-use Livewire\Component;
 use App\Modules\Purchasing\Models\GoodsReceipt;
-use App\Modules\Purchasing\Models\Purchase;
+use Livewire\Component;
 
 class GoodsReceiptView extends Component
 {
@@ -12,8 +11,10 @@ class GoodsReceiptView extends Component
 
     public function mount(GoodsReceipt $receipt): void
     {
-        // Goods receipts are admin-only (same as purchases)
-        $this->authorize('viewAny', Purchase::class);
+        // Admins see all receipts; Main-Branch receiving staff (branch
+        // supervisors assigned to the Main Branch) can view receipts —
+        // the records of their own receiving workflow (WF-2).
+        $this->authorize('view-goods-receipts');
 
         $this->receipt = $receipt->load([
             'purchase.supplier',
@@ -24,8 +25,12 @@ class GoodsReceiptView extends Component
             'garments.fiscalYear',
         ]);
 
-        // Make garment purchase_cost visible — safe because this view is admin-only
-        $this->receipt->garments->each(fn ($g) => $g->withPurchaseCost());
+        // Make garment purchase_cost visible — only for admins. Supplier
+        // identity and cost stay hidden for receiving staff (Security §4.3);
+        // the view renders those columns conditionally for admins only.
+        if (auth()->user()?->hasRole('main_branch_admin')) {
+            $this->receipt->garments->each(fn ($g) => $g->withPurchaseCost());
+        }
     }
 
     public function render()
