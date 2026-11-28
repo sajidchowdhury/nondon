@@ -2,6 +2,7 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Receiving;
 
+use App\Modules\Audit\Services\AuditService;
 use App\Modules\Purchasing\Models\GoodsReceipt;
 use Livewire\Component;
 
@@ -30,6 +31,9 @@ class GoodsReceiptView extends Component
         // the view renders those columns conditionally for admins only.
         if (auth()->user()?->hasRole('main_branch_admin')) {
             $this->receipt->garments->each(fn ($g) => $g->withPurchaseCost());
+
+            // Security §4.3: restricted-data access is audit-logged.
+            app(AuditService::class)->logDataAccess('purchase_cost', 'goods_receipt', $receipt->id);
         }
     }
 

@@ -2,8 +2,9 @@
 
 namespace App\Modules\Inventory\Http\Livewire\Garments;
 
-use Livewire\Component;
+use App\Modules\Audit\Services\AuditService;
 use App\Modules\Inventory\Models\Garment;
+use Livewire\Component;
 
 class GarmentView extends Component
 {
@@ -19,15 +20,18 @@ class GarmentView extends Component
             'currentLocation',
             'fiscalYear',
         ]);
+
+        // Reveal purchase cost only for admin, and audit the sensitive-data
+        // access (Security §4.3: restricted-data access is logged).
+        if (auth()->user()?->hasRole('main_branch_admin')) {
+            $this->garment->withPurchaseCost();
+
+            app(AuditService::class)->logDataAccess('purchase_cost', 'garment', $garment->id);
+        }
     }
 
     public function render()
     {
-        // Reveal purchase cost only for admin
-        if (auth()->user()?->hasRole('main_branch_admin')) {
-            $this->garment->withPurchaseCost();
-        }
-
         return view('livewire.inventory.garments.view')
             ->layout('layouts.app');
     }

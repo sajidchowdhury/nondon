@@ -2,8 +2,9 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Suppliers;
 
-use Livewire\Component;
+use App\Modules\Audit\Services\AuditService;
 use App\Modules\Purchasing\Models\Supplier;
+use Livewire\Component;
 
 class SupplierView extends Component
 {
@@ -18,6 +19,10 @@ class SupplierView extends Component
         $supplier->withSensitiveInfo();
 
         $this->supplier = $supplier;
+
+        // Security §4.3: access to restricted supplier data is itself
+        // audit-logged (who viewed which supplier, when, from where).
+        app(AuditService::class)->logDataAccess('supplier_info', 'supplier', $supplier->id);
     }
 
     public function render()
