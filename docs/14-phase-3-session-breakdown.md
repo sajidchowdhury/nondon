@@ -21,7 +21,7 @@
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | COMPLETE | 94c7903 |
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | 2ce0a72 |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | COMPLETE | 7a44429 |
-| 3.7 Transfers UI — Request Creation, Approval & Dispatch | COMPLETE | (this session) |
+| 3.7 Transfers UI — Request Creation, Approval & Dispatch | COMPLETE | a66dbca |
 | 3.8 Transfer Receiving & Discrepancy Handling | PENDING | — |
 | 3.9 Cross-Branch Stock Visibility Browser & Reservation Board | PENDING | — |
 | 3.10 Customer History & Duplicate Merge | PENDING | — |
