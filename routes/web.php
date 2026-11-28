@@ -51,6 +51,10 @@ use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierView;
 use App\Modules\Sales\Http\Controllers\ReceiptPrintController;
 use App\Modules\Sales\Http\Livewire\POS\PointOfSale;
 use App\Modules\Sales\Http\Livewire\POS\PrintReceipt;
+use App\Modules\Transfers\Http\Livewire\Transfers\TransferCreate;
+use App\Modules\Transfers\Http\Livewire\Transfers\TransferList;
+use App\Modules\Transfers\Http\Livewire\Transfers\TransferView;
+use App\Modules\Transfers\Models\TransferRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -220,6 +224,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', CustomerCreate::class)->name('create');
         Route::get('/{customer}/edit', CustomerEdit::class)->name('edit');
         Route::get('/{customer}', CustomerView::class)->name('show');
+    });
+
+    // Transfer Management routes (Session 3.7)
+    Route::prefix('transfers')->name('transfers.')->group(function () {
+        Route::get('/', TransferList::class)->name('index');
+        Route::get('/create', TransferCreate::class)->name('create');
+        Route::get('/{transfer}', TransferView::class)->name('show');
+        Route::get('/{transfer}/dispatch-note', function (TransferRequest $transfer) {
+            abort_unless(auth()->user()?->can('view', $transfer), 403);
+            $transfer->load(['fromBranch', 'toBranch', 'dispatchedBy', 'items.garment', 'items.product', 'items.productSize']);
+
+            return view('transfers.dispatch-note', ['transfer' => $transfer]);
+        })->name('dispatch-note');
     });
 });
 

@@ -21,7 +21,7 @@
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | COMPLETE | 94c7903 |
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | 2ce0a72 |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | COMPLETE | 7a44429 |
-| 3.7 Transfers UI — Request Creation, Approval & Dispatch | PENDING | — |
+| 3.7 Transfers UI — Request Creation, Approval & Dispatch | COMPLETE | (this session) |
 | 3.8 Transfer Receiving & Discrepancy Handling | PENDING | — |
 | 3.9 Cross-Branch Stock Visibility Browser & Reservation Board | PENDING | — |
 | 3.10 Customer History & Duplicate Merge | PENDING | — |
@@ -857,14 +857,14 @@ Constructor injects `InventoryMovementService`, `StockQueryService`, `TransferNu
 - Online supervisor can create requests TO the online channel.
 - No sensitive data (`purchase_cost`, supplier) in any transfer view.
 
-### Acceptance criteria — Session 3.7
-- [ ] Transfer list is branch-scoped and role-gated.
-- [ ] Cross-branch stock picker shows only `available` garments at the source branch, with no supplier/cost data.
-- [ ] Approve, reject (with reason + release), and dispatch work via the UI with correct state transitions.
-- [ ] Dispatch note is printable.
-- [ ] Role gating enforced (source vs destination supervisor; salesperson blocked).
-- [ ] No sensitive data in transfer views.
-- [ ] ~18 tests written.
+### Acceptance criteria — Session 3.7 (COMPLETE)
+- [x] Transfer list is branch-scoped (from OR to user's branch) and role-gated (supervisor/admin 200, salesperson 403 on viewAny; guest redirected).
+- [x] Cross-branch stock picker (searchStock via StockQueryService::searchGarments) shows only `available` garments at the source branch, with no supplier/cost data (searchGarments already calls makeHidden('purchase_cost'); verified no 'purchase_cost' key in results).
+- [x] Approve (pending→approved, stays reserved), reject (with reason + releases reservations → available), and dispatch (approved→dispatched, garments→in_transit) all work via the UI with correct state transitions (all via TransferService calls).
+- [x] Dispatch note is printable (GET /transfers/{transfer}/dispatch-note renders an A4 @page view with request number, from/to, items; policy view enforced; 403 for non-involved users).
+- [x] Role gating enforced: source-branch supervisor approves/dispatches; destination supervisor cannot approve (denied via TransferRequestPolicy::approve — action shows 'do not have permission'); salesperson can view involved transfers but cannot act (action denied, no transfer.approve permission).
+- [x] No sensitive data (purchase_cost) in any transfer view — verified the transfer detail HTML doesn't contain the garment's purchase_cost value.
+- [x] 26 tests written (64 assertions) — all acceptance criteria covered.
 
 ---
 
