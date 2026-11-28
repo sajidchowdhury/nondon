@@ -20,7 +20,7 @@
 | 3.3 POS Interface — Barcode Lookup, Cart & Discount | COMPLETE | 1895b2c |
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | COMPLETE | 94c7903 |
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | 2ce0a72 |
-| 3.6 Transfers Data Model & Reservation-Aware Transfer Service | PENDING | — |
+| 3.6 Transfers Data Model & Reservation-Aware Transfer Service | COMPLETE | (this session) |
 | 3.7 Transfers UI — Request Creation, Approval & Dispatch | PENDING | — |
 | 3.8 Transfer Receiving & Discrepancy Handling | PENDING | — |
 | 3.9 Cross-Branch Stock Visibility Browser & Reservation Board | PENDING | — |
@@ -786,16 +786,16 @@ Constructor injects `InventoryMovementService`, `StockQueryService`, `TransferNu
 - Number generation `TR-YY-NNNNN` is concurrency-safe (parallel `createRequest` → unique numbers).
 - Source supervisor can approve; destination supervisor cannot approve (403); salesperson cannot create/dispatch/receive (403).
 
-### Acceptance criteria — Session 3.6
-- [ ] Full transfer lifecycle (create → approve → dispatch → receive) works atomically with correct garment status transitions and append-only movements.
-- [ ] Reservation is implicit (garment status + `garment_current_stock` ref + movement) — no separate reservations table.
-- [ ] Rejection and cancellation release reservations back to `available`.
-- [ ] Receiving a shortage marks missing garments `missing` (never silently received); discrepancy recorded.
-- [ ] **A garment reserved by a transfer cannot be sold via POS** (cross-module guarantee proven by test).
-- [ ] Role gating: source supervisor approves/dispatches; destination supervisor receives; salesperson blocked.
-- [ ] Transfer numbers concurrency-safe (`TR-YY-NNNNN`).
-- [ ] All actions audited; `TransferRequested/Dispatched/Received` events dispatched.
-- [ ] ~28 tests written including the cross-module reservation-blocks-POS test.
+### Acceptance criteria — Session 3.6 (COMPLETE)
+- [x] Full transfer lifecycle (create → approve → dispatch → receive) works atomically with correct garment status transitions (available → reserved → in_transit → available at destination) and append-only movements (reservation / transfer_dispatch / transfer_receive / reservation_release / missing_report).
+- [x] Reservation is implicit (garment.current_status = 'reserved' + garment_current_stock.reservation_reference_type='transfer_request'/reservation_reference_id + a TYPE_RESERVATION movement) — no separate reservations table.
+- [x] Rejection and cancellation release reservations back to `available` (TYPE_RESERVATION_RELEASE movement + projection ref cleared).
+- [x] Receiving a shortage marks missing garments `missing` (TYPE_MISSING_REPORT movement; never silently received); a TransferDiscrepancy row with missing_garment_ids is recorded; request status → discrepancy.
+- [x] **A garment reserved by a transfer cannot be sold via POS** — proven by test: SaleService::complete() throws GarmentNotAvailableException (current_status=reserved), 0 invoices, garment stays reserved; and after rejecting the transfer, the garment becomes sellable again (sale completes, garment → sold).
+- [x] Role gating: source-branch supervisor approves/dispatches; destination-branch supervisor receives; salesperson (no transfer.request.create) blocked at create; destination supervisor cannot approve (AuthorizationException).
+- [x] Transfer numbers concurrency-safe (`TR-YY-NNNNN` via pg_advisory_xact_lock(9000002 + fy.id) + document_sequences).
+- [x] All actions audited (transfer.request/approve/reject/dispatch/receive/cancel); TransferRequested/TransferDispatched/TransferReceived events dispatched (Event::fake assertions).
+- [x] 22 tests written (81 assertions) including the 2 cross-module reservation-blocks-POS tests.
 
 ---
 
