@@ -138,8 +138,8 @@
         @endif
 
         @if($canReceive && $transfer->isDispatched())
-        <a href="#" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm">
-            {{ __('Receive') }} ({{ __('Session 3.8') }})
+        <a href="{{ route('transfers.receive', $transfer) }}" wire:navigate class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm">
+            {{ __('Receive') }}
         </a>
         @endif
 

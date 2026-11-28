@@ -4,6 +4,7 @@ namespace App\Modules\Transfers;
 
 use App\Modules\Transfers\Http\Livewire\Transfers\TransferCreate;
 use App\Modules\Transfers\Http\Livewire\Transfers\TransferList;
+use App\Modules\Transfers\Http\Livewire\Transfers\TransferReceive;
 use App\Modules\Transfers\Http\Livewire\Transfers\TransferView;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -28,5 +29,6 @@ class TransfersServiceProvider extends ServiceProvider
         Livewire::component('transfers.transfer-list', TransferList::class);
         Livewire::component('transfers.transfer-create', TransferCreate::class);
         Livewire::component('transfers.transfer-view', TransferView::class);
+        Livewire::component('transfers.transfer-receive', TransferReceive::class);
     }
 }

@@ -22,7 +22,7 @@
 | 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | 2ce0a72 |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | COMPLETE | 7a44429 |
 | 3.7 Transfers UI — Request Creation, Approval & Dispatch | COMPLETE | a66dbca |
-| 3.8 Transfer Receiving & Discrepancy Handling | PENDING | — |
+| 3.8 Transfer Receiving & Discrepancy Handling | COMPLETE | (this session) |
 | 3.9 Cross-Branch Stock Visibility Browser & Reservation Board | PENDING | — |
 | 3.10 Customer History & Duplicate Merge | PENDING | — |
 | 3.11 Phase 3 Integration & Sensitive-Data Hardening | PENDING | — |
@@ -911,14 +911,14 @@ Constructor injects `InventoryMovementService`, `StockQueryService`, `TransferNu
 - Salesperson cannot receive (403).
 - Transfer history (movement descriptions) renders correctly for a transferred garment.
 
-### Acceptance criteria — Session 3.8
-- [ ] Receiving works by scan or by quantity entry.
-- [ ] Shortages record discrepancies and mark missing garments `missing` (never silently received).
-- [ ] Excess garments are flagged.
-- [ ] Full receipt moves garments to `available` at the destination branch.
-- [ ] Receiving is destination-branch gated; salesperson blocked.
-- [ ] Discrepancy rows are `open` (resolution deferred to Phase 7).
-- [ ] ~16 tests written.
+### Acceptance criteria — Session 3.8 (COMPLETE)
+- [x] Receiving works by scan (scanBarcode → GarmentIdentityService::lookupByBarcode/lookupBySerial → mark received) or by quantity entry (applyQuantities → marks the first N by serial order per product/size group).
+- [x] Shortages record discrepancies (TransferDiscrepancy type=shortage with missing_garment_ids) and mark missing garments `missing` (TYPE_MISSING_REPORT movement; never a TYPE_TRANSFER_RECEIVE movement for missing garments — verified by test).
+- [x] Excess garments are flagged (scanned garments not in the transfer → discrepancy type=excess with excess_garment_ids).
+- [x] Full receipt (all received) moves garments to `available` at the destination branch (current_branch_id = to_branch_id, current_status = available).
+- [x] Receiving is destination-branch gated (source supervisor 403, salesperson 403; destination supervisor 200).
+- [x] Discrepancy rows are `open` (status = 'open'; resolution deferred to Phase 7 Stock Control).
+- [x] 14 tests written (35 assertions) — all acceptance criteria covered, including the transfer-history movement-description test.
 
 ---
 

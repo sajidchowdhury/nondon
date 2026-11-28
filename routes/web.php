@@ -53,6 +53,7 @@ use App\Modules\Sales\Http\Livewire\POS\PointOfSale;
 use App\Modules\Sales\Http\Livewire\POS\PrintReceipt;
 use App\Modules\Transfers\Http\Livewire\Transfers\TransferCreate;
 use App\Modules\Transfers\Http\Livewire\Transfers\TransferList;
+use App\Modules\Transfers\Http\Livewire\Transfers\TransferReceive;
 use App\Modules\Transfers\Http\Livewire\Transfers\TransferView;
 use App\Modules\Transfers\Models\TransferRequest;
 use Illuminate\Http\Request;
@@ -231,6 +232,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', TransferList::class)->name('index');
         Route::get('/create', TransferCreate::class)->name('create');
         Route::get('/{transfer}', TransferView::class)->name('show');
+        Route::get('/{transfer}/receive', TransferReceive::class)->name('receive');
         Route::get('/{transfer}/dispatch-note', function (TransferRequest $transfer) {
             abort_unless(auth()->user()?->can('view', $transfer), 403);
             $transfer->load(['fromBranch', 'toBranch', 'dispatchedBy', 'items.garment', 'items.product', 'items.productSize']);
