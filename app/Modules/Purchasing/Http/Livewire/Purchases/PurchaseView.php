@@ -2,9 +2,9 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Purchases;
 
-use Livewire\Component;
+use App\Modules\Audit\Services\AuditService;
 use App\Modules\Purchasing\Models\Purchase;
-use App\Modules\Purchasing\Services\PurchasingService;
+use Livewire\Component;
 
 class PurchaseView extends Component
 {
@@ -29,6 +29,10 @@ class PurchaseView extends Component
         // by the 'view' policy (admin only).
         $this->purchase->withTotalCost();
         $this->purchase->items->each(fn ($item) => $item->withUnitCost());
+
+        // Security §4.3: access to restricted purchase cost data is itself
+        // audit-logged (who viewed which purchase, when, from where).
+        app(AuditService::class)->logDataAccess('purchase_cost', 'purchase', $purchase->id);
     }
 
     public function render()

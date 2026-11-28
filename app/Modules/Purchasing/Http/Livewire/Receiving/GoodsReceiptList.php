@@ -2,10 +2,9 @@
 
 namespace App\Modules\Purchasing\Http\Livewire\Receiving;
 
+use App\Modules\Purchasing\Models\GoodsReceipt;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Modules\Purchasing\Models\GoodsReceipt;
-use App\Modules\Purchasing\Models\Purchase;
 
 class GoodsReceiptList extends Component
 {
@@ -26,13 +25,16 @@ class GoodsReceiptList extends Component
 
     public function render()
     {
-        // Goods receipts are admin-only (same as purchases)
-        $this->authorize('viewAny', Purchase::class);
+        // Admins see all receipts; Main-Branch receiving staff (branch
+        // supervisors assigned to the Main Branch) see the receipts of
+        // their own receiving workflow. Sensitive fields (supplier identity,
+        // purchase cost) are hidden for non-admins in the view layer.
+        $this->authorize('view-goods-receipts');
 
         $query = GoodsReceipt::query()
             ->with(['purchase.supplier', 'receiver']);
 
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $query->search($this->search);
         }
 

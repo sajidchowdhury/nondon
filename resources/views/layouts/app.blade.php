@@ -54,6 +54,21 @@
                                 {{ __('Purchases') }}
                             </x-nav-link>
                             @endcan
+                            @can('view-goods-receipts')
+                            <x-nav-link href="{{ route('goods-receipts.index') }}" :active="request()->routeIs('goods-receipts.*')">
+                                {{ __('Goods Receipts') }}
+                            </x-nav-link>
+                            @endcan
+                            @can('print-labels')
+                            <x-nav-link href="{{ route('labels.print') }}" :active="request()->routeIs('labels.*')">
+                                {{ __('Print Labels') }}
+                            </x-nav-link>
+                            @endcan
+                            @can('manage-printer-settings')
+                            <x-nav-link href="{{ route('settings.printers') }}" :active="request()->routeIs('settings.printers')">
+                                {{ __('Printer Settings') }}
+                            </x-nav-link>
+                            @endcan
                             @can('viewAny', \App\Modules\Inventory\Models\Garment::class)
                             <x-nav-link href="{{ route('garments.index') }}" :active="request()->routeIs('garments.*')">
                                 {{ __('Garments') }}

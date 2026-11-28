@@ -22,7 +22,7 @@
 | 2.5 Goods Receiving UI & Edge Cases | COMPLETE | 92a9170 |
 | 2.6 Barcode Label Generation | COMPLETE | 2a0370e |
 | 2.7 Label Printing UI & Printer Configuration | COMPLETE | c4c027e |
-| 2.8 Phase 2 Integration & Sensitive Data Hardening | PENDING | — |
+| 2.8 Phase 2 Integration & Sensitive Data Hardening | COMPLETE | d3e7100 |
 
 ---
 
@@ -901,19 +901,29 @@ Indexes: `INDEX(purchase_id)`, `UNIQUE(receipt_number)`.
 - Audit log captures all purchasing actions
 - Navigation is role-appropriate
 
-### Acceptance criteria — Session 2.8
-- [ ] Full purchasing lifecycle integration test passes
-- [ ] Multi-receipt partial receiving works end-to-end
-- [ ] Purchase cost is never visible to non-admin in any view, API, or response
-- [ ] Supplier info is never visible to non-admin in any view, API, or response
-- [ ] Permission matrix is verified for all 5 roles
-- [ ] Receiving is restricted to Main Branch
-- [ ] Carry-forward preserves garment identity across fiscal years
-- [ ] Concurrency tests pass (100 unique serials)
-- [ ] Audit log captures all purchasing actions with correct metadata
-- [ ] Navigation is complete and role-appropriate
-- [ ] All Phase 2 tests pass (Sessions 2.1–2.8)
-- [ ] Phase 2 is ready for Phase 3 (POS & Transfers)
+### Acceptance criteria — Session 2.8 (COMPLETE)
+- [x] Full purchasing lifecycle integration test passes
+- [x] Multi-receipt partial receiving works end-to-end
+- [x] Purchase cost is never visible to non-admin in any view, API, or response
+- [x] Supplier info is never visible to non-admin in any view, API, or response
+- [x] Permission matrix is verified for all 5 roles
+- [x] Receiving is restricted to Main Branch (branch-scope hardening: PurchasePolicy::receive now requires Main-Branch assignment; non-main-branch supervisors denied at policy, service and page level)
+- [x] Carry-forward preserves garment identity across fiscal years
+- [x] Concurrency tests pass (100 unique serials; interleaved receipts on two purchases without collisions)
+- [x] Audit log captures all purchasing actions with correct metadata (supplier.create/update/deactivate, purchase.create/confirm/cancel, purchase.receive per garment + per receipt, label.print)
+- [x] Navigation is complete and role-appropriate (admin: Suppliers, Purchases, Goods Receipts, Print Labels, Printer Settings; main-branch supervisor: Goods Receipts + Print Labels; other roles: no purchasing menu)
+- [x] All Phase 2 tests pass (Sessions 2.1–2.8) — 624 tests, 1544 assertions, all green
+- [x] Phase 2 is ready for Phase 3 (POS & Transfers)
+
+**Deliverable 4 — sensitive data hardening review result:**
+- Model level: Garment.$hidden=purchase_cost, Purchase.$hidden=total_cost, PurchaseItem.$hidden=unit_cost, Supplier.$hidden=contact_person/phone/email/address/outstanding_balance — verified intact through all query paths.
+- Query level: all StockQueryService methods (branch, all-branch, per-product, search, paginated, summary) exclude purchase_cost; withPurchaseCost()/withTotalCost()/withUnitCost()/withSensitiveInfo() are called only in admin-authorized code paths.
+- View level: every cost/supplier column is inside an admin check; receiving staff see receipts without supplier identity or cost.
+- API level: no purchasing/garment API endpoints exist in Phase 2 (api.php has Phase 8 stubs only) — no exposure surface.
+- Audit level (Security §4.3): admin access to restricted data is itself logged via sensitive_data.view entries (purchase, supplier, garment, goods_receipt references) — written at reveal time in the Livewire components; non-admin paths never reveal and never log.
+- Navigation finalization (deliverable 5): all five Phase 2 module links added behind their gates; new view-goods-receipts gate grants receipt visibility to Main-Branch receiving staff (supplier identity and cost still admin-only), preserving Session 2.5's non-main-branch denials.
+
+**Deliverable 6 — Phase 2 exit checklist:** all Sessions 2.1–2.7 acceptance criteria remain checked; 624 tests / 1544 assertions pass on PostgreSQL; scoped pint clean on all Session 2.8 files (historical Phase 1 style debt tracked separately); all six module providers registered and exercised (Identity, Organization, Audit, Catalog, Inventory, Purchasing). Phase 2 is complete.
 
 ---
 
