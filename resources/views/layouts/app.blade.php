@@ -24,6 +24,11 @@
                             <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
+                            @can('create', \App\Modules\Sales\Models\SaleInvoice::class)
+                            <x-nav-link href="{{ route('pos.index') }}" :active="request()->routeIs('pos.*')">
+                                {{ __('POS') }}
+                            </x-nav-link>
+                            @endcan
                             @can('viewAny', \App\Modules\Identity\Models\User::class)
                             <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
                                 {{ __('Users') }}

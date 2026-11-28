@@ -44,4 +44,30 @@ class BelowMinimumPriceException extends RuntimeException
             'minimum_price' => $this->minimumPrice,
         ];
     }
+
+    /**
+     * Convenience factory: a negative discount was attempted.
+     */
+    public static function forNegativeDiscount(int $garmentId): self
+    {
+        return new self(
+            garmentId: $garmentId,
+            finalPrice: '0.00',
+            minimumPrice: '0.00',
+            message: __('Discount cannot be negative for garment :id.', ['id' => $garmentId]),
+        );
+    }
+
+    /**
+     * Convenience factory: a discount exceeding the standard price.
+     */
+    public static function forDiscountExceedsStandard(int $garmentId): self
+    {
+        return new self(
+            garmentId: $garmentId,
+            finalPrice: '0.00',
+            minimumPrice: '0.00',
+            message: __('Discount cannot exceed the standard price for garment :id.', ['id' => $garmentId]),
+        );
+    }
 }

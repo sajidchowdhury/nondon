@@ -48,6 +48,7 @@ use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierCreate;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierEdit;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierList;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierView;
+use App\Modules\Sales\Http\Livewire\POS\PointOfSale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -109,6 +110,9 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
+
+    // POS interface (Session 3.3)
+    Route::get('/pos', PointOfSale::class)->name('pos.index');
 
     // Role switching (for multi-role users)
     Route::get('/role/select', RoleSwitcher::class)->name('role.select');
