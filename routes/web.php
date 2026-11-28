@@ -48,7 +48,9 @@ use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierCreate;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierEdit;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierList;
 use App\Modules\Purchasing\Http\Livewire\Suppliers\SupplierView;
+use App\Modules\Sales\Http\Controllers\ReceiptPrintController;
 use App\Modules\Sales\Http\Livewire\POS\PointOfSale;
+use App\Modules\Sales\Http\Livewire\POS\PrintReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -113,6 +115,10 @@ Route::middleware('auth')->group(function () {
 
     // POS interface (Session 3.3)
     Route::get('/pos', PointOfSale::class)->name('pos.index');
+
+    // Receipt printing (Session 3.5)
+    Route::get('/pos/receipts/{invoice}', ReceiptPrintController::class)->name('sales.receipts.print');
+    Route::get('/pos/print-receipt/{invoiceId}', PrintReceipt::class)->name('pos.print-receipt');
 
     // Role switching (for multi-role users)
     Route::get('/role/select', RoleSwitcher::class)->name('role.select');

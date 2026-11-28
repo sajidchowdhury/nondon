@@ -19,7 +19,7 @@
 | 3.2 Sales Data Model & Atomic Sale Service | COMPLETE | 5192d21 |
 | 3.3 POS Interface — Barcode Lookup, Cart & Discount | COMPLETE | 1895b2c |
 | 3.4 POS Checkout — Payment, Completion & Customer Linking | COMPLETE | 94c7903 |
-| 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | PENDING | — |
+| 3.5 Receipt Printing — Thermal 58/80mm & A4, No-Tax-Line | COMPLETE | (this session) |
 | 3.6 Transfers Data Model & Reservation-Aware Transfer Service | PENDING | — |
 | 3.7 Transfers UI — Request Creation, Approval & Dispatch | PENDING | — |
 | 3.8 Transfer Receiving & Discrepancy Handling | PENDING | — |
@@ -631,13 +631,13 @@ Constructor injects `InventoryMovementService`, `PriceService`, `SaleNumberServi
 - Non-owning-branch salesperson cannot print another branch's invoice (403 via policy).
 - Walk-in sale (no customer) renders without a customer block.
 
-### Acceptance criteria — Session 3.5
-- [ ] Receipts render for 58mm, 80mm, and A4 with correct `@page` sizing.
-- [ ] No tax/VAT line on any receipt format (ADR-010).
-- [ ] `purchase_cost` never appears on a receipt.
-- [ ] Only completed invoices are printable; branch scope enforced.
-- [ ] Return-policy footer uses the sale-time snapshot.
-- [ ] ~12 tests written.
+### Acceptance criteria — Session 3.5 (COMPLETE)
+- [x] Receipts render for 58mm, 80mm, and A4 with correct `@page` sizing (`@page receipt-80mm { size: 80mm auto }` / `58mm auto` / `A4`; verified by tests asserting the directives + the wrapper class appear).
+- [x] No tax/VAT line on any receipt format (ADR-010) — verified none of "VAT", "Tax", "ট্যাক্স", "GST" appear in any of the three rendered formats; ADR-010 code comments placed in each view.
+- [x] `purchase_cost` never appears on a receipt — verified with a garment carrying `purchase_cost = 250.00` that none of the three formats render "250.00" or "purchase_cost".
+- [x] Only completed invoices are printable (draft redirects to POS with an error); branch scope enforced (salesperson of another branch gets 403 via the SaleInvoicePolicy::view gate; admin prints any).
+- [x] Return-policy footer uses the sale-time snapshot (`return_policy_snapshot.return_period_days` → "Returns within N days at this branch"; verified with default 7 and a custom 14).
+- [x] 18 tests written (62 assertions) — all acceptance criteria covered, including the walk-in (no customer) case and the PrintReceipt Livewire component.
 
 ---
 

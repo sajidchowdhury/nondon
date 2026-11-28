@@ -9,8 +9,9 @@
         <p class="text-sm font-medium text-green-800 dark:text-green-200">{{ $completionSuccess }}</p>
         @if($completedInvoiceId)
         <div class="mt-3 flex flex-wrap gap-3">
-            {{-- Print receipt is wired up in Session 3.5; the route will exist then. --}}
-            <a href="#" class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md shadow-sm">
+            {{-- Print receipt (Session 3.5): opens the print-receipt page with a format selector + browser print. --}}
+            <a href="{{ route('pos.print-receipt', ['invoiceId' => $completedInvoiceId]) }}" wire:navigate
+               class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md shadow-sm">
                 {{ __('Print receipt') }}
             </a>
             <button wire:click="backToPos" class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
