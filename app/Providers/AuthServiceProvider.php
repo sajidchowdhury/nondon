@@ -8,6 +8,8 @@ use App\Modules\Catalog\Models\ProductSize;
 use App\Modules\Catalog\Policies\PricePolicy;
 use App\Modules\Catalog\Policies\ProductPolicy;
 use App\Modules\Catalog\Policies\ProductSizePolicy;
+use App\Modules\Customers\Models\Customer;
+use App\Modules\Customers\Policies\CustomerPolicy;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Policies\UserPolicy;
 use App\Modules\Inventory\Models\Garment;
@@ -43,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         Garment::class => GarmentPolicy::class,
         Supplier::class => SupplierPolicy::class,
         Purchase::class => PurchasePolicy::class,
+        Customer::class => CustomerPolicy::class,
     ];
 
     /**

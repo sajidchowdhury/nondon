@@ -6,6 +6,10 @@ use App\Modules\Catalog\Http\Livewire\Products\ProductCreate;
 use App\Modules\Catalog\Http\Livewire\Products\ProductEdit;
 use App\Modules\Catalog\Http\Livewire\Products\ProductList;
 use App\Modules\Catalog\Http\Livewire\Products\ProductView;
+use App\Modules\Customers\Http\Livewire\Customers\CustomerCreate;
+use App\Modules\Customers\Http\Livewire\Customers\CustomerEdit;
+use App\Modules\Customers\Http\Livewire\Customers\CustomerList;
+use App\Modules\Customers\Http\Livewire\Customers\CustomerView;
 use App\Modules\Identity\Http\Livewire\Auth\Dashboard;
 use App\Modules\Identity\Http\Livewire\Auth\Login;
 use App\Modules\Identity\Http\Livewire\Auth\RoleSwitcher;
@@ -199,6 +203,14 @@ Route::middleware('auth')->group(function () {
 
     // Printer Settings route (Session 2.7)
     Route::get('/settings/printers', PrinterSettings::class)->name('settings.printers');
+
+    // Customer Management routes (Session 3.1)
+    Route::prefix('customers')->name('customers.')->group(function () {
+        Route::get('/', CustomerList::class)->name('index');
+        Route::get('/create', CustomerCreate::class)->name('create');
+        Route::get('/{customer}/edit', CustomerEdit::class)->name('edit');
+        Route::get('/{customer}', CustomerView::class)->name('show');
+    });
 });
 
 // Root redirect

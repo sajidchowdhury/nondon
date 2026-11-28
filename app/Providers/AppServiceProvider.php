@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Catalog\CatalogServiceProvider;
+use App\Modules\Customers\CustomersServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Inventory\InventoryServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
@@ -49,8 +50,9 @@ class AppServiceProvider extends ServiceProvider
             CatalogServiceProvider::class,
             InventoryServiceProvider::class,
 
-            // Business modules (to be added in later phases)
+            // Business modules
             PurchasingServiceProvider::class,
+            CustomersServiceProvider::class,
             // \App\Modules\Transfers\TransfersServiceProvider::class,
             // \App\Modules\Sales\SalesServiceProvider::class,
             // \App\Modules\OnlineOrders\OnlineOrdersServiceProvider::class,
@@ -61,7 +63,6 @@ class AppServiceProvider extends ServiceProvider
             // \App\Modules\DamagedStock\DamagedStockServiceProvider::class,
             // \App\Modules\Expenses\ExpensesServiceProvider::class,
             // \App\Modules\SupplierPayments\SupplierPaymentsServiceProvider::class,
-            // \App\Modules\Customers\CustomersServiceProvider::class,
             // \App\Modules\Reporting\ReportingServiceProvider::class,
             // \App\Modules\Audit\AuditServiceProvider::class,
             // \App\Modules\Notifications\NotificationsServiceProvider::class,
